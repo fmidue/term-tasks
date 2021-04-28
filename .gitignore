@@ -1,0 +1,15 @@
+.stack-work/
+stack.yaml.lock
+*.aux
+*.blg
+*.bbl
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lol
+*.lot
+*.out
+*.synctex.gz
+*.toc
+*~
