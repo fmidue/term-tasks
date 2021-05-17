@@ -1,10 +1,10 @@
 name: ba-ma-template
 extra-source-files: []
 dependencies:
-  - base
+  - base 
 library:
   source-dirs: src
-  exposed-modules: []
+  exposed-modules: Lib
   ghc-options:
     - -Wall
     - -Werror
@@ -26,3 +26,4 @@ tests:
     dependencies:
       - ba-ma-template
       - hspec
+      - split
