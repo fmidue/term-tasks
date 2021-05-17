@@ -4,7 +4,9 @@ dependencies:
   - base 
 library:
   source-dirs: src
-  exposed-modules: Lib
+  exposed-modules: []
+  build-depends : base >= 4.0 && <5
+                 ,split
   ghc-options:
     - -Wall
     - -Werror
