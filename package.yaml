@@ -5,7 +5,6 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules: []
-  build-depends : split == 0.2.3.3
   ghc-options:
     - -Wall
     - -Werror
@@ -27,4 +26,4 @@ tests:
     dependencies:
       - ba-ma-template
       - hspec
-      - split
+
