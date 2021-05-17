@@ -1,7 +1,7 @@
 name: ba-ma-template
 extra-source-files: []
 dependencies:
-  - base
+  - base 
 library:
   source-dirs: src
   exposed-modules: []
@@ -26,3 +26,4 @@ tests:
     dependencies:
       - ba-ma-template
       - hspec
+
