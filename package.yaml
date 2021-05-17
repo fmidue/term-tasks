@@ -5,8 +5,7 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules: []
-  build-depends : base >= 4.0 && <5
-                 ,split
+  build-depends : split == 0.2.3.3
   ghc-options:
     - -Wall
     - -Werror
