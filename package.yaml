@@ -1,7 +1,7 @@
-name: ba-ma-template
+name: ba-jiarui-liu
 extra-source-files: []
 dependencies:
-  - base 
+  - base
 library:
   source-dirs: src
   exposed-modules: []
@@ -13,9 +13,9 @@ executables:
     main: default.hs
     source-dirs: app
     dependencies:
-      - ba-ma-template
+      - ba-jiarui-liu
 tests:
-  ba-ma-template-test:
+  ba-jiarui-liu-test:
     main: Spec.hs
     source-dirs:
       - test
@@ -24,6 +24,5 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - ba-ma-template
+      - ba-jiarui-liu
       - hspec
-

@@ -1,0 +1,48 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 560aa235d39e0df8144dea4fc1ddba6d1f7eb1d20fb8cf658b4c4996d31574d7
+
+name:           ba-jiarui-liu
+version:        0.0.0
+build-type:     Simple
+
+library
+  other-modules:
+      Paths_ba_jiarui_liu
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Werror
+  build-depends:
+      base
+  default-language: Haskell2010
+
+executable default
+  main-is: default.hs
+  other-modules:
+      FourthTask
+      ThirdTask
+      Paths_ba_jiarui_liu
+  hs-source-dirs:
+      app
+  build-depends:
+      ba-jiarui-liu
+    , base
+  default-language: Haskell2010
+
+test-suite ba-jiarui-liu-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_ba_jiarui_liu
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      ba-jiarui-liu
+    , base
+    , hspec
+  default-language: Haskell2010
