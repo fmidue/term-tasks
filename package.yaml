@@ -2,6 +2,7 @@ name: ba-jiarui-liu
 extra-source-files: []
 dependencies:
   - base
+  - split
 library:
   source-dirs: src
   exposed-modules: []
