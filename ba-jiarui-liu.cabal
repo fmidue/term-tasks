@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 59cf09a5174c5e202cc2ed090fcc2979764a394008bc92c814830fbb5f280a14
+-- hash: c96d418b612089bf3905edca9601f8436b35f45f81f3cd5270ec328fc9f598e0
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -18,20 +18,6 @@ library
   ghc-options: -Wall -Werror
   build-depends:
       base
-    , split
-  default-language: Haskell2010
-
-executable default
-  main-is: default.hs
-  other-modules:
-      FourthTask
-      ThirdTask
-      Paths_ba_jiarui_liu
-  hs-source-dirs:
-      app
-  build-depends:
-      ba-jiarui-liu
-    , base
     , split
   default-language: Haskell2010
 

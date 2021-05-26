@@ -9,12 +9,6 @@ library:
   ghc-options:
     - -Wall
     - -Werror
-executables:
-  default:
-    main: default.hs
-    source-dirs: app
-    dependencies:
-      - ba-jiarui-liu
 tests:
   ba-jiarui-liu-test:
     main: Spec.hs
