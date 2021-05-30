@@ -79,9 +79,7 @@ makeTerm w (FunctionSymbol a x y : xs)
    where n = makeSymbol w (FunctionSymbol a x y)
 
 checkExist :: [FunctionSymbol] -> Bool
-checkExist xs = if FunctionSymbol "o" [] O `elem` xs
-                then False
-                else True
+checkExist xs = not (FunctionSymbol "o" [] O `elem` xs)
 
 checkType' :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 checkType' _ [] _ = []
@@ -125,7 +123,7 @@ toEnd (Term x (FunctionSymbol y xs t:ys))
 toEnd (Function s xs) = s ++ "(" ++ intercalate "," (map toEnd xs) ++ ")"
 
 term' :: Int -> Signature -> [Term] -> [Term]
-term' n (Signature xs) w = if (makeTerm' xs b w \\ w) == []
+term' n (Signature xs) w = if null (makeTerm' xs b w \\ w)
                            then makeTerm' xs b w
                            else term' n (Signature xs) (w ++ (makeTerm' xs b w \\ w))
                            where a = checkElement xs
