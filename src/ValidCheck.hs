@@ -15,10 +15,9 @@ module ValidCheck (
 
 import DataType
 
-tr = [FunctionSymbol "x" [] A,FunctionSymbol "y" [] B,FunctionSymbol "z" [] C,FunctionSymbol "f" [A,A] B,FunctionSymbol "g" [A,B] C,FunctionSymbol "h" [A,B,C] D]
-
 hasType :: Term -> Type -> Bool
 hasType x t = checkType t x tr
+   where tr = [FunctionSymbol "x" [] A,FunctionSymbol "y" [] B,FunctionSymbol "z" [] C,FunctionSymbol "f" [A,A] B,FunctionSymbol "g" [A,B] C,FunctionSymbol "h" [A,B,C] D]
 
 isValid :: Signature -> Term -> Bool
 isValid (Signature xs) t = checkNumber t a && checkType b t xs && checkSymbol d c
@@ -54,6 +53,7 @@ checkType t (Function s xs) w = a && b
 
 checkType' :: [Type] ->[Term] -> [FunctionSymbol] -> Bool
 checkType' _ [] _ = True
+checkType' [] _ _ = True
 checkType' (t:ts) (Term a x:xs) w = checkType' ts xs w && giveType (Term a x) w == t
 checkType' (t:ts) (Function a x':xs) w = checkType' n x' w && checkType' ts xs w && giveType (Function a x') w == t
    where n = make x' w 
