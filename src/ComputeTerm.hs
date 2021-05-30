@@ -25,7 +25,7 @@ import DataType
 -- first parameter is a bound on complexity of terms
 term :: Int -> Signature -> [Term]
 term n (Signature xs) = if maximum(checkLength b) <= n 
-                        then term' n (Signature xs) d
+                        then nub (makeSingleTerms a ++ term' n (Signature xs) d)
                         else []
                         where a = checkElement xs
                               b = xs \\ a 
@@ -79,7 +79,7 @@ makeTerm w (FunctionSymbol a x y : xs)
    where n = makeSymbol w (FunctionSymbol a x y)
 
 checkExist :: [FunctionSymbol] -> Bool
-checkExist xs = not (FunctionSymbol "o" [] O `elem` xs)
+checkExist xs = notElem (FunctionSymbol "o" [] O) xs
 
 checkType' :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 checkType' _ [] _ = []
