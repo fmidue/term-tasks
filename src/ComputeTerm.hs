@@ -79,7 +79,7 @@ makeTerm w (FunctionSymbol a x y : xs)
    where n = makeSymbol w (FunctionSymbol a x y)
 
 checkExist :: [FunctionSymbol] -> Bool
-checkExist xs = notElem (FunctionSymbol "o" [] O) xs
+checkExist = notElem (FunctionSymbol "o" [] O)
 
 checkType' :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 checkType' _ [] _ = []
