@@ -1,20 +1,21 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 22a7e1d4d3676be4d05cf596e6f8811414c1a795065fdfc35a5419331d5b8181
+-- hash: cea92b0a675a9fd9bd8d762a62b6232cfaa7d281a45654e7a1fc01f9ba591aff
 
 name:           ba-jiarui-liu
 version:        0.0.0
 build-type:     Simple
 
 library
-  other-modules:
+  exposed-modules:
       ComputeTerm
       DataType
       ValidCheck
+  other-modules:
       Paths_ba_jiarui_liu
   hs-source-dirs:
       src
@@ -28,6 +29,7 @@ test-suite ba-jiarui-liu-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Examples.Signatures
       Paths_ba_jiarui_liu
   hs-source-dirs:
       test

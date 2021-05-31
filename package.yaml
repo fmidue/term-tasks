@@ -5,7 +5,6 @@ dependencies:
   - split
 library:
   source-dirs: src
-  exposed-modules: []
   ghc-options:
     - -Wall
     - -Werror
