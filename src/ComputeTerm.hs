@@ -24,9 +24,7 @@ import DataType
 -- for #3
 -- first parameter is a bound on complexity of terms
 term :: Int -> Signature -> [Term]
-term n (Signature xs) = if maximum(checkLength b) <= n 
-                        then nub (makeSingleTerms a ++ term' n (Signature xs) d)
-                        else []
+term n (Signature xs) = take n (nub (makeSingleTerms a ++ term' n (Signature xs) d))                    
                         where a = checkElement xs
                               b = xs \\ a 
                               c = makeSingleTerms a ++ makeTerm a b
@@ -59,10 +57,10 @@ checkElement (FunctionSymbol x xs t:ys)
 
 makeSingleTerms :: [FunctionSymbol] -> [Term]
 makeSingleTerms [] = []
-makeSingleTerms (FunctionSymbol x xs t:ys) = Term x [FunctionSymbol x xs t] : makeSingleTerms ys
+makeSingleTerms (FunctionSymbol x _ _:ys) = Term x [] : makeSingleTerms ys
 
 checkType :: Type -> [FunctionSymbol] -> FunctionSymbol
-checkType _ [] = FunctionSymbol "o" [] O
+checkType _ [] = FunctionSymbol "o" [] (Type "error")
 checkType a (FunctionSymbol x xs t:ys) 
    | a == t = FunctionSymbol x xs t
    | otherwise = checkType a ys
@@ -79,7 +77,7 @@ makeTerm w (FunctionSymbol a x y : xs)
    where n = makeSymbol w (FunctionSymbol a x y)
 
 checkExist :: [FunctionSymbol] -> Bool
-checkExist = notElem (FunctionSymbol "o" [] O)
+checkExist = notElem (FunctionSymbol "o" [] (Type "error"))
 
 checkType' :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 checkType' _ [] _ = []
@@ -88,11 +86,11 @@ checkType' a (x:xs) ys
    | otherwise = checkType' a xs ys
 
 giveType :: Term -> [FunctionSymbol] -> Type
-giveType (Term _ _) [] = O
+giveType (Term _ _) [] = (Type "error")
 giveType (Term a s) (FunctionSymbol b _ t : ys)
    | a == b = t 
    | otherwise =  giveType (Term a s) ys
-giveType (Function _ _) [] = O
+giveType (Function _ _) [] = (Type "error")
 giveType (Function a s) (FunctionSymbol b _ t : ys)
    | a == b = t 
    | otherwise =  giveType (Function a s) ys
@@ -123,8 +121,9 @@ toEnd (Term x (FunctionSymbol y xs t:ys))
 toEnd (Function s xs) = s ++ "(" ++ intercalate "," (map toEnd xs) ++ ")"
 
 term' :: Int -> Signature -> [Term] -> [Term]
-term' n (Signature xs) w = if null (makeTerm' xs b w \\ w)
-                           then makeTerm' xs b w
-                           else term' n (Signature xs) (w ++ (makeTerm' xs b w \\ w))
+term' n (Signature xs) w = if null (nub (makeTerm' xs b w) \\ w) || length (nub (makeTerm' xs b w)) >= n
+                           then nub (makeTerm' xs b w)
+                           else term' n (Signature xs) (w ++ (nub (makeTerm' xs b w) \\ w))
                            where a = checkElement xs
                                  b = xs \\ a 
+

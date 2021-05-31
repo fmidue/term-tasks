@@ -15,9 +15,8 @@ module ValidCheck (
 
 import DataType
 
-hasType :: Term -> Type -> Bool
-hasType x t = checkType t x tr
-   where tr = [FunctionSymbol "x" [] A,FunctionSymbol "y" [] B,FunctionSymbol "z" [] C,FunctionSymbol "f" [A,A] B,FunctionSymbol "g" [A,B] C,FunctionSymbol "h" [A,B,C] D]
+hasType :: Type -> Term  -> [FunctionSymbol] -> Bool
+hasType = checkType 
 
 isValid :: Signature -> Term -> Bool
 isValid (Signature xs) t = checkNumber t a && checkType b t xs && checkSymbol d c
@@ -27,11 +26,11 @@ isValid (Signature xs) t = checkNumber t a && checkType b t xs && checkSymbol d 
                                  d = getTermName t
 
 checkNumber :: Term -> FunctionSymbol -> Bool
-checkNumber (Term _ xs) (FunctionSymbol _ ys _) = length xs == length ys
+checkNumber (Term _ xs) _ = null xs
 checkNumber (Function _ xs) (FunctionSymbol _ ys _) = length xs == length ys
 
 giveSymbol :: Term -> [FunctionSymbol] -> FunctionSymbol
-giveSymbol _ [] = FunctionSymbol "o" [] O
+giveSymbol _ [] = FunctionSymbol "e" [] (Type "error")
 giveSymbol (Term a ys) (FunctionSymbol b x t : xs)
    | a == b = FunctionSymbol b x t
    | otherwise = giveSymbol (Term a ys) xs
@@ -44,7 +43,7 @@ make [] _ = []
 make (x:xs) w = giveType x w : make xs w
 
 checkType :: Type -> Term -> [FunctionSymbol] -> Bool
-checkType O _ _ = False
+checkType (Type "error") _ _ = False
 checkType t (Term a x) w = giveType (Term a x) w == t 
 checkType t (Function s xs) w = a && b
    where a = giveType (Function s xs) w == t
@@ -59,11 +58,11 @@ checkType' (t:ts) (Function a x':xs) w = checkType' n x' w && checkType' ts xs w
    where n = make x' w 
 
 giveType :: Term -> [FunctionSymbol] -> Type
-giveType (Term _ _) [] = O
+giveType (Term _ _) [] = (Type "error")
 giveType (Term a s) (FunctionSymbol b _ t : ys)
    | a == b = t 
    | otherwise =  giveType (Term a s) ys
-giveType (Function _ _) [] = O
+giveType (Function _ _) [] = (Type "error")
 giveType (Function a s) (FunctionSymbol b _ t : ys)
    | a == b = t 
    | otherwise =  giveType (Function a s) ys
