@@ -14,5 +14,5 @@ main = hspec $ do
     Term "a" [] `elem` term 10 signature1
   specify "h(f,g) is not a term that can be built from signature3" $
     Term "h" [f3,g3] `notElem` term 10 signature1
-  specify "terms computed from a signature are valid (for signature1 and size up to 30)" $
+  specify "terms computed from a signature are valid (for signature2 and size up to 30)" $
     all (isValid signature2) (term 30 signature2)
