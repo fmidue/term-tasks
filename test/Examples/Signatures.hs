@@ -31,3 +31,22 @@ z3  = FunctionSymbol "z" [] (Type "C")
 f3  = FunctionSymbol "f" [Type "A",Type "A"] (Type "B")
 g3  = FunctionSymbol "g" [Type "A",Type "B"] (Type "C")
 h3  = FunctionSymbol "h" [Type "A",Type "B",Type "C"] (Type "D")
+
+signature4 = Signature [a4,b4,c4,d4,x4,y4,z4,f4,g4,h4]
+a4  = FunctionSymbol "a" [] (Type "A")
+b4  = FunctionSymbol "b" [] (Type "B")
+c4  = FunctionSymbol "c" [] (Type "C")
+d4  = FunctionSymbol "d" [] (Type "D")
+x4  = FunctionSymbol "x" [Type "A",Type "B" ,Type "C"] (Type "A")
+y4  = FunctionSymbol "y" [Type "B",Type "D"] (Type "E")
+z4  = FunctionSymbol "z" [Type "D",Type "C" ,Type "E"] (Type "F")
+f4  = FunctionSymbol "f" [Type "A",Type "B"] (Type "G")
+g4  = FunctionSymbol "g" [Type "F",Type "G"] (Type "C")
+h4  = FunctionSymbol "h" [Type "A",Type "G"] (Type "F")
+
+signature5 = Signature [a5,b5,c5,d5,e5]
+a5  = FunctionSymbol "a" [] (Type "A")
+b5  = FunctionSymbol "b" [Type "A"] (Type "B")
+c5  = FunctionSymbol "c" [Type "B"] (Type "C")
+d5  = FunctionSymbol "d" [Type "C"] (Type "D")
+e5  = FunctionSymbol "e" [Type "D"] (Type "A")
