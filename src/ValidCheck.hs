@@ -38,9 +38,11 @@ giveSymbol (Function a ys) (FunctionSymbol b x t : xs)
    | a == b = FunctionSymbol b x t
    | otherwise = giveSymbol (Function a ys) xs
 
-make :: [Term] -> [FunctionSymbol] -> [Type]
-make [] _ = []
-make (x:xs) w = giveType x w : make xs w
+make :: Term -> [FunctionSymbol] -> [Type]
+make _ [] = []
+make (Function x xs) (FunctionSymbol y ys _:l) 
+   | x == y = ys 
+   | otherwise = make (Function x xs) l
 
 checkType :: Type -> Term -> [FunctionSymbol] -> Bool
 checkType (Type "error") _ _ = False
@@ -48,14 +50,15 @@ checkType t (Term a) w = giveType (Term a) w == t
 checkType t (Function s xs) w = a && b
    where a = giveType (Function s xs) w == t
          b = checkType' c xs w
-         c = make xs w
+         c = make (Function s xs) w
 
 checkType' :: [Type] ->[Term] -> [FunctionSymbol] -> Bool
-checkType' _ [] _ = True
-checkType' [] _ _ = True
+checkType' [] [] _ = True
+checkType' [] xs _ = null xs
+checkType' xs [] _ = null xs
 checkType' (t:ts) (Term a:xs) w = checkType' ts xs w && giveType (Term a) w == t
 checkType' (t:ts) (Function a x':xs) w = checkType' n x' w && checkType' ts xs w && giveType (Function a x') w == t
-   where n = make x' w 
+   where n = make (Function a x') w 
 
 giveType :: Term -> [FunctionSymbol] -> Type
 giveType (Term _) [] = (Type "error")

@@ -28,5 +28,6 @@ main = hspec $ do
     Term "c" `notElem` term 10 signature5
   specify "b(e(d(c(b(a))))) is a term that can be built from signature5" $
     Function "b" [Function "e" [Function "d" [Function "c"[Function "b" [Term "a"]]]]] `elem` term 10 signature5
-  specify "b(e(d(c(a)))) is not a term that can be built from signature5" $
-    Function "b" [Function "e" [Function "d" [Function "c" [Term "a"]]]] `notElem` term 10 signature5
+
+
+
