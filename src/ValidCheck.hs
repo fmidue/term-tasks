@@ -40,6 +40,7 @@ giveSymbol (Function a ys) (FunctionSymbol b x t : xs)
 
 make :: Term -> [FunctionSymbol] -> [Type]
 make _ [] = []
+make (Term _) _ = []
 make (Function x xs) (FunctionSymbol y ys _:l) 
    | x == y = ys 
    | otherwise = make (Function x xs) l
