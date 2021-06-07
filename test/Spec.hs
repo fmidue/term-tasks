@@ -28,6 +28,15 @@ main = hspec $ do
     Term "c" `notElem` term 10 signature5
   specify "b(e(d(c(b(a))))) is a term that can be built from signature5" $
     Function "b" [Function "e" [Function "d" [Function "c"[Function "b" [Term "a"]]]]] `elem` term 10 signature5
-
+  specify "b(e(d(c(a)))) is not a term that can be built from signature5" $
+    Function "b" [Function "e" [Function "d" [Function "c" [Term "a"]]]] `notElem` term 10 signature5
+  specify "x(a,b,d) is an invalid term of signature4" $
+    isValid signature4 (Function "x" [Term "a",Term "b",Term "d"]) == False
+  specify "t(b,u(x(a,b,x(a,b)))) is an invalid term of signature1" $
+    isValid signature1 (Function "t" [Term "b",Function "u" [Function "x" [Term "a",Term "b",Function "x" [Term "a",Term "b"]]]])==False
+  specify "g(x,f) is an invalid term of signature3" $
+    isValid signature3 (Function "g" [Term "x",Function "f" []]) == False
+  specify "f(a,b) is an invalid term of signature3" $
+    isValid signature3 (Function "f" [Term "x",Term "y"]) == False
 
 

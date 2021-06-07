@@ -87,3 +87,4 @@ getTermName' (Function x' xs:ys) = [x'] ++ getTermName' xs ++ getTermName' ys
 checkSymbol :: [String] -> [String] -> Bool
 checkSymbol [] _ = True
 checkSymbol (x:xs) ys = x `elem` ys && checkSymbol xs ys
+
