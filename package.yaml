@@ -3,6 +3,7 @@ extra-source-files: []
 dependencies:
   - base
   - split
+  - QuickCheck
 library:
   source-dirs: src
   ghc-options:
