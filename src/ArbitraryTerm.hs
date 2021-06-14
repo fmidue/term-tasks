@@ -2,13 +2,11 @@ module ArbitraryTerm where
 import Data.List
 import Test.QuickCheck
 import DataType
-import ComputeTerm
-import ValidCheck
 
 changeOrder :: Term -> Gen Term
 changeOrder (Term x) = do return (Term x)
 changeOrder (Function x xs) = do
-  a <- elements [0,1]
+  a <- elements [0 :: Int,1]
   if a == 0
   then do b <- shuffle xs
           return (Function x b) 
@@ -47,7 +45,7 @@ getName (Function x _) = x
 changeLength :: Term -> Gen Term
 changeLength (Term x) = do return (Term x)
 changeLength (Function x xs) = do
-  a <- elements [0,1]
+  a <- elements [0 :: Int,1]
   if a == 0 
   then do b <- choose (0,(length xs)+5)
           let c = elements xs
@@ -102,7 +100,7 @@ changeFunction (Function x xs) = do
   a <- elements xs
   if checkTerm a
   then changeFunction (Function x xs)
-  else do b <- elements [1,2,3]
+  else do b <- elements [1 :: Int,2,3]
           let d = elemIndex a xs 
           if b == 1
           then do c <- changeOrder a 
