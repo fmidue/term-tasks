@@ -2,23 +2,13 @@ module ArbitraryTerm where
 import Data.List
 import Test.QuickCheck
 import DataType
+import ComputeTerm 
 
 changeOrder :: Term -> Gen Term
-changeOrder (Term x) = do return (Term x)
+changeOrder (Term x) = return (Term x)
 changeOrder (Function x xs) = do
-  a <- elements [0 :: Int,1]
-  if a == 0
-  then do b <- shuffle xs
-          return (Function x b) 
-  else do b <- elements xs
-          if checkTerm b 
-          then return (Function x xs)
-          else do let c = getList b
-                      d = elemIndex b xs
-                  e <- shuffle c 
-                  let f = getName b
-                      g = replace (getInt d) (Function f e) xs
-                  return (Function x g)                  
+  a <- shuffle xs 
+  return (Function x a)                 
 
 getInt :: Maybe Int -> Int
 getInt (Just x) = x
@@ -32,36 +22,13 @@ getName :: Term -> String
 getName (Term _) = "Error"
 getName (Function x _) = x
 
---randomTerm :: Signature -> Gen Term
---randomTerm (Signature xs) = do  
---  a <- choose (1,20)
---  b <- choose (0,5)
---  let c = elements (term a (Signature xs))
---  d <- vectorOf b c
---  e <- elements (getSigName xs)
---  let f = backTerm e d   
---  return f
-
 changeLength :: Term -> Gen Term
-changeLength (Term x) = do return (Term x)
+changeLength (Term x) = return (Term x)
 changeLength (Function x xs) = do
-  a <- elements [0 :: Int,1]
-  if a == 0 
-  then do b <- choose (0,(length xs)+5)
-          let c = elements xs
-          d <- vectorOf b c
-          return (Function x d)
-  else do b <- elements xs
-          if checkTerm b
-          then return (Function x xs)
-          else do let c = getList b 
-                      d = elemIndex b xs 
-                      e = elements c 
-                      f = getName b
-                  g <- choose (0,(length c)+5)
-                  h <- vectorOf g e 
-                  let i = replace (getInt d) (Function f h) xs
-                  return (Function x i)
+  a <- choose (0,(length xs)+5)
+  let b = elements xs
+  c <- vectorOf a b
+  return (Function x c)
 
 changeName :: Term -> Gen Term 
 changeName (Term _) = do 
@@ -95,7 +62,7 @@ makeString :: Char -> String
 makeString x = [x]
 
 changeFunction :: Term -> Gen Term
-changeFunction (Term x) = do return (Term x)
+changeFunction (Term x) = return (Term x)
 changeFunction (Function x xs) = do
   a <- elements xs
   if checkTerm a
@@ -117,5 +84,40 @@ changeFunction (Function x xs) = do
 checkTerm :: Term -> Bool
 checkTerm (Term _) = True
 checkTerm (Function _ _) = False          
+
+randomTerm :: Term -> Gen Term
+randomTerm (Term x) = do 
+  a <- elements [1 :: Int,2]
+  if a == 1
+  then return (Term x)
+  else changeName (Term x)
+randomTerm (Function x xs) = do  
+  a <- elements [1 :: Int,4]
+  let b = ["changeOrder","changeLength","changeName","changeFunction"]
+      c = elements b
+  d <- vectorOf a c
+  randomTerm' (Function x xs) d
+
+randomTerm' :: Term -> [String] -> Gen Term
+randomTerm' _ [] = return (Term "Error") 
+randomTerm' t ["changeOrder"] = changeOrder t
+randomTerm' t ["changeLength"] = changeLength t
+randomTerm' t ["changeName"] = changeName t
+randomTerm' t ["changeFunction"] = changeFunction t
+randomTerm' t (x:xs) 
+  | x == "changeOrder" = do a <- changeOrder t 
+                            randomTerm' a xs
+  | x == "changeLength" = do a <- changeLength t 
+                             randomTerm' a xs                         
+  | x == "changeName" = do a <- changeName t 
+                           randomTerm' a xs
+  | x == "changeFunction" = do a <- changeFunction t 
+                               randomTerm' a xs
+  | otherwise = return (Term "Error")
+
+printRandomTerm :: Term -> Gen String
+printRandomTerm t = do
+  a <- randomTerm t
+  return (toEnd a)
 
 
