@@ -1,10 +1,13 @@
 import Test.Hspec
+import Test.Hspec.QuickCheck
 
 import DataType
 import ComputeTerm
 import ValidCheck
-
+import ArbitraryTerm
+import Test.QuickCheck
 import Examples.Signatures
+
 
 main :: IO ()
 main = hspec $ do
@@ -37,6 +40,12 @@ main = hspec $ do
   specify "g(x,f) is an invalid term of signature3" $
     isValid signature3 (Function "g" [Term "x",Function "f" []]) == False
   specify "f(a,b) is an invalid term of signature3" $
-    isValid signature3 (Function "f" [Term "x",Term "y"]) == False
+    isValid signature3 (Function "f" [Term "x",Term "y"]) == False 
 
 
+  prop "randoming leads to invalid terms (for non ground terms)" $
+    forAll (elements (term 10 signature5) (>>=) totalRandomTerm) (\t -> not (isValid signature5 t) || isGroudTerm t)
+
+isGroudTerm :: Term -> Bool
+isGroudTerm (Term _) = True 
+isGroudTerm _ = False  
