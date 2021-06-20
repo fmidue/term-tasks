@@ -1,11 +1,25 @@
-module ArbitrarySig where
+module ArbitrarySig (
+    randomSig,
+    randomSig',
+    makeFuncSymbol,
+    randomSigTotal,
+    makeFuncSymbol',
+    randomSigTotal',
+    getAllName,
+    getSignatureTerm,
+    getSignatureName,
+    getSignatureType,
+    changeSigOrder,
+    changeSigLength,
+    changeSigName,
+    makeString,
+    checkSigTerm
+    ) where
 import DataType
 import Test.QuickCheck
 import Data.List 
 
--- Signature [FunctionSymbol]
--- data FunctionSymbol = FunctionSymbol String [Type] Type
-
+-- only change the order or number of arguments, or change the name of functions 
 randomSig :: Signature -> Gen Signature
 randomSig (Signature []) = return (Signature [])
 randomSig (Signature xs) = do 
@@ -17,15 +31,8 @@ randomSig' [] = return []
 randomSig' (x:xs) = do 
     if checkSigTerm x 
     then do 
-        a <- chooseInt (0,1)
-        if a == 0 
-        then do 
-            b <- randomSig' xs
-            return (x:b)
-        else do 
-            b <- changeSigName x 
-            c <- randomSig' xs 
-            return (b:c)
+        b <- randomSig' xs
+        return (x:b)
     else do     
         let a = ["changeOrder","changeLength","changeName"] 
         b <- elements a
@@ -39,22 +46,16 @@ makeFuncSymbol "changeLength" x = changeSigLength x
 makeFuncSymbol "changeName" x = changeSigName x 
 makeFuncSymbol _ _ = return (FunctionSymbol "Error" [] (Type "Error"))
 
+-- The ground terms won't be changed. The name of functions can't be changed. 
+-- But parameters of the functions will be completely randomly generated. 
 randomSigTotal :: Signature -> Gen Signature 
+randomSigTotal (Signature []) = return (Signature [])
 randomSigTotal s = do 
-    let a = getSignatureName s
-        b = getSignatureName' s
-        c = getSignatureType s
-    d <- makeFuncTerm a c
-    e <- makeFuncSymbol' b c  
-    return (Signature (d++e))
-
-makeFuncTerm :: [String] -> [Type] -> Gen [FunctionSymbol]
-makeFuncTerm [] _ = return []
-makeFuncTerm _ [] = return []
-makeFuncTerm (x:xs) t = do 
-    a <- elements t
-    b <- makeFuncTerm xs t  
-    return (FunctionSymbol x [] a : b) 
+    let a = getSignatureName s 
+        b = getSignatureType s
+        c = getSignatureTerm s
+    d <- makeFuncSymbol' a b 
+    return (Signature (c++d))
 
 makeFuncSymbol' :: [String] -> [Type] -> Gen [FunctionSymbol]
 makeFuncSymbol' [] _ = return []
@@ -67,6 +68,8 @@ makeFuncSymbol' (x:xs) t = do
     e <- makeFuncSymbol' xs t 
     return (FunctionSymbol x c d : e)
 
+-- It only uses the names and types of original signature. 
+-- It will generate totally new functions and ground terms.
 randomSigTotal' :: Signature -> Gen Signature 
 randomSigTotal' s = do 
     let a = getAllName s        
@@ -78,17 +81,17 @@ getAllName :: Signature -> [String]
 getAllName (Signature []) = []
 getAllName (Signature (FunctionSymbol s _ _ : xs)) = s : getAllName (Signature xs)
 
+getSignatureTerm :: Signature -> [FunctionSymbol] 
+getSignatureTerm (Signature []) = []
+getSignatureTerm (Signature (FunctionSymbol s ys t : xs)) 
+    | null ys = (FunctionSymbol s ys t) : getSignatureTerm (Signature xs) 
+    | otherwise = getSignatureTerm (Signature xs) 
+
 getSignatureName :: Signature -> [String] 
 getSignatureName (Signature []) = []
 getSignatureName (Signature (FunctionSymbol s ys _ : xs)) 
-    | null ys = s : getSignatureName (Signature xs) 
-    | otherwise = getSignatureName (Signature xs) 
-
-getSignatureName' :: Signature -> [String] 
-getSignatureName' (Signature []) = []
-getSignatureName' (Signature (FunctionSymbol s ys _ : xs)) 
-    | null ys = getSignatureName' (Signature xs) 
-    | otherwise = s : getSignatureName' (Signature xs) 
+    | null ys = getSignatureName (Signature xs) 
+    | otherwise = s : getSignatureName (Signature xs) 
 
 getSignatureType :: Signature -> [Type] 
 getSignatureType (Signature []) = []
