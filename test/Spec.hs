@@ -62,7 +62,7 @@ main = hspec $ do
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature4)" $
     forAll ((totalRandomTerm' 10 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t || isSingelTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature5)" $
-    forAll ((totalRandomTerm' 20 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t)
+    forAll ((totalRandomTerm' 20 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t || isSingelTerm t)
 
 
 isGroudTerm :: Term -> Bool
