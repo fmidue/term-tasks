@@ -28,7 +28,7 @@ randomSig (Signature xs) = do
     
 randomSig' :: [FunctionSymbol] -> Gen [FunctionSymbol] 
 randomSig' [] = return []
-randomSig' (x:xs) = do 
+randomSig' (x:xs) =  
     if checkSigTerm x 
     then do 
         b <- randomSig' xs
