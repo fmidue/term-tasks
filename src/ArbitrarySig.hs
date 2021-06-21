@@ -24,8 +24,11 @@ randomSig :: Signature -> Gen Signature
 randomSig (Signature []) = return (Signature [])
 randomSig (Signature xs) = do 
     a <- randomSig' xs 
-    return (Signature a)
-    
+    let b = getSignatureTerm (Signature xs)
+        c = overlaps a xs          
+        d = (a \\ c)
+    return (Signature (b++d))
+       
 randomSig' :: [FunctionSymbol] -> Gen [FunctionSymbol] 
 randomSig' [] = return []
 randomSig' (x:xs) =  
@@ -50,12 +53,14 @@ makeFuncSymbol _ _ = return (FunctionSymbol "Error" [] (Type "Error"))
 -- But parameters of the functions will be completely randomly generated. 
 randomSigTotal :: Signature -> Gen Signature 
 randomSigTotal (Signature []) = return (Signature [])
-randomSigTotal s = do 
-    let a = getSignatureName s 
-        b = getSignatureType s
-        c = getSignatureTerm s
+randomSigTotal (Signature xs) = do 
+    let a = getSignatureName (Signature xs) 
+        b = getSignatureType (Signature xs)
+        c = getSignatureTerm (Signature xs)
     d <- makeFuncSymbol' a b 
-    return (Signature (c++d))
+    let e = overlaps d (xs\\c)          
+        f = (d \\ e)
+    return (Signature (c++f))
 
 makeFuncSymbol' :: [String] -> [Type] -> Gen [FunctionSymbol]
 makeFuncSymbol' [] _ = return []
@@ -71,11 +76,13 @@ makeFuncSymbol' (x:xs) t = do
 -- It only uses the names and types of original signature. 
 -- It will generate totally new functions and ground terms.
 randomSigTotal' :: Signature -> Gen Signature 
-randomSigTotal' s = do 
-    let a = getAllName s        
-        b = getSignatureType s
-    c <- makeFuncSymbol' a b   
-    return (Signature c)
+randomSigTotal' (Signature xs) = do 
+    let a = getAllName (Signature xs)        
+        b = getSignatureType (Signature xs)
+    c <- makeFuncSymbol' a b  
+    let d = overlaps c xs 
+        e = c \\ d 
+    return (Signature e)
 
 getAllName :: Signature -> [String] 
 getAllName (Signature []) = []
@@ -124,4 +131,10 @@ checkSigTerm (FunctionSymbol _ xs _)
    | null xs = True 
    | otherwise = False
 
+overlaps :: [FunctionSymbol] -> [FunctionSymbol] -> [FunctionSymbol] 
+overlaps _ [] = []
+overlaps [] _ = [] 
+overlaps (FunctionSymbol s1 x1 t1:xs) (FunctionSymbol s2 x2 _:ys) 
+   | x1 == x2 && s1 == s2 = FunctionSymbol s1 x1 t1 : overlaps xs ys 
+   | otherwise = overlaps xs ys
 

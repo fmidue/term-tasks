@@ -41,44 +41,45 @@ main = hspec $ do
   specify "g(x,f) is an invalid term of signature3" $
     isValid signature3 (Function "g" [Term "x",Function "f" []]) == False
   specify "f(a,b) is an invalid term of signature3" $
-    isValid signature3 (Function "f" [Term "x",Term "y"]) == False 
+    isValid signature3 (Function "f" [Term "x",Term "y"]) == False
+  specify "f(e) is a valid term of signature2" $
+    isValid signature2 (Function "f" [Term "e"]) == True  
 
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature1)" $
-    forAll ((totalRandomTerm 20 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature2)" $
-    forAll ((totalRandomTerm 10 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t || isSingelTerm t)
-  prop "randoming leads to invalid terms (for non ground terms) withtotalRandomTerm (signature3)" $
-    forAll ((totalRandomTerm 10 signature3) >>= elements) (\t -> not (isValid signature3 t) || isGroudTerm t || isSingelTerm t)
-  prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm  (signature4)" $
-    forAll ((totalRandomTerm 20 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm 10 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t)
+  prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature3)" $
+    forAll ((totalRandomTerm 10 signature3) >>= elements) (\t -> not (isValid signature3 t) || isGroudTerm t)
+  prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature4)" $
+    forAll ((totalRandomTerm 10 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature5)" $
-    forAll ((totalRandomTerm 10 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm 10 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature1)" $
-    forAll ((totalRandomTerm' 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm' 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature2)" $
-    forAll ((totalRandomTerm' 20 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm' 10 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature3)" $
-    forAll ((totalRandomTerm' 20 signature3) >>= elements) (\t -> not (isValid signature3 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm' 10 signature3) >>= elements) (\t -> not (isValid signature3 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature4)" $
-    forAll ((totalRandomTerm' 10 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm' 10 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature5)" $
-    forAll ((totalRandomTerm' 20 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t || isSingelTerm t)
+    forAll ((totalRandomTerm' 10 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t) 
+  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature1)" $  
+    forAll ((randomTerm 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
+  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature2)" $  
+    forAll ((randomTerm 10 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t)
+  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature3)" $  
+   forAll ((randomTerm 10 signature3) >>= elements) (\t -> not (isValid signature3 t) || isGroudTerm t)
+  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature4)" $  
+    forAll ((randomTerm 10 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t)
+  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature5)" $  
+    forAll ((randomTerm 10 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t)
 
 
 isGroudTerm :: Term -> Bool
 isGroudTerm (Term _) = True 
 isGroudTerm _ = False  
 
-isSingelTerm :: Term -> Bool 
-isSingelTerm (Function _ xs) 
-   | length xs == 1 = True
-   | otherwise = checkSingelTerm xs 
-isSingelTerm _ = False 
-
-checkSingelTerm ::[Term] -> Bool 
-checkSingelTerm (Function _ xs : ys) 
-   | length xs == 1 = True && checkSingelTerm ys 
-   | otherwise = False 
-checkSingelTerm _ = False 
 
 
