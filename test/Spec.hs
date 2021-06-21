@@ -43,7 +43,7 @@ main = hspec $ do
   specify "f(a,b) is an invalid term of signature3" $
     isValid signature3 (Function "f" [Term "x",Term "y"]) == False
   specify "f(e) is a valid term of signature2" $
-    isValid signature2 (Function "f" [Term "e"]) == True  
+    isValid signature2 (Function "f" [Term "e"])  
 
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature1)" $
     forAll ((totalRandomTerm 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
