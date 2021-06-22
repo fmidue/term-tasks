@@ -46,7 +46,7 @@ checkElement (FunctionSymbol x xs t:ys)
 
 makeSingleTerms :: [FunctionSymbol] -> [Term]
 makeSingleTerms [] = []
-makeSingleTerms (FunctionSymbol x _ _:ys) = Term x : makeSingleTerms ys
+makeSingleTerms (FunctionSymbol x _ _:ys) = Term x [] : makeSingleTerms ys
 
 checkType :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 checkType _ [] _ = []
@@ -55,14 +55,10 @@ checkType a (x:xs) ys
    | otherwise = checkType a xs ys
 
 giveType :: Term -> [FunctionSymbol] -> Type
-giveType (Term _) [] = (Type "error")
-giveType (Term a) (FunctionSymbol b _ t : ys)
+giveType (Term _ _) [] = (Type "error")
+giveType (Term a s) (FunctionSymbol b _ t : ys)
    | a == b = t 
-   | otherwise =  giveType (Term a) ys
-giveType (Function _ _) [] = (Type "error")
-giveType (Function a s) (FunctionSymbol b _ t : ys)
-   | a == b = t 
-   | otherwise =  giveType (Function a s) ys
+   | otherwise =  giveType (Term a s) ys
 
 makeSymbol :: [FunctionSymbol] -> [Term] -> FunctionSymbol -> [[Term]]
 makeSymbol _ _ (FunctionSymbol _ [] _) = []
@@ -71,8 +67,8 @@ makeSymbol w s (FunctionSymbol a (x:xs) y) = checkType x s w : makeSymbol w s (F
 toTerm :: String -> [[Term]] -> [Term]
 toTerm _ [] = []
 toTerm s (x:xs) 
-   | null xs = [Function s x] 
-   | otherwise = Function s x : toTerm s xs
+   | null xs = [Term s x] 
+   | otherwise = Term s x : toTerm s xs
 
 makeTerm :: [FunctionSymbol] -> [FunctionSymbol] -> [Term] -> [Term]
 makeTerm _ [] _ = []
@@ -83,8 +79,8 @@ toString [] = []
 toString (FunctionSymbol x _ _ :ys) = x : toString ys
 
 toEnd :: Term -> String
-toEnd (Term x) = x
-toEnd (Function s xs) = s ++ "(" ++ intercalate "," (map toEnd xs) ++ ")"
+toEnd (Term x []) = x
+toEnd (Term s xs) = s ++ "(" ++ intercalate "," (map toEnd xs) ++ ")"
 
 term' :: Int -> Signature -> [Term] -> [Term]
 term' n (Signature xs) w = if null (nub (makeTerm xs b w) \\ w) || length (nub (makeTerm xs b w)) >= n
