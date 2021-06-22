@@ -13,9 +13,11 @@ module ArbitrarySig (
     changeSigLength,
     changeSigName,
     makeString,
-    checkSigTerm
+    checkSigTerm,
+    overlaps
     ) where
 import DataType
+import ValidCheck
 import Test.QuickCheck
 import Data.List 
 
@@ -23,31 +25,33 @@ import Data.List
 randomSig :: Signature -> Gen Signature
 randomSig (Signature []) = return (Signature [])
 randomSig (Signature xs) = do 
-    a <- randomSig' xs 
-    let b = getSignatureTerm (Signature xs)
-        c = overlaps a xs          
-        d = (a \\ c)
-    return (Signature (b++d))
+    let e = getSigTermName xs 
+    a <- randomSig' xs e 
+    let b = overlaps a xs 
+--    let b = getSignatureTerm (Signature xs)       
+--        c = overlaps a xs          
+--        d = (a \\ c)
+    return (Signature b)
        
-randomSig' :: [FunctionSymbol] -> Gen [FunctionSymbol] 
-randomSig' [] = return []
-randomSig' (x:xs) =  
+randomSig' :: [FunctionSymbol] -> [String] -> Gen [FunctionSymbol] 
+randomSig' [] _ = return []
+randomSig' (x:xs) s =  
     if checkSigTerm x 
     then do 
-        b <- randomSig' xs
+        b <- randomSig' xs s 
         return (x:b)
     else do     
         let a = ["changeOrder","changeLength","changeName"] 
         b <- elements a
-        c <- makeFuncSymbol b x
-        d <- randomSig' xs
+        c <- makeFuncSymbol b x s 
+        d <- randomSig' xs s
         return (c : d)
 
-makeFuncSymbol :: String -> FunctionSymbol -> Gen FunctionSymbol 
-makeFuncSymbol "changeOrder" x = changeSigOrder x 
-makeFuncSymbol "changeLength" x = changeSigLength x 
-makeFuncSymbol "changeName" x = changeSigName x 
-makeFuncSymbol _ _ = return (FunctionSymbol "Error" [] (Type "Error"))
+makeFuncSymbol :: String -> FunctionSymbol -> [String] -> Gen FunctionSymbol 
+makeFuncSymbol "changeOrder" x _ = changeSigOrder x 
+makeFuncSymbol "changeLength" x _ = changeSigLength x 
+makeFuncSymbol "changeName" x s = changeSigName x s
+makeFuncSymbol _ _ _  = return (FunctionSymbol "Error" [] (Type "Error"))
 
 -- The ground terms won't be changed. The name of functions can't be changed. 
 -- But parameters of the functions will be completely randomly generated. 
@@ -58,9 +62,11 @@ randomSigTotal (Signature xs) = do
         b = getSignatureType (Signature xs)
         c = getSignatureTerm (Signature xs)
     d <- makeFuncSymbol' a b 
-    let e = overlaps d (xs\\c)          
-        f = (d \\ e)
-    return (Signature (c++f))
+    let e = c ++ d 
+        f = overlaps e xs 
+--    let e = overlaps d (xs\\c)          
+--        f = (d \\ e)
+    return (Signature f)
 
 makeFuncSymbol' :: [String] -> [Type] -> Gen [FunctionSymbol]
 makeFuncSymbol' [] _ = return []
@@ -81,8 +87,8 @@ randomSigTotal' (Signature xs) = do
         b = getSignatureType (Signature xs)
     c <- makeFuncSymbol' a b  
     let d = overlaps c xs 
-        e = c \\ d 
-    return (Signature e)
+--        e = c \\ d 
+    return (Signature d)
 
 getAllName :: Signature -> [String] 
 getAllName (Signature []) = []
@@ -116,10 +122,10 @@ changeSigLength (FunctionSymbol s xs t)= do
     c <- vectorOf a b 
     return (FunctionSymbol s c t)
 
-changeSigName :: FunctionSymbol -> Gen FunctionSymbol 
-changeSigName (FunctionSymbol _ xs t) = do 
+changeSigName :: FunctionSymbol -> [String] -> Gen FunctionSymbol 
+changeSigName (FunctionSymbol _ xs t) s = do 
     let a = ['a'..'z']
-        b = map makeString a
+        b = (map makeString a)\\s 
     c <- elements b 
     return (FunctionSymbol c xs t)
 
@@ -131,10 +137,16 @@ checkSigTerm (FunctionSymbol _ xs _)
    | null xs = True 
    | otherwise = False
 
-overlaps :: [FunctionSymbol] -> [FunctionSymbol] -> [FunctionSymbol] 
-overlaps _ [] = []
-overlaps [] _ = [] 
-overlaps (FunctionSymbol s1 x1 t1:xs) (FunctionSymbol s2 x2 _:ys) 
-   | x1 == x2 && s1 == s2 = FunctionSymbol s1 x1 t1 : overlaps xs ys 
-   | otherwise = overlaps xs ys
+checkExist :: FunctionSymbol -> [FunctionSymbol] -> Bool 
+checkExist _ [] = False 
+checkExist (FunctionSymbol s1 x1 t1) (FunctionSymbol s2 x2 _:ys) 
+   | s1 == s2 && x1 == x2 = True 
+   | otherwise = False || checkExist (FunctionSymbol s1 x1 t1) ys  
 
+overlaps :: [FunctionSymbol] -> [FunctionSymbol] -> [FunctionSymbol]
+overlaps [] _ = []
+overlaps _ [] = []
+overlaps (FunctionSymbol s x t : xs) ys 
+   | null x = (FunctionSymbol s x t) : overlaps xs ys 
+   | checkExist (FunctionSymbol s x t) ys = overlaps xs ys 
+   | otherwise = (FunctionSymbol s x t) : overlaps xs ys 

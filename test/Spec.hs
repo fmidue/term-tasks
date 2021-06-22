@@ -56,7 +56,7 @@ main = hspec $ do
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm (signature5)" $
     forAll ((totalRandomTerm 10 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature1)" $
-    forAll ((totalRandomTerm' 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
+   forAll ((totalRandomTerm' 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature2)" $
     forAll ((totalRandomTerm' 10 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature3)" $
@@ -65,7 +65,7 @@ main = hspec $ do
     forAll ((totalRandomTerm' 10 signature4) >>= elements) (\t -> not (isValid signature4 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature5)" $
     forAll ((totalRandomTerm' 10 signature5) >>= elements) (\t -> not (isValid signature5 t) || isGroudTerm t) 
-  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature1)" $  
+  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature1)" $ 
     forAll ((randomTerm 10 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)
   prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature2)" $  
     forAll ((randomTerm 10 signature2) >>= elements) (\t -> not (isValid signature2 t) || isGroudTerm t)
