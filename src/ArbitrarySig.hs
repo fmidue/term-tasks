@@ -4,17 +4,7 @@ module ArbitrarySig (
     makeFuncSymbol,
     randomSigTotal,
     makeFuncSymbol',
-    randomSigTotal',
-    getAllName,
-    getSignatureTerm,
-    getSignatureName,
-    getSignatureType,
-    changeSigOrder,
-    changeSigLength,
-    changeSigName,
-    makeString,
-    checkSigTerm,
-    overlaps
+    randomSigTotal'
     ) where
 import DataType
 import ValidCheck

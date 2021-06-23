@@ -16,14 +16,15 @@ isValid (Signature xs) t = checkNumber t a && checkType b t xs && checkSymbol d 
                                  c = getSigName xs
                                  d = getTermName t
 
-checkNumber :: Term -> FunctionSymbol -> Bool
+checkNumber :: Term -> Maybe FunctionSymbol -> Bool
 checkNumber (Term _ []) _ = True
-checkNumber (Term _ xs) (FunctionSymbol _ ys _) = length xs == length ys
+checkNumber _ Nothing = False
+checkNumber (Term _ xs) (Just (FunctionSymbol _ ys _)) = length xs == length ys
 
-giveSymbol :: Term -> [FunctionSymbol] -> FunctionSymbol
-giveSymbol _ [] = FunctionSymbol "e" [] (Type "error")
+giveSymbol :: Term -> [FunctionSymbol] -> Maybe FunctionSymbol
+giveSymbol _ [] = Nothing
 giveSymbol (Term a ys) (FunctionSymbol b x t : xs)
-   | a == b = FunctionSymbol b x t
+   | a == b = Just (FunctionSymbol b x t)
    | otherwise = giveSymbol (Term a ys) xs
 
 make :: Term -> [FunctionSymbol] -> [Type]
