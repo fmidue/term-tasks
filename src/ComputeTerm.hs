@@ -18,17 +18,17 @@ import DataType
 -- for #3
 -- first parameter is a bound on complexity of terms
 term :: Int -> Signature -> [Term]
-term n (Signature xs) = take n (nub (c ++ term' n (Signature xs) d))                    
+term n (Signature xs) = take n (nub (c ++ term' n (Signature xs) d))
                         where a = checkElement xs
-                              b = xs \\ a 
+                              b = xs \\ a
                               c = makeSingleTerms a
-                              d = c ++ makeTerm xs b c 
+                              d = c ++ makeTerm xs b c
 
 -- maybe also for terms of a specific type
 termsOfType :: Int -> Type -> Signature -> [Term]
-termsOfType n t (Signature xs) = if null a 
+termsOfType n t (Signature xs) = if null a
                                  then []
-                                 else checkType t (term n (Signature xs)) xs  
+                                 else checkType t (term n (Signature xs)) xs
                                  where a = term n (Signature xs)
 
 -- can tansform [Term] in more readable forms
@@ -57,7 +57,7 @@ checkType a (x:xs) ys
 giveType :: Term -> [FunctionSymbol] -> Type
 giveType (Term _ _) [] = (Type "error")
 giveType (Term a s) (FunctionSymbol b _ t : ys)
-   | a == b = t 
+   | a == b = t
    | otherwise =  giveType (Term a s) ys
 
 makeSymbol :: [FunctionSymbol] -> [Term] -> FunctionSymbol -> [[Term]]
@@ -66,8 +66,8 @@ makeSymbol w s (FunctionSymbol a (x:xs) y) = checkType x s w : makeSymbol w s (F
 
 toTerm :: String -> [[Term]] -> [Term]
 toTerm _ [] = []
-toTerm s (x:xs) 
-   | null xs = [Term s x] 
+toTerm s (x:xs)
+   | null xs = [Term s x]
    | otherwise = Term s x : toTerm s xs
 
 makeTerm :: [FunctionSymbol] -> [FunctionSymbol] -> [Term] -> [Term]
@@ -87,5 +87,5 @@ term' n (Signature xs) w = if null (nub (makeTerm xs b w) \\ w) || length (nub (
                            then nub (makeTerm xs b w)
                            else term' n (Signature xs) (w ++ (nub (makeTerm xs b w) \\ w))
                            where a = checkElement xs
-                                 b = xs \\ a 
+                                 b = xs \\ a
 
