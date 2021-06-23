@@ -3,15 +3,7 @@ module ComputeTerm (
    termsOfType,
    printTerm,
    printTermsOfType,
-   checkElement,
-   makeSingleTerms,
-   giveType,
-   makeSymbol,
-   toTerm,
-   makeTerm,
-   toString,
-   toEnd,
-   term'
+   giveType
    )where
 import Data.List
 import DataType
@@ -51,13 +43,13 @@ makeSingleTerms (FunctionSymbol x _ _:ys) = Term x [] : makeSingleTerms ys
 checkType :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 checkType _ [] _ = []
 checkType a (x:xs) ys
-   | a == giveType x ys = x : checkType a xs ys
+   | Just a == giveType x ys = x : checkType a xs ys
    | otherwise = checkType a xs ys
 
-giveType :: Term -> [FunctionSymbol] -> Type
-giveType (Term _ _) [] = (Type "error")
+giveType :: Term -> [FunctionSymbol] -> Maybe Type
+giveType (Term _ _) [] = Nothing
 giveType (Term a s) (FunctionSymbol b _ t : ys)
-   | a == b = t
+   | a == b = Just t
    | otherwise =  giveType (Term a s) ys
 
 makeSymbol :: [FunctionSymbol] -> [Term] -> FunctionSymbol -> [[Term]]
@@ -73,10 +65,6 @@ toTerm s (x:xs)
 makeTerm :: [FunctionSymbol] -> [FunctionSymbol] -> [Term] -> [Term]
 makeTerm _ [] _ = []
 makeTerm w (FunctionSymbol a x y : xs) t = toTerm a (sequence(makeSymbol w t (FunctionSymbol a x y))) ++ makeTerm w xs t
-
-toString :: [FunctionSymbol] -> [String]
-toString [] = []
-toString (FunctionSymbol x _ _ :ys) = x : toString ys
 
 toEnd :: Term -> String
 toEnd (Term x []) = x

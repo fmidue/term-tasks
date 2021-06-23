@@ -1,23 +1,13 @@
 module ValidCheck (
-   hasType,
    isValid,
-   checkNumber,
-   giveSymbol,
-   make,
-   getSigTermName,
-   checkType,
-   checkType',
-   giveType,
-   getSigName,
-   getTermName,
-   getTermName',
-   checkSymbol
+   getSigTermName
    )where
 
 import DataType
+import ComputeTerm
 
-hasType :: Type -> Term  -> [FunctionSymbol] -> Bool
-hasType = checkType
+--hasType :: Type -> Term  -> [FunctionSymbol] -> Bool
+--hasType = checkType
 
 isValid :: Signature -> Term -> Bool
 isValid (Signature xs) t = checkNumber t a && checkType b t xs && checkSymbol d c
@@ -49,10 +39,8 @@ getSigTermName (FunctionSymbol s xs _ : ys)
    | null xs = s : getSigTermName ys
    | otherwise = getSigTermName ys
 
-checkType :: Type -> Term -> [FunctionSymbol] -> Bool
-checkType (Type "error") _ _ = False
---checkType t (Term a []) w = giveType (Term a []) w == t && a `elem` n
---   where n = getSigTermName w
+checkType :: Maybe Type -> Term -> [FunctionSymbol] -> Bool
+checkType Nothing _ _ = False
 checkType _ (Term s xs) w = a
    where a = checkType' b xs w
          b = make (Term s xs) w
@@ -61,16 +49,10 @@ checkType' :: [Type] ->[Term] -> [FunctionSymbol] -> Bool
 checkType' [] [] _ = True
 checkType' [] xs _ = null xs
 checkType' xs [] _ = null xs
-checkType' (t:ts) (Term a []:xs) w = checkType' ts xs w && giveType (Term a []) w == t && a `elem` b
+checkType' (t:ts) (Term a []:xs) w = checkType' ts xs w && giveType (Term a []) w == Just t && a `elem` b
    where b = getSigTermName w
-checkType' (t:ts) (Term a x':xs) w = checkType' n x' w && checkType' ts xs w && giveType (Term a x') w == t
+checkType' (t:ts) (Term a x':xs) w = checkType' n x' w && checkType' ts xs w && giveType (Term a x') w == Just t
    where n = make (Term a x') w
-
-giveType :: Term -> [FunctionSymbol] -> Type
-giveType (Term _ _) [] = (Type "error")
-giveType (Term a s) (FunctionSymbol b _ t : ys)
-   | a == b = t
-   | otherwise =  giveType (Term a s) ys
 
 getSigName :: [FunctionSymbol] -> [String]
 getSigName [] = []
