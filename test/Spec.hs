@@ -24,6 +24,8 @@ main = hspec $ do
     all (isValid signature2) (term 30 signature2)
   specify "terms computed from a signature are valid (for signature4 and size up to 40)" $
     all (isValid signature4) (term 40 signature4)
+  specify "terms computed from a signature are valid (for signature6 and size up to 20)" $
+    all (isValid signature6) (term 20 signature6)
   specify "x(a,b,d) is not a term that can be built from signature4" $
     Term "x" [Term "a" [],Term "b" [],Term "d" []] `notElem` term 10 signature4
   specify "y(b) is not a term that can be built from signature4" $
@@ -46,6 +48,10 @@ main = hspec $ do
     isValid signature2 (Term "f" [Term "e" [Term "a" []]]) == False
   specify "f(e) is a valid term of signature2" $
     isValid signature2 (Term "f" [Term "e" []])
+  specify "x is an invalid term of signature4" $
+    isValid signature4 (Term "x" []) == False
+  specify "c(a,b,x) is an invalid term of signature6" $
+    isValid signature6 (Term "c" [Term "a" [],Term "b" [],Term "x" []]) == False
 
 --  prop "randoming leads to invalid terms (for non ground terms) with randomTerm (signature1)" $
 --    forAll ((randomTerm 5 signature1) >>= elements) (\t -> not (isValid signature1 t) || isGroudTerm t)

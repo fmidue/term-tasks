@@ -50,3 +50,12 @@ b5  = FunctionSymbol "b" [Type "A"] (Type "B")
 c5  = FunctionSymbol "c" [Type "B"] (Type "C")
 d5  = FunctionSymbol "d" [Type "C"] (Type "D")
 e5  = FunctionSymbol "e" [Type "D"] (Type "A")
+
+signature6 = Signature [a6,b6,c6,d6,e6]
+a6  = FunctionSymbol "a" [] (Type "A")
+b6  = FunctionSymbol "b" [] (Type "A")
+c6  = FunctionSymbol "c" [Type "A",Type "A",Type "C"] (Type "B")
+d6  = FunctionSymbol "d" [] (Type "C")
+e6  = FunctionSymbol "e" [] (Type "C")
+f6  = FunctionSymbol "f" [] (Type "C")
+

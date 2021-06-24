@@ -33,8 +33,8 @@ printTermsOfType n t xs = nub (map toEnd (termsOfType n t xs))
 checkElement :: [FunctionSymbol] -> [FunctionSymbol]
 checkElement [] = []
 checkElement (FunctionSymbol x xs t:ys)
-   | null xs = (FunctionSymbol x xs t) : checkElement ys
-   | otherwise = [] ++ checkElement ys
+   | null xs = FunctionSymbol x xs t : checkElement ys
+   | otherwise = checkElement ys
 
 makeSingleTerms :: [FunctionSymbol] -> [Term]
 makeSingleTerms [] = []
