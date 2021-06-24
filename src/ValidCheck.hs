@@ -10,11 +10,10 @@ import ComputeTerm
 --hasType = checkType
 
 isValid :: Signature -> Term -> Bool
-isValid (Signature xs) t = checkSymbol d c && checkNumber t a && checkType b t xs
+isValid (Signature xs) t = checkSymbol c b && checkNumber t a && checkType t xs
                            where a = giveSymbol t xs
-                                 b = giveType t xs
-                                 c = getSigName xs
-                                 d = getTermName t
+                                 b = getSigName xs
+                                 c = getTermName t
 
 checkNumber :: Term -> Maybe FunctionSymbol -> Bool
 checkNumber (Term _ []) (Just (FunctionSymbol _ [] _)) = True
@@ -41,9 +40,8 @@ getSigTermName (FunctionSymbol s xs _ : ys)
    | null xs = s : getSigTermName ys
    | otherwise = getSigTermName ys
 
-checkType :: Maybe Type -> Term -> [FunctionSymbol] -> Bool
-checkType Nothing _ _ = False
-checkType _ (Term s xs) w = a
+checkType :: Term -> [FunctionSymbol] -> Bool
+checkType (Term s xs) w = a
    where a = checkType' b xs w
          b = giveArgType (Term s xs) w
 
