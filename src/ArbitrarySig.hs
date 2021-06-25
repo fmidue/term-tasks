@@ -57,7 +57,7 @@ makeFuncSymbol' :: [String] -> [Type] -> Gen [FunctionSymbol]
 makeFuncSymbol' [] _ = return []
 makeFuncSymbol' _ [] = return []
 makeFuncSymbol' (x:xs) t = do
-    a <- chooseInt (0,4)
+    a <- chooseInt (0,5)
     let b = elements t
     c <- vectorOf a b
     d <- elements t
