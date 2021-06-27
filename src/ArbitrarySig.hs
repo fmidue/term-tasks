@@ -7,7 +7,7 @@ module ArbitrarySig (
     randomSigTotal'
     ) where
 import DataType
-import ValidCheck
+import ValidCheck (getAllConstant)
 import Test.QuickCheck
 import Data.List
 
@@ -15,7 +15,7 @@ import Data.List
 randomSig :: Signature -> Gen Signature
 randomSig (Signature []) = return (Signature [])
 randomSig (Signature xs) = do
-    let e = getSigTermName xs
+    let e = getAllConstant xs
     a <- randomSig' xs e
     let b = overlaps a xs
     return (Signature b)

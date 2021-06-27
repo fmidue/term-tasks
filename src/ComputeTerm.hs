@@ -3,77 +3,81 @@ module ComputeTerm (
    termsOfType,
    printTerm,
    printTermsOfType,
-   giveType
+   giveType,
+   getAllConstant
    )where
-import Data.List
+import Data.List ((\\),nub,intercalate)
 import DataType
 -- for #3
 -- first parameter is a bound on complexity of terms
 term :: Int -> Signature -> [Term]
-term n (Signature xs) = take n (nub (c ++ term' n (Signature xs) d))
-                        where a = checkElement xs
-                              b = xs \\ a
-                              c = makeSingleTerms a
-                              d = c ++ makeTerm xs b c
+term n (Signature xs) = take n (nub (makeConstants (getAllConstant xs) ++ makeSubterm n (Signature xs) ft))
+                        where constant = getAllConstant xs
+                              ft = makeConstants constant ++ makeAllTerm xs (getAllFunction xs) (makeConstants constant)
 
 -- maybe also for terms of a specific type
 termsOfType :: Int -> Type -> Signature -> [Term]
-termsOfType n t (Signature xs) = if null a
+termsOfType n t (Signature xs) = if null (term n (Signature xs))
                                  then []
-                                 else checkType t (term n (Signature xs)) xs
-                                 where a = term n (Signature xs)
+                                 else getSameTypeTerm t (term n (Signature xs)) xs
 
 -- can tansform [Term] in more readable forms
 printTerm :: Int -> Signature -> [String]
-printTerm n xs = nub (map toEnd (term n xs))
+printTerm n xs = nub (map transTerm (term n xs))
 
 printTermsOfType :: Int -> Type -> Signature -> [String]
-printTermsOfType n t xs = nub (map toEnd (termsOfType n t xs))
+printTermsOfType n t xs = nub (map transTerm (termsOfType n t xs))
 
-checkElement :: [FunctionSymbol] -> [FunctionSymbol]
-checkElement [] = []
-checkElement (FunctionSymbol x xs t:ys)
-   | null xs = FunctionSymbol x xs t : checkElement ys
-   | otherwise = checkElement ys
+getAllFunction :: [FunctionSymbol] -> [FunctionSymbol]
+getAllFunction [] = []
+getAllFunction (FunctionSymbol s xs t:ys)
+   | null xs = getAllFunction ys
+   | otherwise = FunctionSymbol s xs t : getAllFunction ys
 
-makeSingleTerms :: [FunctionSymbol] -> [Term]
-makeSingleTerms [] = []
-makeSingleTerms (FunctionSymbol x _ _:ys) = Term x [] : makeSingleTerms ys
+getAllConstant :: [FunctionSymbol] -> [String]
+getAllConstant [] = []
+getAllConstant (FunctionSymbol s xs _ : ys)
+   | null xs = s : getAllConstant ys
+   | otherwise = getAllConstant ys
 
-checkType :: Type -> [Term] -> [FunctionSymbol] -> [Term]
-checkType _ [] _ = []
-checkType a (x:xs) ys
-   | Just a == giveType x ys = x : checkType a xs ys
-   | otherwise = checkType a xs ys
+makeConstants :: [String] -> [Term]
+makeConstants [] = []
+makeConstants (x:xs) = Term x [] : makeConstants xs
 
-giveType :: Term -> [FunctionSymbol] -> Maybe Type
-giveType (Term _ _) [] = Nothing
-giveType (Term a s) (FunctionSymbol b _ t : ys)
+getSameTypeTerm :: Type -> [Term] -> [FunctionSymbol] -> [Term]
+getSameTypeTerm _ [] _ = []
+getSameTypeTerm a (Term s t:xs) ys
+   | Just a == giveType s ys = Term s t : getSameTypeTerm a xs ys
+   | otherwise = getSameTypeTerm a xs ys
+
+giveType :: String -> [FunctionSymbol] -> Maybe Type
+giveType _ [] = Nothing
+giveType a (FunctionSymbol b _ t : ys)
    | a == b = Just t
-   | otherwise =  giveType (Term a s) ys
+   | otherwise =  giveType a ys
 
-makeSymbol :: [FunctionSymbol] -> [Term] -> FunctionSymbol -> [[Term]]
-makeSymbol _ _ (FunctionSymbol _ [] _) = []
-makeSymbol w s (FunctionSymbol a (x:xs) y) = checkType x s w : makeSymbol w s (FunctionSymbol a xs y)
+makeDiffTypeTermList :: [FunctionSymbol] -> [Term] -> FunctionSymbol -> [[Term]]
+makeDiffTypeTermList _ _ (FunctionSymbol _ [] _) = []
+makeDiffTypeTermList w s (FunctionSymbol a (x:xs) y) = getSameTypeTerm x s w : makeDiffTypeTermList w s (FunctionSymbol a xs y)
 
-toTerm :: String -> [[Term]] -> [Term]
-toTerm _ [] = []
-toTerm s (x:xs)
+makeTerm :: String -> [[Term]] -> [Term]
+makeTerm _ [] = []
+makeTerm s (x:xs)
    | null xs = [Term s x]
-   | otherwise = Term s x : toTerm s xs
+   | otherwise = Term s x : makeTerm s xs
 
-makeTerm :: [FunctionSymbol] -> [FunctionSymbol] -> [Term] -> [Term]
-makeTerm _ [] _ = []
-makeTerm w (FunctionSymbol a x y : xs) t = toTerm a (sequence(makeSymbol w t (FunctionSymbol a x y))) ++ makeTerm w xs t
+makeAllTerm :: [FunctionSymbol] -> [FunctionSymbol] -> [Term] -> [Term]
+makeAllTerm _ [] _ = []
+makeAllTerm w (FunctionSymbol a x y : xs) t = makeTerm a (sequence(makeDiffTypeTermList w t (FunctionSymbol a x y))) ++ makeAllTerm w xs t
 
-toEnd :: Term -> String
-toEnd (Term x []) = x
-toEnd (Term s xs) = s ++ "(" ++ intercalate "," (map toEnd xs) ++ ")"
+transTerm :: Term -> String
+transTerm (Term x []) = x
+transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
 
-term' :: Int -> Signature -> [Term] -> [Term]
-term' n (Signature xs) w = if null (nub (makeTerm xs b w) \\ w) || length (nub (makeTerm xs b w)) >= n
-                           then nub (makeTerm xs b w)
-                           else term' n (Signature xs) (w ++ (nub (makeTerm xs b w) \\ w))
-                           where a = checkElement xs
-                                 b = xs \\ a
+makeSubterm :: Int -> Signature -> [Term] -> [Term]
+makeSubterm n (Signature xs) w = if null (nub (makeAllTerm xs b w) \\ w) || length (nub (makeAllTerm xs b w)) >= n
+                           then nub (makeAllTerm xs b w)
+                           else makeSubterm n (Signature xs) (w ++ (nub (makeAllTerm xs b w) \\ w))
+                           where b = getAllFunction xs
+
 
