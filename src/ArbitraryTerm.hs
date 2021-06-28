@@ -1,34 +1,35 @@
 module ArbitraryTerm (
-   randomTerm,
-   printRanTerm,
-   totalRandomTerm,
-   printTotalRanTerm,
+   invalidTerm1,
+   invalidTerm2,
+   invalidTermOfType1,
+   invalidTermOfType2
    ) where
 import Test.QuickCheck
 import DataType
-import ComputeTerm (term,printTerm)
+import ComputeTerm (term,termsOfType)
 import ArbitrarySig
 
-randomTerm :: Int -> Signature -> Gen [Term]
-randomTerm n xs = do
-    a <- randomSig xs
-    let b = term n a
-    return b
+invalidTerm1 :: Int -> Signature -> Gen [Term]
+invalidTerm1 n xs = do
+    sig <- randomSig xs
+    let invalidT = term n sig
+    return invalidT
 
-printRanTerm :: Int -> Signature -> Gen [String]
-printRanTerm n xs = do
-    a <- randomSig xs
-    let b = printTerm n a
-    return b
+invalidTermOfType1 :: Int -> Type -> Signature -> Gen [Term]
+invalidTermOfType1 n t xs = do
+    sig <- randomSig xs
+    let invalidT = termsOfType n t sig
+    return invalidT
 
-totalRandomTerm :: Int -> Signature -> Gen [Term]
-totalRandomTerm n xs = do
-    a <- randomSigTotal xs
-    let b = term n a
-    return b
+invalidTerm2 :: Int -> Signature -> Gen [Term]
+invalidTerm2 n xs = do
+    sig <- randomSigTotal xs
+    let invalidT = term n sig
+    return invalidT
 
-printTotalRanTerm :: Int -> Signature -> Gen [String]
-printTotalRanTerm n xs = do
-    a <- randomSigTotal xs
-    let b = printTerm n a
-    return b
+invalidTermOfType2 :: Int -> Type -> Signature -> Gen [Term]
+invalidTermOfType2 n t xs = do
+    sig <- randomSigTotal xs
+    let invalidT = termsOfType n t sig
+    return invalidT
+

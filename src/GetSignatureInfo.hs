@@ -1,6 +1,7 @@
 module GetSignatureInfo (
    getSigSymbol,
    getFuncSymbol,
+   getAllConstant,
    getAllFunction,
    getAllConstantSymbol,
    getAllType,
@@ -26,6 +27,12 @@ getAllFunction [] = []
 getAllFunction (FunctionSymbol s xs t:ys)
    | null xs = getAllFunction ys
    | otherwise = FunctionSymbol s xs t : getAllFunction ys
+
+getAllConstant :: Signature -> [FunctionSymbol]
+getAllConstant (Signature []) = []
+getAllConstant (Signature (FunctionSymbol s ys t : xs))
+    | null ys = FunctionSymbol s ys t : getAllConstant (Signature xs)
+    | otherwise = getAllConstant (Signature xs)
 
 getAllConstantSymbol :: [FunctionSymbol] -> [String]
 getAllConstantSymbol [] = []

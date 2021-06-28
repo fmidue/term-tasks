@@ -6,7 +6,7 @@ module ArbitrarySig (
     makeFuncSymbol'
     ) where
 import DataType
-import GetSignatureInfo (getAllConstantSymbol,getFuncSymbol,getAllType)
+import GetSignatureInfo (getAllConstantSymbol,getFuncSymbol,getAllType,getAllConstant)
 import Test.QuickCheck
 import Data.List
 
@@ -46,7 +46,7 @@ randomSigTotal (Signature []) = return (Signature [])
 randomSigTotal (Signature xs) = do
     let a = getFuncSymbol (Signature xs)
         b = getAllType (Signature xs)
-        c = getSignatureTerm (Signature xs)
+        c = getAllConstant (Signature xs)
     d <- makeFuncSymbol' a b
     let e = c ++ d
         f = overlaps e xs
@@ -62,12 +62,6 @@ makeFuncSymbol' (x:xs) t = do
     d <- elements t
     e <- makeFuncSymbol' xs t
     return (FunctionSymbol x c d : e)
-
-getSignatureTerm :: Signature -> [FunctionSymbol]
-getSignatureTerm (Signature []) = []
-getSignatureTerm (Signature (FunctionSymbol s ys t : xs))
-    | null ys = FunctionSymbol s ys t : getSignatureTerm (Signature xs)
-    | otherwise = getSignatureTerm (Signature xs)
 
 changeArgOrder :: FunctionSymbol -> Gen FunctionSymbol
 changeArgOrder (FunctionSymbol s xs t)= do
