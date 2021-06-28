@@ -30,7 +30,7 @@ printTermsOfType :: Int -> Type -> Signature -> [String]
 printTermsOfType n t xs = nub (map transTerm (termsOfType n t xs))
 
 makeConstants :: [String] -> [Term]
-makeConstants xs = map (`Term` []) xs
+makeConstants xs = map (`Term` [])
 
 getSameTypeTerm :: Type -> [Term] -> [FunctionSymbol] -> [Term]
 getSameTypeTerm _ [] _ = []
