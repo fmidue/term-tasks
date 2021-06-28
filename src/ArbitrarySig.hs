@@ -7,7 +7,7 @@ module ArbitrarySig (
     randomSigTotal'
     ) where
 import DataType
-import ValidCheck (getAllConstant)
+import ComputeTerm (getAllConstant)
 import Test.QuickCheck
 import Data.List
 

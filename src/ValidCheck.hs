@@ -1,6 +1,5 @@
 module ValidCheck (
    isValid,
-   getAllConstant
    )where
 
 import DataType
