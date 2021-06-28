@@ -84,12 +84,18 @@ main = hspec $ do
     forAll ((totalRandomTerm' 5 signature4) >>= elements) (\t -> not (isValid signature4 t) || isConstant t)
   prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature5)" $
     forAll ((totalRandomTerm' 5 signature5) >>= elements) (\t -> not (isValid signature5 t) || isConstant t)
-
+  prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature1)" $
+    forAll (randomTerm 5 signature1) (all (\t -> not (isValid signature1 t) || isConstant t))
+  prop "randoming leads to invalid terms (for non ground terms) with totalRandomTerm' (signature1)" $
+    forAll (((randomSig signature1) >>= selectOneFunc) >>= (randomTerm 10)) (all (\t -> not (isValid signature1 t) || isConstant t))
 
 
 isConstant :: Term -> Bool
 isConstant (Term _ []) = True
 isConstant _ = False
 
-
+selectOneFunc :: Signature -> Gen Signature
+selectOneFunc (Signature xs) = do
+  f <- elements xs
+  return (Signature [f])
 

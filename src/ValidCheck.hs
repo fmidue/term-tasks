@@ -3,25 +3,10 @@ module ValidCheck (
    )where
 
 import DataType
-import ComputeTerm (giveType,getAllConstant)
-
---hasType :: Type -> Term  -> [FunctionSymbol] -> Bool
---hasType = checkType
+import GetSignatureInfo (giveType,getAllConstantSymbol,getSigSymbol)
 
 isValid :: Signature -> Term -> Bool
-isValid (Signature xs) t@(Term root ys) = all (`elem` getSigSymbol xs) (getTermSymbol t) && checkNumber ys (giveSymbol root xs) && checkType t xs
-
-checkNumber :: [Term] -> Maybe FunctionSymbol -> Bool
-checkNumber [] (Just (FunctionSymbol _ [] _)) = True
-checkNumber [] _ = False
-checkNumber _ Nothing = False
-checkNumber xs (Just (FunctionSymbol _ ys _)) = length xs == length ys
-
-giveSymbol :: String -> [FunctionSymbol] -> Maybe FunctionSymbol
-giveSymbol _ [] = Nothing
-giveSymbol s (FunctionSymbol b x t : xs)
-   | s == b = Just (FunctionSymbol b x t)
-   | otherwise = giveSymbol s xs
+isValid (Signature xs) t = all (`elem` getSigSymbol xs) (getTermSymbol t) && checkType t xs
 
 giveArgType :: String -> [FunctionSymbol] -> [Type]
 giveArgType _ [] = error "This will never happen!"
@@ -36,12 +21,8 @@ checkType' :: [Type] ->[Term] -> [FunctionSymbol] -> Bool
 checkType' [] [] _ = True
 checkType' [] xs _ = null xs
 checkType' xs [] _ = null xs
-checkType' (t:ts) (Term s []:xs) w = checkType' ts xs w && giveType s w == Just t && s `elem` getAllConstant w
-checkType' (t:ts) (Term s x':xs) w = checkType' (giveArgType s w) x' w && checkType' ts xs w && giveType s w == Just t
-
-getSigSymbol :: [FunctionSymbol] -> [String]
-getSigSymbol [] = []
-getSigSymbol (FunctionSymbol x _ _:ys) = x : getSigSymbol ys
+checkType' (t:ts) (Term s []:xs) w = checkType' ts xs w && giveType s w == Just t && s `elem` getAllConstantSymbol w
+checkType' (t:ts) (Term s x':xs) w = checkType (Term s x') w && checkType' ts xs w && giveType s w == Just t
 
 getTermSymbol :: Term -> [String]
 getTermSymbol (Term x xs) = x : getTermSymbol' xs
