@@ -37,7 +37,7 @@ printTotalRanTerm n xs = do
 
 totalRandomTerm' :: Int -> Signature -> Gen [Term]
 totalRandomTerm' n xs = do
-    a <- randomSigTotal xs
+    a <- randomSigTotal' xs
     let b = term n a
     return b
 

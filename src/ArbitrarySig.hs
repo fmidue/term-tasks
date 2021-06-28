@@ -78,7 +78,7 @@ randomSigTotal' (Signature xs) = do
 getSignatureTerm :: Signature -> [FunctionSymbol]
 getSignatureTerm (Signature []) = []
 getSignatureTerm (Signature (FunctionSymbol s ys t : xs))
-    | null ys = (FunctionSymbol s ys t) : getSignatureTerm (Signature xs)
+    | null ys = FunctionSymbol s ys t : getSignatureTerm (Signature xs)
     | otherwise = getSignatureTerm (Signature xs)
 
 changeArgOrder :: FunctionSymbol -> Gen FunctionSymbol
@@ -88,7 +88,7 @@ changeArgOrder (FunctionSymbol s xs t)= do
 
 changeArgLength :: FunctionSymbol -> Gen FunctionSymbol
 changeArgLength (FunctionSymbol s xs t)= do
-    a <- choose (0,(length xs)+2)
+    a <- choose (0,length xs + 2)
     let b = elements xs
     c <- vectorOf a b
     return (FunctionSymbol s c t)
@@ -96,7 +96,7 @@ changeArgLength (FunctionSymbol s xs t)= do
 changeFuncSymbol :: FunctionSymbol -> [String] -> Gen FunctionSymbol
 changeFuncSymbol (FunctionSymbol _ xs t) s = do
     let a = ['a'..'z']
-        b = (map makeString a)\\s
+        b = map makeString a \\ s
     c <- elements b
     return (FunctionSymbol c xs t)
 
@@ -112,12 +112,12 @@ checkSame :: FunctionSymbol -> [FunctionSymbol] -> Bool
 checkSame _ [] = False
 checkSame (FunctionSymbol s1 x1 t1) (FunctionSymbol s2 x2 _:ys)
    | s1 == s2 && x1 == x2 = True
-   | otherwise = False || checkSame (FunctionSymbol s1 x1 t1) ys
+   | otherwise = checkSame (FunctionSymbol s1 x1 t1) ys
 
 overlaps :: [FunctionSymbol] -> [FunctionSymbol] -> [FunctionSymbol]
 overlaps [] _ = []
 overlaps _ [] = []
 overlaps (FunctionSymbol s x t : xs) ys
-   | null x = (FunctionSymbol s x t) : overlaps xs ys
+   | null x = FunctionSymbol s x t : overlaps xs ys
    | checkSame (FunctionSymbol s x t) ys = overlaps xs ys
-   | otherwise = (FunctionSymbol s x t) : overlaps xs ys
+   | otherwise = FunctionSymbol s x t : overlaps xs ys

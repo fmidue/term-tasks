@@ -15,9 +15,9 @@ allTerm n xs = do
 
 printAllTerm :: Int -> Signature -> Gen [String]
 printAllTerm n xs = do
-    a <- printRanTerm n xs
-    let b = printTerm n xs
-    c <- shuffle (a++b)
+    it <- printRanTerm n xs
+    let vt = printTerm n xs
+    c <- shuffle (it++vt)
     let d = take n c
     return d
 
