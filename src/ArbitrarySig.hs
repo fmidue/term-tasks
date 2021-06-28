@@ -3,11 +3,10 @@ module ArbitrarySig (
     randomSig',
     makeFuncSymbol,
     randomSigTotal,
-    makeFuncSymbol',
-    randomSigTotal'
+    makeFuncSymbol'
     ) where
 import DataType
-import GetSignatureInfo (getAllConstantSymbol,getSigSymbol,getFuncSymbol,getAllType)
+import GetSignatureInfo (getAllConstantSymbol,getFuncSymbol,getAllType)
 import Test.QuickCheck
 import Data.List
 
@@ -63,17 +62,6 @@ makeFuncSymbol' (x:xs) t = do
     d <- elements t
     e <- makeFuncSymbol' xs t
     return (FunctionSymbol x c d : e)
-
--- It only uses the names and types of original signature.
--- It will generate totally new functions and ground terms.
-randomSigTotal' :: Signature -> Gen Signature
-randomSigTotal' (Signature xs) = do
-    let a = getSigSymbol xs
-        b = getAllType (Signature xs)
-    c <- makeFuncSymbol' a b
-    let d = overlaps c xs
---        e = c \\ d
-    return (Signature d)
 
 getSignatureTerm :: Signature -> [FunctionSymbol]
 getSignatureTerm (Signature []) = []
