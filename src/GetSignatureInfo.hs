@@ -6,7 +6,8 @@ module GetSignatureInfo (
    getAllConstantSymbol,
    getAllType,
    giveType,
-   giveArgType
+   giveArgType,
+   funcSymbolOfType
 )
 where
 
@@ -57,3 +58,8 @@ giveArgType x (Signature(FunctionSymbol y ys _:xs))
    | x == y = Just ys
    | otherwise = giveArgType x (Signature xs)
 
+funcSymbolOfType :: Type -> Signature -> [FunctionSymbol]
+funcSymbolOfType _ (Signature []) = []
+funcSymbolOfType t (Signature (FunctionSymbol s xs t' : ys))
+   | t == t' && not (null xs)= FunctionSymbol s xs t' : funcSymbolOfType t (Signature ys)
+   | otherwise = funcSymbolOfType t (Signature ys)
