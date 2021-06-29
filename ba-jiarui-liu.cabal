@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6925bf555f7bcdc9af9f1752eac0087fe7f4433ccbc5fd54f3d9e1a12f23d20d
+-- hash: cf6e769da9db83dd1729fb89208b05c38315b2028b5a80e8626cf726ed88fe10
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -17,6 +17,7 @@ library
       ComputeAllTerm
       ComputeTerm
       DataType
+      DealWithTerm
       GetSignatureInfo
       ValidCheck
   other-modules:
