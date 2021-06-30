@@ -40,9 +40,9 @@ getSameTypeTerm a (Term s t:xs) sig
    | Just a == giveType s sig = Term s t : getSameTypeTerm a xs sig
    | otherwise = getSameTypeTerm a xs sig
 
-makeDiffTypeTermList :: Signature -> [Term] -> FunctionSymbol -> [[Term]]
-makeDiffTypeTermList _ _ (FunctionSymbol _ [] _) = []
-makeDiffTypeTermList w s (FunctionSymbol a (x:xs) y) = getSameTypeTerm x s w : makeDiffTypeTermList w s (FunctionSymbol a xs y)
+makeDiffTypeTermList :: Signature -> [Term] -> [Type] -> [[Term]]
+makeDiffTypeTermList _ _ [] = []
+makeDiffTypeTermList w s (x:xs) = getSameTypeTerm x s w : makeDiffTypeTermList w s xs
 
 makeTerm :: String -> [[Term]] -> [Term]
 makeTerm _ [] = []
@@ -50,7 +50,7 @@ makeTerm s (x:xs) = Term s x : makeTerm s xs
 
 makeAllTerm :: Signature -> [FunctionSymbol] -> [Term] -> [Term]
 makeAllTerm _ [] _ = []
-makeAllTerm w (FunctionSymbol a x y : xs) t = makeTerm a (sequence(makeDiffTypeTermList w t (FunctionSymbol a x y))) ++ makeAllTerm w xs t
+makeAllTerm w (FunctionSymbol a x _ : xs) t = makeTerm a (sequence(makeDiffTypeTermList w t x)) ++ makeAllTerm w xs t
 
 makeSubterm :: Int -> Signature -> [Term] -> [Term]
 makeSubterm n sig w = if null (nub getAllT \\ w) || length (nub getAllT) >= n

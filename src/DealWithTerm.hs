@@ -1,6 +1,5 @@
 module DealWithTerm (
    getTermSymbol,
-   getTermSymbol',
    transTerm
    ) where
 
