@@ -1,7 +1,9 @@
 module ComputeAllTerm where
 import DataType
 import ComputeTerm
+import ValidCheck (isValid)
 import ArbitraryTerm
+import Data.List (partition)
 import Test.QuickCheck
 
 allTerm1 :: Int -> Signature -> Gen [Term]
@@ -32,11 +34,14 @@ allTermOfType2 n t xs = do
     combineT <- shuffle (invalidT++validT)
     return (take n combineT)
 
---checkAllTerm :: Int -> Signature -> Gen [Bool]
---checkAllTerm n xs = do
---    a <- allTerm n xs
---    let b = map (isValid xs) a
---    return b
+-- partition :: (a -> Bool) -> [a] -> ([a], [a])
+checkAllTerm :: Int -> Signature -> Gen ([Term],[Term])
+checkAllTerm n xs = do
+    t <- allTerm1 n xs
+    let termTuple = partition (isValid xs) t
+    return termTuple
+
+
 
 --main :: IO ()
 --main = do

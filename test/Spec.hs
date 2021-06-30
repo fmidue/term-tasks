@@ -53,6 +53,19 @@ main = hspec $ do
     not (isValid signature4 (Term "x" []))
   specify "c(a,b,x) is an invalid term of signature6" $
     not (isValid signature6 (Term "c" [Term "a" [],Term "b" [],Term "x" []]))
+  specify "t(a,b) is not a term of Type D that can be built from signature1" $
+    Term "t" [Term "a" [],Term "b" []] `notElem` termsOfType 20 (Type "D") signature1
+  specify "g(f(e),a) is a term of Type E that can be built from signature2" $
+    Term "g" [Term "f" [Term "e" []], Term "a" []] `elem` termsOfType 20 (Type "E") signature2
+  specify "h(x,f(x,x),g(y,y)) is not a term of Type D that can be built from signature3" $
+    Term "h" [Term "x" [],Term "f" [Term "x" [],Term "x" []],Term "g" [Term "y" [],Term "y" []]] `notElem` termsOfType 20 (Type "D") signature3
+  specify "h(x(a,b,c)) is not a term of Type F that can be built from signature4" $
+    Term "h" [Term "x" [Term "a" [],Term "b" [],Term "c" []]] `notElem` termsOfType 20 (Type "F") signature4
+  specify "b(e(d(c(b(a))))) is a term of Type B that can be built from signature5" $
+    Term "b" [Term "e" [Term "d" [Term "c"[Term "b" [Term "a" []]]]]] `elem` termsOfType 20 (Type "B") signature5
+  specify "c(a,b,f) is a term of Type B that can be built from signature6" $
+    Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
+
 
   prop "randoming leads to invalid terms (for non constants) with invalidTerm1 (signature1)" $
     forAll (invalidTerm1 5 signature1 >>= elements) (\t -> not (isValid signature1 t) || isConstant t)
