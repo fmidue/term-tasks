@@ -7,6 +7,7 @@ import ValidCheck
 import ArbitrarySig
 import ArbitraryTerm
 import GetSignatureInfo
+import DealWithTerm
 import Test.QuickCheck
 import Examples.Signatures
 
@@ -65,7 +66,6 @@ main = hspec $ do
     Term "b" [Term "e" [Term "d" [Term "c"[Term "b" [Term "a" []]]]]] `elem` termsOfType 20 (Type "B") signature5
   specify "c(a,b,f) is a term of Type B that can be built from signature6" $
     Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
-
 
   prop "randoming leads to invalid terms (for non constants) with invalidTerm1 (signature1)" $
     forAll (invalidTerm1 5 signature1 >>= elements) (\t -> not (isValid signature1 t) || isConstant t)
@@ -126,4 +126,17 @@ selectOneFunc sig = do
       f = getAllFunction sig
   fList <- elements f
   return (Signature (con++f))
+
+-- maybe also for terms of a specific type
+termsOfType :: Int -> Type -> Signature -> [Term]
+termsOfType n t sig = getSameTypeTerm t (term n sig) sig
+
+-- can tansform [Term] in more readable forms
+printTerm :: Int -> Signature -> [String]
+printTerm n xs = map transTerm (term n xs)
+
+printTermsOfType :: Int -> Type -> Signature -> [String]
+printTermsOfType n t xs = map transTerm (termsOfType n t xs)
+
+
 

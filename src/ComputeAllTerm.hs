@@ -1,6 +1,6 @@
 module ComputeAllTerm where
 import DataType
-import ComputeTerm
+import ComputeTerm (term,getSameTypeTerm)
 import ValidCheck (isValid)
 import ArbitraryTerm
 import Data.List (partition)
@@ -23,14 +23,14 @@ allTerm2 n xs = do
 allTermOfType1 :: Int -> Type -> Signature -> Gen [Term]
 allTermOfType1 n t xs = do
     invalidT <- invalidTermOfType1 n t xs
-    let validT = termsOfType n t xs
+    let validT = getSameTypeTerm t (term n xs) xs
     combineT <- shuffle (invalidT++validT)
     return (take n combineT)
 
 allTermOfType2 :: Int -> Type -> Signature -> Gen [Term]
 allTermOfType2 n t xs = do
     invalidT <- invalidTermOfType2 n t xs
-    let validT = termsOfType n t xs
+    let validT = getSameTypeTerm t (term n xs) xs
     combineT <- shuffle (invalidT++validT)
     return (take n combineT)
 
