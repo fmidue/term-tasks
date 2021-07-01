@@ -8,6 +8,7 @@ import ArbitrarySig
 import ArbitraryTerm
 import GetSignatureInfo
 import DealWithTerm
+import CheckError
 import Test.QuickCheck
 import Examples.Signatures
 
@@ -66,6 +67,18 @@ main = hspec $ do
     Term "b" [Term "e" [Term "d" [Term "c"[Term "b" [Term "a" []]]]]] `elem` termsOfType 20 (Type "B") signature5
   specify "c(a,b,f) is a term of Type B that can be built from signature6" $
     Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
+
+  specify "c(a,b) is an invalid term (parameter length error) that can be built from signature6" $
+    checkErrorType signature6 (Term "c" [Term "a" [],Term "b" []]) == (Just LENGTH)
+  specify "z(d,y,c) is an invalid term (parameter order error) that can be built from signature4" $
+    checkErrorType signature4 (Term "z" [Term "d" [],Term "y" [Term "b" [],Term "d" []],Term "c" []]) == (Just ORDER)
+  specify "f(x,y) is an invalid term (parameter type error) that can be built from signature3" $
+    checkErrorType signature3 (Term "f" [Term "x" [],Term "y" []]) == (Just TYPE)
+  specify "g(a,f(e)) is an invalid term (parameter order error) that can be built from signature2" $
+    checkErrorType signature2 (Term "g" [Term "a" [],Term "f" [Term "e" []]]) == (Just ORDER)
+  specify "a(b) is an invalid term (parameter length error) that can be built from signature1" $
+    checkErrorType signature1 (Term "a" [Term "b" []]) == (Just LENGTH)
+
 
   prop "randoming leads to invalid terms (for non constants) with invalidTerm1 (signature1)" $
     forAll (invalidTerm1 5 signature1 >>= elements) (\t -> not (isValid signature1 t) || isConstant t)

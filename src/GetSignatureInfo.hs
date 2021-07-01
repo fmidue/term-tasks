@@ -6,6 +6,7 @@ module GetSignatureInfo (
    getAllConstantSymbol,
    getAllType,
    giveType,
+   giveTypeList,
    giveArgType,
    funcSymbolOfType
 )
@@ -13,6 +14,7 @@ where
 
 import DataType
 import Data.List (nub)
+import Data.Maybe (fromJust)
 
 getSigSymbol :: Signature -> [String]
 getSigSymbol (Signature []) = []
@@ -51,6 +53,11 @@ giveType _ (Signature []) = Nothing
 giveType a (Signature(FunctionSymbol b _ t : ys))
    | a == b = Just t
    | otherwise =  giveType a (Signature ys)
+
+giveTypeList :: [String] -> Signature -> [Type]
+giveTypeList _ (Signature []) = []
+giveTypeList [] _ = []
+giveTypeList (s:ys) xs = fromJust(giveType s xs) : giveTypeList ys xs
 
 giveArgType :: String -> Signature -> Maybe [Type]
 giveArgType _ (Signature []) = Nothing
