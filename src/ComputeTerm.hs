@@ -1,11 +1,13 @@
 module ComputeTerm (
    term,
-   getSameTypeTerm
+   getSameTypeTerm,
+   oneValidTerm
    )where
 
 import DataType
 import GetSignatureInfo (getAllFunction,getAllConstantSymbol,giveType)
 import Data.List ((\\))
+import Test.QuickCheck (Gen,elements,chooseInt)
 
 -- for #3
 -- first parameter is a bound on complexity of terms
@@ -41,4 +43,12 @@ makeSubterm n sig w = if null (getAllT \\ w) || length getAllT >= n
                          where func = getAllFunction sig
                                getAllT = makeAllTerm sig func w
 
+oneValidTerm :: Signature -> Gen Term
+oneValidTerm sig = do
+   n <- chooseInt (1,20)
+   let conSymbol = getAllConstantSymbol sig
+       constant = makeConstants conSymbol
+       getAllT = makeSubterm n sig constant
+       allTerm = constant ++ getAllT
+   elements allTerm
 
