@@ -1,5 +1,6 @@
 module ArbitrarySig (
-    randomSig
+    randomSig,
+    longerLength
     ) where
 import DataType
 import GetSignatureInfo (getAllConstantSymbol,getAllType)
@@ -42,9 +43,25 @@ changeArgOrder (FunctionSymbol s xs t) = do
 changeArgLength :: FunctionSymbol -> Gen FunctionSymbol
 changeArgLength (FunctionSymbol s xs t) = do
     argLength <- choose (0,length xs + 2)
-    let selectType = elements xs
-    randomLength <- vectorOf argLength selectType
-    return (FunctionSymbol s randomLength t)
+    let n = abs (length xs - argLength)
+    if argLength >= length xs
+    then do randomLength <- longerLength xs n
+            return (FunctionSymbol s randomLength t)
+    else do randomLength <- shorterLength xs n
+            return (FunctionSymbol s randomLength t)
+
+shorterLength :: [Type] -> Int -> Gen [Type]
+shorterLength ts 0 = return ts
+shorterLength ts n = do
+    t <- elements ts
+    shorterLength (delete t ts) (n-1)
+
+
+longerLength :: [Type] -> Int -> Gen [Type]
+longerLength ts 0 = return ts
+longerLength ts n = do
+    t <- elements ts
+    longerLength (ts ++ [t]) (n-1)
 
 changeArgType :: FunctionSymbol -> [Type] -> Gen FunctionSymbol
 changeArgType (FunctionSymbol s xs t) ts = do
