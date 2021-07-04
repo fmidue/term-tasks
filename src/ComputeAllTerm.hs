@@ -1,45 +1,45 @@
 module ComputeAllTerm where
-import DataType
-import ComputeTerm (term,getSameTypeTerm)
-import ValidCheck (isValid)
-import ArbitraryTerm
-import Data.List (partition)
-import Test.QuickCheck
+--import DataType
+--import ComputeTerm (term,getSameTypeTerm)
+--import ValidCheck (isValid)
+--import ArbitraryTerm
+--import Data.List (partition)
+--import Test.QuickCheck
 
-allTerm1 :: Int -> Signature -> Gen [Term]
-allTerm1 n xs = do
-    invalidT <- invalidTerm1 n xs
-    let validT = term n xs
-    combineT <- shuffle (invalidT++validT)
-    return (take n combineT)
+--allTerm :: Int -> Signature -> Gen [Term]
+--allTerm n xs = do
+--    invalidT <- invalidTerm n xs
+--    let validT = term n xs
+--    combineT <- shuffle (invalidT++validT)
+--    return (take n combineT)
 
-allTerm2 :: Int -> Signature -> Gen [Term]
-allTerm2 n xs = do
-    invalidT <- invalidTerm2 n xs
-    let validT = term n xs
-    combineT <- shuffle (invalidT++validT)
-    return (take n combineT)
+--allTerm2 :: Int -> Signature -> Gen [Term]
+--allTerm2 n xs = do
+--    invalidT <- invalidTerm2 n xs
+--    let validT = term n xs
+--    combineT <- shuffle (invalidT++validT)
+--    return (take n combineT)
 
-allTermOfType1 :: Int -> Type -> Signature -> Gen [Term]
-allTermOfType1 n t xs = do
-    invalidT <- invalidTermOfType1 n t xs
-    let validT = getSameTypeTerm t (term n xs) xs
-    combineT <- shuffle (invalidT++validT)
-    return (take n combineT)
+--allTermOfType :: Int -> Type -> Signature -> Gen [Term]
+--allTermOfType n t xs = do
+--    invalidT <- invalidTermOfType n t xs
+--    let validT = getSameTypeTerm t (term n xs) xs
+--    combineT <- shuffle (invalidT++validT)
+--    return (take n combineT)
 
-allTermOfType2 :: Int -> Type -> Signature -> Gen [Term]
-allTermOfType2 n t xs = do
-    invalidT <- invalidTermOfType2 n t xs
-    let validT = getSameTypeTerm t (term n xs) xs
-    combineT <- shuffle (invalidT++validT)
-    return (take n combineT)
+--allTermOfType2 :: Int -> Type -> Signature -> Gen [Term]
+--allTermOfType2 n t xs = do
+--    invalidT <- invalidTermOfType2 n t xs
+--    let validT = getSameTypeTerm t (term n xs) xs
+--    combineT <- shuffle (invalidT++validT)
+--    return (take n combineT)
 
 -- partition :: (a -> Bool) -> [a] -> ([a], [a])
-checkAllTerm :: Int -> Signature -> Gen ([Term],[Term])
-checkAllTerm n xs = do
-    t <- allTerm1 n xs
-    let termTuple = partition (isValid xs) t
-    return termTuple
+--checkAllTerm :: Int -> Signature -> Gen ([Term],[Term])
+--checkAllTerm n xs = do
+--    t <- allTerm n xs
+--    let termTuple = partition (isValid xs) t
+--    return termTuple
 
 
 

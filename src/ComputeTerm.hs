@@ -1,6 +1,8 @@
 module ComputeTerm (
    term,
    getSameTypeTerm,
+   makeConstants,
+   makeSubterm,
    oneValidTerm
    )where
 
