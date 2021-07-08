@@ -73,12 +73,12 @@ funcSymbolOfType t (Signature (FunctionSymbol s xs t' : ys))
    | t == t' && not (null xs)= FunctionSymbol s xs t' : funcSymbolOfType t (Signature ys)
    | otherwise = funcSymbolOfType t (Signature ys)
 
-getAllSameType :: Signature -> Type -> [String]
+getAllSameType :: Signature -> Type -> [FunctionSymbol]
 getAllSameType (Signature []) _ = []
-getAllSameType (Signature (FunctionSymbol s _ t' : ys)) t
-   | t == t' = s : getAllSameType (Signature ys) t
+getAllSameType (Signature (FunctionSymbol s xs t' : ys)) t
+   | t == t' = FunctionSymbol s xs t' : getAllSameType (Signature ys) t
    | otherwise = getAllSameType (Signature ys) t
 
-checkConstantSymbol :: Signature -> String -> Bool
+checkConstantSymbol :: Signature -> FunctionSymbol -> Bool
 checkConstantSymbol sig s = s `elem` constantList
-                              where constantList = getAllConstantSymbol sig
+                              where constantList = getAllConstant sig
