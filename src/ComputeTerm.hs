@@ -1,19 +1,16 @@
 module ComputeTerm (
-   term,
-   getSameTypeTerm,
-   makeConstants,
-   makeSubterm
+   term
    )where
 
 import DataType
-import GetSignatureInfo (getAllFunction,getAllConstantSymbol,giveType)
+import GetSignatureInfo (getAllFunction,getAllConstant,giveType)
 import Data.List ((\\))
 
 -- for #3
 -- first parameter is a bound on complexity of terms
 term :: Int -> Signature -> [Term]
 term n sig = take n (constant ++ makeSubterm n sig constant)
-                  where conSymbol = getAllConstantSymbol sig
+                  where conSymbol = map funcName (getAllConstant sig)
                         constant = makeConstants conSymbol
 
 makeConstants :: [String] -> [Term]
@@ -22,7 +19,7 @@ makeConstants = map (`Term` [])
 getSameTypeTerm :: Type -> [Term] -> Signature -> [Term]
 getSameTypeTerm _ [] _ = []
 getSameTypeTerm a (Term s t:xs) sig
-   | Just a == giveType s sig = Term s t : getSameTypeTerm a xs sig
+   | Just a == giveType sig s = Term s t : getSameTypeTerm a xs sig
    | otherwise = getSameTypeTerm a xs sig
 
 makeDiffTypeTermList :: Signature -> [Term] -> [Type] -> [[Term]]

@@ -15,8 +15,7 @@ getTermSymbol' [] = []
 getTermSymbol' (Term x xs:ys) = [x] ++ getTermSymbol' xs ++ getTermSymbol' ys
 
 getArgSymbol :: [Term] -> [String]
-getArgSymbol [] = []
-getArgSymbol (Term x _:ys) = x : getArgSymbol ys
+getArgSymbol = map termName
 
 transTerm :: Term -> String
 transTerm (Term x []) = x

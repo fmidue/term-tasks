@@ -4,7 +4,7 @@ module ValidCheck (
 
 import Data.Maybe (fromJust)
 import DataType
-import GetSignatureInfo (giveType,getAllConstantSymbol,getSigSymbol,giveArgType)
+import GetSignatureInfo (giveType,getAllConstant,getSigSymbol,giveArgType)
 import DealWithTerm (getTermSymbol)
 
 isValid :: Signature -> Term -> Bool
@@ -17,8 +17,8 @@ checkType' :: [Type] ->[Term] -> Signature -> Bool
 checkType' [] [] _ = True
 checkType' [] xs _ = null xs
 checkType' xs [] _ = null xs
-checkType' (t:ts) (Term s []:xs) w = checkType' ts xs w && giveType s w == Just t && s `elem` getAllConstantSymbol w
-checkType' (t:ts) (Term s x':xs) w = checkType (Term s x') w && checkType' ts xs w && giveType s w == Just t
+checkType' (t:ts) (Term s []:xs) w = checkType' ts xs w && giveType w s == Just t && s `elem` map funcName (getAllConstant w)
+checkType' (t:ts) (Term s x':xs) w = checkType (Term s x') w && checkType' ts xs w && giveType w s == Just t
 
 
 

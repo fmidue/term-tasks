@@ -6,7 +6,7 @@ import DataType
 import Data.Maybe (fromJust)
 import Data.List ((\\))
 import ValidCheck (isValid)
-import GetSignatureInfo (giveArgType,giveTypeList)
+import GetSignatureInfo (giveArgType,giveType)
 import DealWithTerm (getArgSymbol)
 
 
@@ -28,7 +28,8 @@ lengthError' _ [] = True
 lengthError' xs (y:ys) = lengthError xs y && lengthError' xs ys
 
 orderError :: Signature -> Term -> Bool
-orderError xs (Term s ys) = compareType (giveTypeList (getArgSymbol ys) xs) (fromJust (giveArgType s xs)) && orderError' xs ys
+orderError xs (Term s ys) = compareType tList (fromJust (giveArgType s xs)) && orderError' xs ys
+                              where tList = map (\x -> fromJust (giveType xs x)) (getArgSymbol ys)
 
 orderError' :: Signature -> [Term] -> Bool
 orderError' _ [] = True
@@ -44,7 +45,7 @@ compareType (t:ts) xs
 typeError :: Signature -> Term -> Bool
 typeError xs (Term s ys) = all (`elem` sigType) argType && all (`elem` argType) sigType && typeError' xs ys
                               where sigType = fromJust (giveArgType s xs)
-                                    argType = giveTypeList (getArgSymbol ys) xs
+                                    argType = map (\x -> fromJust (giveType xs x)) (getArgSymbol ys)
 
 typeError' :: Signature -> [Term] -> Bool
 typeError' _ [] = True
