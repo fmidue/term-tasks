@@ -1,5 +1,6 @@
 module ComputeTerm (
-   term
+   term,
+   getSameTypeTerm
    )where
 
 import DataType

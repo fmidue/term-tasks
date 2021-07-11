@@ -10,44 +10,35 @@ module GetSignatureInfo (
 where
 
 import DataType
-import Data.List (nub)
+import Data.List (nub,find)
+import Data.Maybe (fromJust,isNothing)
 
 getSigSymbol :: Signature -> [String]
-getSigSymbol (Signature []) = []
-getSigSymbol (Signature (FunctionSymbol x _ _:ys)) = x : getSigSymbol (Signature ys)
+getSigSymbol (Signature fs) = map funcName fs
 
 getAllFunction :: Signature -> [FunctionSymbol]
-getAllFunction (Signature []) = []
-getAllFunction (Signature(FunctionSymbol s xs t:ys))
-   | null xs = getAllFunction (Signature ys)
-   | otherwise = FunctionSymbol s xs t : getAllFunction (Signature ys)
+getAllFunction (Signature fs) = filter (not . null . arguments) fs
 
 getAllConstant :: Signature -> [FunctionSymbol]
-getAllConstant (Signature []) = []
-getAllConstant (Signature (FunctionSymbol s ys t : xs))
-    | null ys = FunctionSymbol s ys t : getAllConstant (Signature xs)
-    | otherwise = getAllConstant (Signature xs)
+getAllConstant (Signature fs) = filter (null . arguments) fs
 
 getAllType :: Signature -> [Type]
-getAllType (Signature []) = []
-getAllType (Signature (FunctionSymbol _ x y : xs)) = nub (x++y:getAllType (Signature xs))
+getAllType (Signature fs) = nub (concatMap arguments fs ++ map funcType fs)
 
 giveType :: Signature -> String -> Maybe Type
-giveType (Signature []) _ = Nothing
-giveType (Signature(FunctionSymbol b _ t : ys)) a
-   | a == b = Just t
-   | otherwise =  giveType (Signature ys) a
+giveType (Signature fs) s = if isNothing list
+                            then Nothing
+                            else Just (funcType(fromJust list))
+                              where list = find ((== s) . funcName) fs
 
 giveArgType :: String -> Signature -> Maybe [Type]
-giveArgType _ (Signature []) = Nothing
-giveArgType x (Signature(FunctionSymbol y ys _:xs))
-   | x == y = Just ys
-   | otherwise = giveArgType x (Signature xs)
+giveArgType s (Signature fs) = if isNothing list
+                               then Nothing
+                               else Just (arguments(fromJust list))
+                                 where list = find ((== s) . funcName) fs
 
 getAllSameType :: Signature -> Type -> [FunctionSymbol]
-getAllSameType (Signature []) _ = []
-getAllSameType (Signature (FunctionSymbol s xs t' : ys)) t
-   | t == t' = FunctionSymbol s xs t' : getAllSameType (Signature ys) t
-   | otherwise = getAllSameType (Signature ys) t
+getAllSameType (Signature fs) t = filter ((== t) . funcType) fs
+
 
 

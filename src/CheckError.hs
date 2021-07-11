@@ -29,7 +29,7 @@ lengthError' xs (y:ys) = lengthError xs y && lengthError' xs ys
 
 orderError :: Signature -> Term -> Bool
 orderError xs (Term s ys) = compareType tList (fromJust (giveArgType s xs)) && orderError' xs ys
-                              where tList = map (\x -> fromJust (giveType xs x)) (getArgSymbol ys)
+                              where tList = map (fromJust . giveType xs) (getArgSymbol ys)
 
 orderError' :: Signature -> [Term] -> Bool
 orderError' _ [] = True
@@ -45,7 +45,7 @@ compareType (t:ts) xs
 typeError :: Signature -> Term -> Bool
 typeError xs (Term s ys) = all (`elem` sigType) argType && all (`elem` argType) sigType && typeError' xs ys
                               where sigType = fromJust (giveArgType s xs)
-                                    argType = map (\x -> fromJust (giveType xs x)) (getArgSymbol ys)
+                                    argType = map (fromJust . giveType xs) (getArgSymbol ys)
 
 typeError' :: Signature -> [Term] -> Bool
 typeError' _ [] = True
