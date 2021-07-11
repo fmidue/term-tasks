@@ -11,7 +11,7 @@ isValid :: Signature -> Term -> Bool
 isValid sig t = all (`elem` getSigSymbol sig) (getTermSymbol t) && checkType t sig
 
 checkType :: Term -> Signature -> Bool
-checkType (Term s xs) w = checkType' (fromJust (giveArgType s w)) xs w
+checkType (Term s xs) w = checkType' (fromJust (giveArgType w s)) xs w
 
 checkType' :: [Type] ->[Term] -> Signature -> Bool
 checkType' [] [] _ = True

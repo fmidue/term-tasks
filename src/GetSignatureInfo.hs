@@ -11,7 +11,6 @@ where
 
 import DataType
 import Data.List (nub,find)
-import Data.Maybe (fromJust,isNothing)
 
 getSigSymbol :: Signature -> [String]
 getSigSymbol (Signature fs) = map funcName fs
@@ -26,16 +25,10 @@ getAllType :: Signature -> [Type]
 getAllType (Signature fs) = nub (concatMap arguments fs ++ map funcType fs)
 
 giveType :: Signature -> String -> Maybe Type
-giveType (Signature fs) s = if isNothing list
-                            then Nothing
-                            else Just (funcType(fromJust list))
-                              where list = find ((== s) . funcName) fs
+giveType (Signature fs) s = fmap funcType (find ((== s) . funcName) fs)
 
-giveArgType :: String -> Signature -> Maybe [Type]
-giveArgType s (Signature fs) = if isNothing list
-                               then Nothing
-                               else Just (arguments(fromJust list))
-                                 where list = find ((== s) . funcName) fs
+giveArgType :: Signature -> String -> Maybe [Type]
+giveArgType (Signature fs) s = fmap arguments (find ((== s) . funcName) fs)
 
 getAllSameType :: Signature -> Type -> [FunctionSymbol]
 getAllSameType (Signature fs) t = filter ((== t) . funcType) fs

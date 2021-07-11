@@ -11,6 +11,7 @@ getTermSymbol :: Term -> [String]
 getTermSymbol (Term x xs) = x : getTermSymbol' xs
 
 getTermSymbol' :: [Term] -> [String]
+--getTermSymbol' ts = concatMap (\x -> termName x : map termName (parameter x)) ts
 getTermSymbol' [] = []
 getTermSymbol' (Term x xs:ys) = [x] ++ getTermSymbol' xs ++ getTermSymbol' ys
 

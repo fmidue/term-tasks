@@ -21,14 +21,14 @@ checkErrorType xs t
 --errorTypeList :: Signature -> Term -> [Error]
 
 lengthError :: Signature -> Term -> Bool
-lengthError xs (Term s ys) = length ys == length (fromJust(giveArgType s xs)) && lengthError' xs ys
+lengthError xs (Term s ys) = length ys == length (fromJust(giveArgType xs s)) && lengthError' xs ys
 
 lengthError' :: Signature -> [Term] -> Bool
 lengthError' _ [] = True
 lengthError' xs (y:ys) = lengthError xs y && lengthError' xs ys
 
 orderError :: Signature -> Term -> Bool
-orderError xs (Term s ys) = compareType tList (fromJust (giveArgType s xs)) && orderError' xs ys
+orderError xs (Term s ys) = compareType tList (fromJust (giveArgType xs s)) && orderError' xs ys
                               where tList = map (fromJust . giveType xs) (getArgSymbol ys)
 
 orderError' :: Signature -> [Term] -> Bool
@@ -44,7 +44,7 @@ compareType (t:ts) xs
 
 typeError :: Signature -> Term -> Bool
 typeError xs (Term s ys) = all (`elem` sigType) argType && all (`elem` argType) sigType && typeError' xs ys
-                              where sigType = fromJust (giveArgType s xs)
+                              where sigType = fromJust (giveArgType xs s)
                                     argType = map (fromJust . giveType xs) (getArgSymbol ys)
 
 typeError' :: Signature -> [Term] -> Bool

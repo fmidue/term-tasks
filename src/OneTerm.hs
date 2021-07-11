@@ -7,21 +7,18 @@ import GetSignatureInfo (getAllSameType)
 import DataType
 
 oneValidTerm :: Signature -> Gen Term
-oneValidTerm sig@(Signature fs) = f sig fs
+oneValidTerm sig@(Signature fs) = arbTerm sig fs
 
+--arbTermList :: Signature -> [Type] -> Gen [Term]
+--arbTermList sig = mapM (arbTerm sig . getAllSameType sig)
 
-arbTermList :: Signature -> [Type] -> Gen [Term]
-arbTermList sig = mapM (arbTerm sig)
+--arbTerm :: Signature -> Type -> Gen Term
+--arbTerm sig = arbTerm sig . getAllSameType sig
 
-arbTerm :: Signature -> Type -> Gen Term
-arbTerm sig t = do
-  let list = getAllSameType sig t
-  f sig list
-
-f :: Signature -> [FunctionSymbol] -> Gen Term
-f sig fs = do
+arbTerm :: Signature -> [FunctionSymbol] -> Gen Term
+arbTerm sig fs = do
   one <- elements fs
-  termList <- arbTermList sig (arguments one)
+  termList <- mapM (arbTerm sig . getAllSameType sig) (arguments one)
   return (Term (funcName one) termList)
 
 

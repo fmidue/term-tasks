@@ -6,6 +6,7 @@ module ComputeTerm (
 import DataType
 import GetSignatureInfo (getAllFunction,getAllConstant,giveType)
 import Data.List ((\\))
+import Data.Maybe (fromJust)
 
 -- for #3
 -- first parameter is a bound on complexity of terms
@@ -17,15 +18,11 @@ term n sig = take n (constant ++ makeSubterm n sig constant)
 makeConstants :: [String] -> [Term]
 makeConstants = map (`Term` [])
 
-getSameTypeTerm :: Type -> [Term] -> Signature -> [Term]
-getSameTypeTerm _ [] _ = []
-getSameTypeTerm a (Term s t:xs) sig
-   | Just a == giveType sig s = Term s t : getSameTypeTerm a xs sig
-   | otherwise = getSameTypeTerm a xs sig
+getSameTypeTerm :: Signature -> [Term] -> Type -> [Term]
+getSameTypeTerm sig ts t = filter (\x -> t == fromJust(giveType sig (termName x))) ts
 
 makeDiffTypeTermList :: Signature -> [Term] -> [Type] -> [[Term]]
-makeDiffTypeTermList _ _ [] = []
-makeDiffTypeTermList w s (x:xs) = getSameTypeTerm x s w : makeDiffTypeTermList w s xs
+makeDiffTypeTermList sig ts tList = map (getSameTypeTerm sig ts) tList
 
 makeTerm :: String -> [[Term]] -> [Term]
 makeTerm s = map (Term s)
