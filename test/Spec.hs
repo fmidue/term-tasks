@@ -2,7 +2,7 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 
 import DataType
-import ComputeTerm
+import ComputeTerm (term,sameTypeTerms)
 import ValidCheck
 import ArbitrarySig
 import ArbitraryTerm
@@ -68,61 +68,26 @@ main = hspec $ do
   specify "c(a,b,f) is a term of Type B that can be built from signature6" $
     Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
 
-  specify "c(a,b) is an invalid term (parameter length error) that can be built from signature6" $
-    checkErrorType signature6 (Term "c" [Term "a" [],Term "b" []]) == (Just LENGTH)
-  specify "z(d,y,c) is an invalid term (parameter order error) that can be built from signature4" $
-    checkErrorType signature4 (Term "z" [Term "d" [],Term "y" [Term "b" [],Term "d" []],Term "c" []]) == (Just ORDER)
-  specify "f(x,y) is an invalid term (parameter type error) that can be built from signature3" $
-    checkErrorType signature3 (Term "f" [Term "x" [],Term "y" []]) == (Just TYPE)
-  specify "g(a,f(e)) is an invalid term (parameter order error) that can be built from signature2" $
-    checkErrorType signature2 (Term "g" [Term "a" [],Term "f" [Term "e" []]]) == (Just ORDER)
-  specify "a(b) is an invalid term (parameter length error) that can be built from signature1" $
-    checkErrorType signature1 (Term "a" [Term "b" []]) == (Just LENGTH)
 
-  prop "randoming leads to invalid terms with invalidTerm (signature1)" $
-    forAll (invalidTerm 10 TYPE signature1) (all (\t -> not (isValid signature1 t)))
-  prop "randoming leads to invalid terms with invalidTerm (signature2)" $
-    forAll (invalidTerm 10 ORDER signature2) (all (\t -> not (isValid signature2 t)))
-  prop "randoming leads to invalid terms with invalidTerm (signature3)" $
-    forAll (invalidTerm 10 LENGTH signature3) (all (\t -> not (isValid signature3 t)))
-  prop "randoming leads to invalid terms with invalidTerm (signature4)" $
-    forAll (invalidTerm 10 SYMBOL signature4) (all (\t -> not (isValid signature4 t)))
-  prop "randoming leads to invalid terms with invalidTerm (signature5)" $
-    forAll (invalidTerm 10 TYPE signature5) (all (\t -> not (isValid signature5 t)))
-  prop "randoming leads to invalid terms with invalidTerm (signature6)" $
-    forAll (invalidTerm 10 ORDER signature6) (all (\t -> not (isValid signature6 t)))
-
-  prop "randoming leads to invalid terms with totalinvalidTerm (signature1)" $
-    forAll (selectOneFunc signature1 >>= invalidTerm 10 LENGTH) (all (\t -> not (isValid signature1 t)))
-  prop "randoming leads to invalid terms with totalinvalidTerm (signature2)" $
-    forAll (selectOneFunc signature2 >>= invalidTerm 10 ORDER) (all (\t -> not (isValid signature2 t)))
-  prop "randoming leads to invalid terms with totalinvalidTerm (signature3)" $
-    forAll (selectOneFunc signature3 >>= invalidTerm 10 TYPE) (all (\t -> not (isValid signature3 t)))
-  prop "randoming leads to invalid terms with totalinvalidTerm (signature4)" $
-    forAll (selectOneFunc signature4 >>= invalidTerm 10 SYMBOL) (all (\t -> not (isValid signature4 t)))
-  prop "randoming leads to invalid terms with totalinvalidTerm (signature5)" $
-    forAll (selectOneFunc signature5 >>= invalidTerm 10 TYPE) (all (\t -> not (isValid signature5 t)))
-  prop "randoming leads to invalid terms with totalinvalidTerm (signature6)" $
-    forAll (selectOneFunc signature6 >>= invalidTerm 10 LENGTH) (all (\t -> not (isValid signature6 t)))
 
 
 selectOneFunc :: Signature -> Gen Signature
 selectOneFunc sig = do
-  let con = getAllConstant sig
-      f = getAllFunction sig
+  let con = allConstants sig
+      f = allFunctions sig
   fList <- elements f
   return (Signature (con++f))
 
 -- maybe also for terms of a specific type
 termsOfType :: Int -> Type -> Signature -> [Term]
-termsOfType n t sig = getSameTypeTerm t (term n sig) sig
+termsOfType n t sig = sameTypeTerms sig (term n sig) t
 
 -- can tansform [Term] in more readable forms
 printTerm :: Int -> Signature -> [String]
-printTerm n xs = map transTerm (term n xs)
+printTerm n xs = map termForm (term n xs)
 
 printTermsOfType :: Int -> Type -> Signature -> [String]
-printTermsOfType n t xs = map transTerm (termsOfType n t xs)
+printTermsOfType n t xs = map termForm (termsOfType n t xs)
 
 
 

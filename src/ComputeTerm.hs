@@ -1,41 +1,34 @@
 module ComputeTerm (
    term,
-   getSameTypeTerm
+   sameTypeTerms
    )where
 
 import DataType
-import GetSignatureInfo (getAllFunction,getAllConstant,giveType)
+import GetSignatureInfo (allFunctions,allConstants,theType)
 import Data.List ((\\))
 import Data.Maybe (fromJust)
 
 -- for #3
 -- first parameter is a bound on complexity of terms
 term :: Int -> Signature -> [Term]
-term n sig = take n (constant ++ makeSubterm n sig constant)
-                  where conSymbol = map funcName (getAllConstant sig)
-                        constant = makeConstants conSymbol
+term n sig = take n (constant ++ subterms n sig constant)
+                  where conSymbol = map symbol (allConstants sig)
+                        constant = map (`Term` []) conSymbol
 
-makeConstants :: [String] -> [Term]
-makeConstants = map (`Term` [])
+sameTypeTerms :: Signature -> [Term] -> Type -> [Term]
+sameTypeTerms sig ts t = filter (\x -> t == fromJust(theType sig (termName x))) ts
 
-getSameTypeTerm :: Signature -> [Term] -> Type -> [Term]
-getSameTypeTerm sig ts t = filter (\x -> t == fromJust(giveType sig (termName x))) ts
+diffTypeTerms :: Signature -> [Term] -> [Type] -> [[Term]]
+diffTypeTerms sig ts = map (sameTypeTerms sig ts)
 
-makeDiffTypeTermList :: Signature -> [Term] -> [Type] -> [[Term]]
-makeDiffTypeTermList sig ts tList = map (getSameTypeTerm sig ts) tList
+allTerms :: Signature -> [FunctionSymbol] -> [Term] -> [Term]
+allTerms sig fs ts = concatMap (\x -> map (Term (symbol x)) (sequence(diffTypeTerms sig ts (arguments x)))) fs
 
-makeTerm :: String -> [[Term]] -> [Term]
-makeTerm s = map (Term s)
-
-makeAllTerm :: Signature -> [FunctionSymbol] -> [Term] -> [Term]
-makeAllTerm _ [] _ = []
-makeAllTerm w (FunctionSymbol a x _ : xs) t = makeTerm a (sequence(makeDiffTypeTermList w t x)) ++ makeAllTerm w xs t
-
-makeSubterm :: Int -> Signature -> [Term] -> [Term]
-makeSubterm n sig w = if null (getAllT \\ w) || length getAllT >= n
+subterms :: Int -> Signature -> [Term] -> [Term]
+subterms n sig w = if null (getAllT \\ w) || length getAllT >= n
                       then getAllT
-                      else makeSubterm n sig (w ++ (getAllT \\ w))
-                         where func = getAllFunction sig
-                               getAllT = makeAllTerm sig func w
+                      else subterms n sig (w ++ (getAllT \\ w))
+                         where func = allFunctions sig
+                               getAllT = allTerms sig func w
 
 

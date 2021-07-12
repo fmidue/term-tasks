@@ -4,21 +4,21 @@ module ValidCheck (
 
 import Data.Maybe (fromJust)
 import DataType
-import GetSignatureInfo (giveType,getAllConstant,getSigSymbol,giveArgType)
-import DealWithTerm (getTermSymbol)
+import GetSignatureInfo (theType,allConstants,allSymbols,theArgumentsTypes)
+import DealWithTerm (termSymbols)
 
 isValid :: Signature -> Term -> Bool
-isValid sig t = all (`elem` getSigSymbol sig) (getTermSymbol t) && checkType t sig
+isValid sig t = all (`elem` allSymbols sig) (termSymbols t) && validType t sig
 
-checkType :: Term -> Signature -> Bool
-checkType (Term s xs) w = checkType' (fromJust (giveArgType w s)) xs w
+validType :: Term -> Signature -> Bool
+validType (Term s xs) w = validType' (fromJust (theArgumentsTypes w s)) xs w
 
-checkType' :: [Type] ->[Term] -> Signature -> Bool
-checkType' [] [] _ = True
-checkType' [] xs _ = null xs
-checkType' xs [] _ = null xs
-checkType' (t:ts) (Term s []:xs) w = checkType' ts xs w && giveType w s == Just t && s `elem` map funcName (getAllConstant w)
-checkType' (t:ts) (Term s x':xs) w = checkType (Term s x') w && checkType' ts xs w && giveType w s == Just t
+validType' :: [Type] ->[Term] -> Signature -> Bool
+validType' [] [] _ = True
+validType' [] xs _ = null xs
+validType' xs [] _ = null xs
+validType' (t:ts) (Term s []:xs) w = validType' ts xs w && theType w s == Just t && s `elem` map symbol (allConstants w)
+validType' (t:ts) (Term s x':xs) w = validType (Term s x') w && validType' ts xs w && theType w s == Just t
 
 
 

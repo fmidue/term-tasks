@@ -1,17 +1,16 @@
 module CheckError (
-   checkErrorType
+   errorType
    ) where
 
 import DataType
 import Data.Maybe (fromJust)
 import Data.List ((\\))
 import ValidCheck (isValid)
-import GetSignatureInfo (giveArgType,giveType)
-import DealWithTerm (getArgSymbol)
+import GetSignatureInfo (theArgumentsTypes,theType)
 
 
-checkErrorType :: Signature -> Term -> Maybe Error
-checkErrorType xs t
+errorType :: Signature -> Term -> Maybe Error
+errorType xs t
    | isValid xs t = Nothing
    | not (lengthError xs t) = Just LENGTH
    | not (typeError xs t) = Just TYPE
@@ -21,31 +20,31 @@ checkErrorType xs t
 --errorTypeList :: Signature -> Term -> [Error]
 
 lengthError :: Signature -> Term -> Bool
-lengthError xs (Term s ys) = length ys == length (fromJust(giveArgType xs s)) && lengthError' xs ys
+lengthError xs (Term s ys) = length ys == length (fromJust(theArgumentsTypes xs s)) && lengthError' xs ys
 
 lengthError' :: Signature -> [Term] -> Bool
 lengthError' _ [] = True
 lengthError' xs (y:ys) = lengthError xs y && lengthError' xs ys
 
 orderError :: Signature -> Term -> Bool
-orderError xs (Term s ys) = compareType tList (fromJust (giveArgType xs s)) && orderError' xs ys
-                              where tList = map (fromJust . giveType xs) (getArgSymbol ys)
+orderError xs (Term s ys) = isSameType tList (fromJust (theArgumentsTypes xs s)) && orderError' xs ys
+                              where tList = map ((fromJust . theType xs) . termName) ys
 
 orderError' :: Signature -> [Term] -> Bool
 orderError' _ [] = True
 orderError' xs (y:ys) = orderError xs y && orderError' xs ys
 
-compareType :: [Type] -> [Type] -> Bool
-compareType [] [] = True
-compareType [] _ = False
-compareType (t:ts) xs
-   | t `elem` xs = compareType ts (xs\\[t])
-   | otherwise = compareType ts xs
+isSameType :: [Type] -> [Type] -> Bool
+isSameType [] [] = True
+isSameType [] _ = False
+isSameType (t:ts) xs
+   | t `elem` xs = isSameType ts (xs\\[t])
+   | otherwise = isSameType ts xs
 
 typeError :: Signature -> Term -> Bool
 typeError xs (Term s ys) = all (`elem` sigType) argType && all (`elem` argType) sigType && typeError' xs ys
-                              where sigType = fromJust (giveArgType xs s)
-                                    argType = map (fromJust . giveType xs) (getArgSymbol ys)
+                              where sigType = fromJust (theArgumentsTypes xs s)
+                                    argType = map ((fromJust . theType xs) . termName) ys
 
 typeError' :: Signature -> [Term] -> Bool
 typeError' _ [] = True
