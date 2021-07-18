@@ -13,28 +13,17 @@ oneValidTerm sig@(Signature fs) a b = arbTerm sig a b fs
 arbTerm :: Signature -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
 arbTerm sig a b fs = do
   one <- elements fs
-  if a == 1 && null (arguments one)
-  then return (Just (Term (symbol one) []))
-  else do
   let n = division (length (arguments one)) a b
-  if null n
-  then if length (arguments one) <= b-1
-       then do let n' = division (length (arguments one)) (length (arguments one)+1) b
-               if null n'
-               then return Nothing
-               else do
-                    n'' <- elements n'
-                    termList <- mapM (\(t,(a',b')) -> arbTerm sig a' b' . allSameTypes sig $ t) (zip (arguments one) n'')
-                    if checkMaybe termList
-                    then return (Just (Term (symbol one) (catMaybes termList)))
-                    else arbTerm sig a b fs
-      else return Nothing
+  if a <= 1 && null (arguments one)
+  then return (Just (Term (symbol one) []))
+  else if null n
+  then return Nothing
   else do
   n' <- elements n
   termList <- mapM (\(t,(a',b')) -> arbTerm sig a' b' . allSameTypes sig $ t) (zip (arguments one) n')
-  if checkMaybe termList
+  if isAllValiable termList
   then return (Just (Term (symbol one) (catMaybes termList)))
-  else arbTerm sig a b fs
+  else return Nothing
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division n a b = filter isValidTuples ts
@@ -44,7 +33,7 @@ division' :: Int -> Int -> Int -> [[Int]]
 division' n a b = [x ++ y | x <- validLists a (theLists n a), y <- validLists b (theLists n b)]
 
 theLists ::Int -> Int -> [[Int]]
-theLists n a = replicateM n [1..a-1]
+theLists n a = replicateM n [0..a-1]
 
 validLists :: Int -> [[Int]] -> [[Int]]
 validLists a = filter ((==a-1) . sum)
@@ -72,9 +61,9 @@ number' (f:fs)
   | null (parameters f) = 1 + number' fs
   | otherwise = 1 + number' (parameters f) + number' fs
 
-checkMaybe :: [Maybe Term] -> Bool
-checkMaybe [] = True
-checkMaybe (t:ts)
+isAllValiable :: [Maybe Term] -> Bool
+isAllValiable [] = True
+isAllValiable (t:ts)
   | isNothing t = False
-  | otherwise = checkMaybe ts
+  | otherwise = isAllValiable ts
 
