@@ -1,3 +1,4 @@
+{-# LANGUAGE DuplicateRecordFields#-}
 module DataType where
 newtype Type = Type String   deriving (Show,Eq)
 data Term = Term {termName :: String, parameters :: [Term]}   deriving (Show,Eq)

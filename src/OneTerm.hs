@@ -3,30 +3,38 @@ module OneTerm where
 import Test.QuickCheck
 import GetSignatureInfo (allSameTypes)
 import DataType
-import ValidCheck (isValid)
 import Data.List (transpose)
-import Data.Maybe (catMaybes,fromJust)
+import Data.Maybe (catMaybes,isNothing)
 import Control.Monad (replicateM)
 
 oneValidTerm :: Signature -> Int -> Int -> Gen (Maybe Term)
-oneValidTerm sig@(Signature fs) a b = do
-  term <- arbTerm sig a b fs
-  let term' = fromJust term
-      l = number term'
-  if isValid sig term' && l >= a && l <= b
-  then return term
-  else return Nothing
+oneValidTerm sig@(Signature fs) a b = arbTerm sig a b fs
 
 arbTerm :: Signature -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
 arbTerm sig a b fs = do
   one <- elements fs
+  if a == 1 && null (arguments one)
+  then return (Just (Term (symbol one) []))
+  else do
   let n = division (length (arguments one)) a b
   if null n
-  then return (Just (Term (symbol one) []))
+  then if length (arguments one) <= b-1
+       then do let n' = division (length (arguments one)) (length (arguments one)+1) b
+               if null n'
+               then return Nothing
+               else do
+                    n'' <- elements n'
+                    termList <- mapM (\(t,(a',b')) -> arbTerm sig a' b' . allSameTypes sig $ t) (zip (arguments one) n'')
+                    if checkMaybe termList
+                    then return (Just (Term (symbol one) (catMaybes termList)))
+                    else arbTerm sig a b fs
+      else return Nothing
   else do
   n' <- elements n
   termList <- mapM (\(t,(a',b')) -> arbTerm sig a' b' . allSameTypes sig $ t) (zip (arguments one) n')
-  return (Just (Term (symbol one) (catMaybes termList)))
+  if checkMaybe termList
+  then return (Just (Term (symbol one) (catMaybes termList)))
+  else arbTerm sig a b fs
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division n a b = filter isValidTuples ts
@@ -63,3 +71,10 @@ number' [] = 0
 number' (f:fs)
   | null (parameters f) = 1 + number' fs
   | otherwise = 1 + number' (parameters f) + number' fs
+
+checkMaybe :: [Maybe Term] -> Bool
+checkMaybe [] = True
+checkMaybe (t:ts)
+  | isNothing t = False
+  | otherwise = checkMaybe ts
+
