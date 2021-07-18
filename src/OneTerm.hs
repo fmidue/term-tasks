@@ -4,7 +4,7 @@ import Test.QuickCheck
 import GetSignatureInfo (allSameTypes)
 import DataType
 import Data.List (transpose)
-import Data.Maybe (fromJust,isNothing)
+import Data.Maybe (fromJust)
 import Control.Monad (replicateM,zipWithM)
 
 oneValidTerm :: Signature -> Int -> Int -> Gen (Maybe Term)
@@ -14,19 +14,18 @@ arbTerm :: Signature -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
 arbTerm sig a b fs = do
   one <- elements fs
   let n = division (length (arguments one)) a b
-  if a == 1 && null (arguments one)
-  then return (Just (Term (symbol one) []))
-  else if null n
+  if null n
   then return Nothing
   else do
   n' <- elements n
-  termList <- zipWithM (\(a',b') t -> arbTerm sig a' b' . allSameTypes sig $ t) n' (arguments one)
+  termList <- zipWithM (\(a',b') -> arbTerm sig a' b' . allSameTypes sig) n' (arguments one)
   let termList' = sequence termList
-  if isNothing termList'
-  then return Nothing
-  else return (Just (Term (symbol one) (fromJust termList')))
+  case termList' of
+    Nothing -> return Nothing
+    Just _ -> return (Just (Term (symbol one) (fromJust termList')))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
+division 0 1 _ = [[]]
 division n a b
   | a > b  = []
   | n >= a = division n (n + 1) b
@@ -56,13 +55,5 @@ theTuples xs = map tuplify2 (transpose xs)
 isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
-number :: Term -> Int
-number fs = 1 + number' (parameters fs)
-
-number' :: [Term] -> Int
-number' [] = 0
-number' (f:fs)
-  | null (parameters f) = 1 + number' fs
-  | otherwise = 1 + number' (parameters f) + number' fs
 
 
