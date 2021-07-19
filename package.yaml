@@ -4,6 +4,8 @@ dependencies:
   - base
   - split
   - QuickCheck
+default-extensions:
+  - DuplicateRecordFields
 library:
   source-dirs: src
   ghc-options:
