@@ -4,7 +4,6 @@ import Test.QuickCheck
 import GetSignatureInfo (allSameTypes)
 import DataType
 import Data.List (transpose)
-import Data.Maybe (fromJust)
 import Control.Monad (replicateM,zipWithM)
 
 oneValidTerm :: Signature -> Int -> Int -> Gen (Maybe Term)
@@ -22,7 +21,7 @@ arbTerm sig a b fs = do
   let termList' = sequence termList
   case termList' of
     Nothing -> return Nothing
-    Just _ -> return (Just (Term (symbol one) (fromJust termList')))
+    Just ts -> return (Just (Term (symbol one) ts))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
