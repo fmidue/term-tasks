@@ -6,21 +6,25 @@ import GetSignatureInfo (allSameTypes)
 import DataType
 import DealWithTerm (termSymbols,termSymbols')
 import Data.List (transpose)
-import Data.Maybe (fromJust,isJust)
+import Data.Maybe (fromJust,isJust,isNothing)
 import Control.Monad (replicateM,zipWithM)
 
 oneValidTerm :: Signature -> Mode -> Int -> Int -> Gen (Maybe Term)
-oneValidTerm sig@(Signature fs) m@(ONCE s) a b = do term <- arbTerm sig m a b fs
-                                                    if isJust term && (s `elem` termSymbols (fromJust term))
-                                                    then return term
-                                                    else return Nothing
+oneValidTerm sig@(Signature fs) m@(ONCE (Just s)) a b = do term <- arbTerm sig m a b fs
+                                                           if isJust term && (s `elem` termSymbols (fromJust term))
+                                                           then return term
+                                                           else return Nothing
 
 oneValidTerm sig@(Signature fs) m a b = arbTerm sig m a b fs
 
 arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
 arbTerm sig m a b fs = do
-  (one,newMode) <- selectOne m fs
-  let n = division (length ((arguments :: FunctionSymbol -> [Type]) one)) a b
+  x <- selectOne m fs
+  if isNothing x
+  then return Nothing
+  else do
+  let (one,newMode) = fromJust x
+      n = division (length ((arguments :: FunctionSymbol -> [Type]) one)) a b
   if null n
   then return Nothing
   else do
@@ -30,7 +34,8 @@ arbTerm sig m a b fs = do
   case termList' of
     Nothing -> return Nothing
     Just ts -> do let x = termSymbols' ts
-                  if count ((symbol :: Mode -> String) newMode) x >1
+                      name = (symbol :: Mode -> Maybe String) newMode
+                  if isJust name && count (fromJust name) x >1
                   then return Nothing
                   else return (Just (Term ((symbol :: FunctionSymbol -> String) one) ts))
 
@@ -65,16 +70,19 @@ theTuples xs = map tuplify2 (transpose xs)
 isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
-selectOne ::Mode -> [FunctionSymbol] -> Gen (FunctionSymbol,Mode)
-selectOne NONE fs = do one <- elements fs
-                       return (one,NONE)
-selectOne (NO s) fs = do one <- elements fs'
-                         return (one,NO s)
-                           where fs' = filter (\x -> (symbol :: FunctionSymbol -> String) x /= s) fs
-selectOne (ONCE s) fs = do one <- elements fs
-                           if (symbol :: FunctionSymbol -> String) one == s
-                           then return (one,NO s)
-                           else return (one,ONCE s)
+selectOne ::Mode -> [FunctionSymbol] -> Gen (Maybe (FunctionSymbol,Mode))
+selectOne _ [] = return Nothing
+selectOne (NONE s) fs = do one <- elements fs
+                           return (Just(one,NONE s))
+selectOne (NO s'@(Just s)) fs = do if null fs'
+                                   then return Nothing
+                                   else do one <- elements fs'
+                                           return (Just(one,NO s'))
+                                    where fs' = filter (\x -> (symbol :: FunctionSymbol -> String) x /= s) fs
+selectOne (ONCE s'@(Just s)) fs = do one <- elements fs
+                                     if (symbol :: FunctionSymbol -> String) one == s
+                                     then return (Just(one,NO s'))
+                                     else return (Just(one,ONCE s'))
 
 count :: String -> [String] -> Int
 count x = length . filter (x==)
