@@ -3,7 +3,7 @@ module ComputeTerm (
    sameTypeTerms
    )where
 
-import DataType
+import DataType hiding (Mode(..))
 import GetSignatureInfo (allFunctions,allConstants,theType)
 import Data.List ((\\))
 import Data.Maybe (fromJust)
@@ -22,7 +22,7 @@ diffTypeTerms :: Signature -> [Term] -> [Type] -> [[Term]]
 diffTypeTerms sig ts = map (sameTypeTerms sig ts)
 
 allTerms :: Signature -> [FunctionSymbol] -> [Term] -> [Term]
-allTerms sig fs ts = concatMap (\x -> map (Term (symbol x)) (sequence(diffTypeTerms sig ts (arguments x)))) fs
+allTerms sig fs ts = concatMap (\x -> map (Term (symbol x)) (sequence(diffTypeTerms sig ts ((arguments :: FunctionSymbol -> [Type]) x)))) fs
 
 subterms :: Int -> Signature -> [Term] -> [Term]
 subterms n sig w = if null (getAllT \\ w) || length getAllT >= n

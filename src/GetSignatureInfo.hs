@@ -9,7 +9,7 @@ module GetSignatureInfo (
 )
 where
 
-import DataType
+import DataType (FunctionSymbol(..),Signature(..),Type(..))
 import Data.List (nub,find)
 
 allSymbols :: Signature -> [String]

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 150efcc8274261c7f203a55ebe1addaa4491c8a4e1db66b42b3d23f42b4dffc5
+-- hash: 84c6d8f3ecc5d18d37aa0faa424195ed62cf87d457e6972f0f61a8b2f96f41eb
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -40,7 +40,6 @@ test-suite ba-jiarui-liu-test
   main-is: Spec.hs
   other-modules:
       Examples.Signatures
-      Helper
       Paths_ba_jiarui_liu
   hs-source-dirs:
       test

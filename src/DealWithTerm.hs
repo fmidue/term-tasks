@@ -1,5 +1,6 @@
 module DealWithTerm (
    termSymbols,
+   termSymbols',
    termForm
    ) where
 
