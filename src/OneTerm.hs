@@ -4,40 +4,39 @@ module OneTerm where
 import Test.QuickCheck
 import GetSignatureInfo (allSameTypes)
 import DataType
-import DealWithTerm (termSymbols,termSymbols')
 import Data.List (transpose)
-import Data.Maybe (fromJust,isJust,isNothing)
+import Data.Maybe (fromJust)
 import Control.Monad (replicateM,zipWithM)
 
 oneValidTerm :: Signature -> Mode -> Int -> Int -> Gen (Maybe Term)
-oneValidTerm sig@(Signature fs) m@(ONCE (Just s)) a b = do term <- arbTerm sig m a b fs
-                                                           if isJust term && (s `elem` termSymbols (fromJust term))
-                                                           then return term
-                                                           else return Nothing
+oneValidTerm sig@(Signature fs) m a b = arbTerm sig (Mode' m (theSymbol m)) a b fs
 
-oneValidTerm sig@(Signature fs) m a b = arbTerm sig m a b fs
-
-arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
-arbTerm sig m a b fs = do
+arbTerm :: Signature -> Mode' -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
+arbTerm sig m@(Mode' _ (Just s)) a b fs = do
   x <- selectOne m fs
-  if isNothing x
-  then return Nothing
-  else do
   let (one,newMode) = fromJust x
       n = division (length ((arguments :: FunctionSymbol -> [Type]) one)) a b
+  if null ((arguments :: FunctionSymbol -> [Type]) one) && newMode == Mode' (ONCE s) (Just s)
+  then return Nothing
+  else do
   if null n
   then return Nothing
   else do
   n' <- elements n
+  if newMode == Mode' (ONCE s) (Just s)
+  then do
+  y <- chooseInt (0,length ((arguments :: FunctionSymbol -> [Type]) one))
+  termList <- tt sig n' ((arguments :: FunctionSymbol -> [Type]) one) (Just s) y
+  let termList' = sequence termList
+  case termList' of
+    Nothing -> return Nothing
+    Just ts -> return (Just (Term ((symbol :: FunctionSymbol -> String) one) ts))
+  else do
   termList <- zipWithM (\(a',b') -> arbTerm sig newMode a' b' . allSameTypes sig) n' ((arguments :: FunctionSymbol -> [Type]) one)
   let termList' = sequence termList
   case termList' of
     Nothing -> return Nothing
-    Just ts -> do let x = termSymbols' ts
-                      name = (symbol :: Mode -> Maybe String) newMode
-                  if isJust name && count (fromJust name) x >1
-                  then return Nothing
-                  else return (Just (Term ((symbol :: FunctionSymbol -> String) one) ts))
+    Just ts -> return (Just (Term ((symbol :: FunctionSymbol -> String) one) ts))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
@@ -70,20 +69,33 @@ theTuples xs = map tuplify2 (transpose xs)
 isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
-selectOne ::Mode -> [FunctionSymbol] -> Gen (Maybe (FunctionSymbol,Mode))
+selectOne ::Mode' -> [FunctionSymbol] -> Gen (Maybe (FunctionSymbol,Mode'))
 selectOne _ [] = return Nothing
-selectOne (NONE s) fs = do one <- elements fs
-                           return (Just(one,NONE s))
-selectOne (NO s'@(Just s)) fs = do if null fs'
-                                   then return Nothing
-                                   else do one <- elements fs'
-                                           return (Just(one,NO s'))
-                                    where fs' = filter (\x -> (symbol :: FunctionSymbol -> String) x /= s) fs
-selectOne (ONCE s'@(Just s)) fs = do one <- elements fs
-                                     if (symbol :: FunctionSymbol -> String) one == s
-                                     then return (Just(one,NO s'))
-                                     else return (Just(one,ONCE s'))
+selectOne (Mode' (NO _) Nothing) _ = return Nothing
+selectOne (Mode' (ONCE _) Nothing) _ = return Nothing
+selectOne m@(Mode' NONE _) fs = do one <- elements fs
+                                   return (Just(one,m))
+selectOne m@(Mode' (NO _) (Just s)) fs = do if null fs'
+                                            then return Nothing
+                                            else do one <- elements fs'
+                                                    return (Just(one,m))
+                                              where fs' = filter (\x -> (symbol :: FunctionSymbol -> String) x /= s) fs
+selectOne m@(Mode' (ONCE _) (Just s)) fs = do one <- elements fs
+                                              if (symbol :: FunctionSymbol -> String) one == s
+                                              then return (Just(one,Mode' (NO s) (Just s)))
+                                              else return (Just(one,m))
 
-count :: String -> [String] -> Int
-count x = length . filter (x==)
+tt :: Signature -> [(Int,Int)] -> [Type] -> (Maybe String) -> Int -> Gen [Maybe Term]
+tt _ [] _ _ _ = return []
+tt _ _ [] _ _ = return []
+tt _ _ _ Nothing _ = return []
+tt sig ((a,b):ls) (t:ts) s'@(Just s) 0 = do x <- arbTerm sig (Mode' (ONCE s) s') a b (allSameTypes sig t)
+                                            y <- tt sig ls ts s' (-1)
+                                            return (x:y)
+tt sig ((a,b):ls) (t:ts) s'@(Just s) n = do x <- arbTerm sig (Mode' (NO s) s') a b (allSameTypes sig t)
+                                            y <- tt sig ls ts s' (n-1)
+                                            return (x:y)
+
+
+
 
