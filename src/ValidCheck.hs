@@ -3,7 +3,7 @@ module ValidCheck (
    )where
 
 import Data.Maybe (fromJust)
-import DataType hiding (Mode(..))
+import DataType
 import GetSignatureInfo (theType,allConstants,allSymbols,theArgumentsTypes)
 import DealWithTerm (termSymbols)
 

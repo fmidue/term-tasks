@@ -5,12 +5,13 @@ import DataType
 import ComputeTerm (term,sameTypeTerms)
 import ValidCheck
 import ArbitrarySig
-import ArbitraryTerm
 import GetSignatureInfo
 import DealWithTerm
 import CheckError
+import OneTerm
 import Test.QuickCheck
 import Examples.Signatures
+import Data.Maybe (isJust,fromJust)
 
 
 main :: IO ()
@@ -67,7 +68,18 @@ main = hspec $ do
     Term "b" [Term "e" [Term "d" [Term "c"[Term "b" [Term "a" []]]]]] `elem` termsOfType 20 (Type "B") signature5
   specify "c(a,b,f) is a term of Type B that can be built from signature6" $
     Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
-
+  prop "check oneValidTerm (signature1)" $
+    forAll (oneValidTerm signature1 (Just "u") 1 10) (\x -> isJust x ==> isValid signature1 (fromJust x))
+  prop "check oneValidTerm (signature2)" $
+    forAll (oneValidTerm signature2 (Just "e") 1 6) (\x -> isJust x ==> isValid signature2 (fromJust x))
+  prop "check oneValidTerm (signature3)" $
+    forAll (oneValidTerm signature3 (Just "f") 3 8) (\x -> isJust x ==> isValid signature3 (fromJust x))
+  prop "check oneValidTerm (signature4)" $
+    forAll (oneValidTerm signature4 Nothing 3 8) (\x -> isJust x ==> isValid signature4 (fromJust x))
+  prop "check oneValidTerm (signature5)" $
+    forAll (oneValidTerm signature5 (Just "b") 1 8) (\x -> isJust x ==> isValid signature5 (fromJust x))
+  prop "check oneValidTerm (signature6)" $
+    forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> isValid signature6 (fromJust x))
 
 
 

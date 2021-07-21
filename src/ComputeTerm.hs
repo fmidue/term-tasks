@@ -3,7 +3,7 @@ module ComputeTerm (
    sameTypeTerms
    )where
 
-import DataType hiding (Mode(..))
+import DataType
 import GetSignatureInfo (allFunctions,allConstants,theType)
 import Data.List ((\\))
 import Data.Maybe (fromJust)
