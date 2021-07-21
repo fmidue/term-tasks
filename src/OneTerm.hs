@@ -1,43 +1,50 @@
-{-# LANGUAGE DuplicateRecordFields#-}
 module OneTerm where
 
 import Test.QuickCheck
 import GetSignatureInfo (allSameTypes)
 import DataType
-import DealWithTerm (termSymbols,termSymbols')
 import Data.List (transpose)
-import Data.Maybe (fromJust,isJust,isNothing)
 import Control.Monad (replicateM,zipWithM)
 
 oneValidTerm :: Signature -> Mode -> Int -> Int -> Gen (Maybe Term)
-oneValidTerm sig@(Signature fs) m@(ONCE (Just s)) a b = do term <- arbTerm sig m a b fs
-                                                           if isJust term && (s `elem` termSymbols (fromJust term))
-                                                           then return term
-                                                           else return Nothing
-
 oneValidTerm sig@(Signature fs) m a b = arbTerm sig m a b fs
 
 arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
 arbTerm sig m a b fs = do
+-- select one function symbol from fs. If symbol of "one" is the given symbol, newMode is changed from ONCE to NO
   x <- selectOne m fs
-  if isNothing x
-  then return Nothing
-  else do
-  let (one,newMode) = fromJust x
-      n = division (length ((arguments :: FunctionSymbol -> [Type]) one)) a b
-  if null n
-  then return Nothing
-  else do
-  n' <- elements n
-  termList <- zipWithM (\(a',b') -> arbTerm sig newMode a' b' . allSameTypes sig) n' ((arguments :: FunctionSymbol -> [Type]) one)
-  let termList' = sequence termList
-  case termList' of
+  case x of
     Nothing -> return Nothing
-    Just ts -> do let x = termSymbols' ts
-                      name = (symbol :: Mode -> Maybe String) newMode
-                  if isJust name && count (fromJust name) x >1
-                  then return Nothing
-                  else return (Just (Term ((symbol :: FunctionSymbol -> String) one) ts))
+                             -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
+    Just (one,newMode) -> do if null ((arguments :: FunctionSymbol -> [Type]) one) && newMode == ONCE (symbol' m)
+                             then return Nothing
+                             else do
+                             -- Here do as the original vision
+                             let n = division (length ((arguments :: FunctionSymbol -> [Type]) one)) a b
+                             if null n
+                             then return Nothing
+                             else do
+                             n' <- elements n
+                             -- Here need to seperate two different situations.
+                             -- If ONCE, give ONCE to one sub node, others are all NO
+                             if newMode == ONCE (symbol' m)
+                             then do
+                               -- random select one sub term. Here I think (0,0) is impossible, Because when one is constant
+                               -- and ONCE, directly return Nothing
+                               number <- chooseInt (0,length ((arguments :: FunctionSymbol -> [Type]) one))
+                               termList <- newTermList sig n' ((arguments :: FunctionSymbol -> [Type]) one) (symbol' m) number
+                               let termList' = sequence termList
+                               case termList' of
+                                 Nothing -> return Nothing
+                                 Just ts -> return (Just (Term (symbol one) ts))
+                               -- If NO and NONE, do as original version
+                             else do
+                               termList <- zipWithM (\(a',b') -> arbTerm sig newMode a' b' . allSameTypes sig) n' ((arguments :: FunctionSymbol -> [Type]) one)
+                               let termList' = sequence termList
+                               case termList' of
+                                 Nothing -> return Nothing
+                                 Just ts -> return (Just (Term (symbol one) ts))
+
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
@@ -78,12 +85,23 @@ selectOne (NO s'@(Just s)) fs = do if null fs'
                                    then return Nothing
                                    else do one <- elements fs'
                                            return (Just(one,NO s'))
-                                    where fs' = filter (\x -> (symbol :: FunctionSymbol -> String) x /= s) fs
+                                     where fs' = filter (\x -> (symbol x) /= s) fs
+-- if the given symbol is just seleted, the Mode change to NO and return
 selectOne (ONCE s'@(Just s)) fs = do one <- elements fs
-                                     if (symbol :: FunctionSymbol -> String) one == s
+                                     if symbol one == s
                                      then return (Just(one,NO s'))
                                      else return (Just(one,ONCE s'))
+selectOne _ _ = return Nothing
 
-count :: String -> [String] -> Int
-count x = length . filter (x==)
+newTermList :: Signature -> [(Int,Int)] -> [Type] -> (Maybe String) -> Int -> Gen [Maybe Term]
+newTermList _ [] _ _ _ = return []
+newTermList _ _ [] _ _ = return []
+-- define Mode of the selected node to ONCE
+newTermList sig ((a,b):ls) (t:ts) s 0 = do x <- arbTerm sig (ONCE s) a b (allSameTypes sig t)
+                                           y <- newTermList sig ls ts s (-1)
+                                           return (x:y)
+-- define Mode of rest nodes as NO
+newTermList sig ((a,b):ls) (t:ts) s n = do x <- arbTerm sig (NO s) a b (allSameTypes sig t)
+                                           y <- newTermList sig ls ts s (n-1)
+                                           return (x:y)
 
