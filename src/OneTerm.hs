@@ -42,7 +42,7 @@ division n a b
   | a > b  = []
   | n >= a = division n (n + 1) b
   | otherwise = filter isValidTuples ts
-                    where ts = map (theTuples . newModess n) (division' n a b)
+                    where ts = map (theTuples . newLists n) (division' n a b)
 
 division' :: Int -> Int -> Int -> [[Int]]
 division' n a b = [x ++ y | x <- validLists a (theLists n a), y <- validLists b (theLists n b)]
@@ -53,8 +53,8 @@ theLists n a = replicateM n [1..a-1]
 validLists :: Int -> [[Int]] -> [[Int]]
 validLists a = filter ((==a-1) . sum)
 
-newModess :: Int -> [Int] -> [[Int]]
-newModess n xs = a : [b]
+newLists :: Int -> [Int] -> [[Int]]
+newLists n xs = a : [b]
                   where (a,b) = splitAt n xs
 
 tuplify2 :: [Int] -> (Int,Int)
@@ -85,15 +85,8 @@ selectOne (ONCE s) fs = do one <- elements fs
 newModes :: Int -> Mode -> Gen [Mode]
 newModes n (ONCE s) = do
   n' <- chooseInt (0,n-1)
-  let new = replace n' (ONCE s) (replicate n (NO s))
-  return new
+  return [ if j == n' then (ONCE s) else (NO s) | j <- [0 .. n-1] ]
 newModes n m = return (replicate n m)
-
-replace :: Int -> Mode -> [Mode] -> [Mode]
-replace _ _ [] = []
-replace n y (x:xs)
-  | n == 0 = y : replace (n-1) y xs
-  | otherwise = x : replace (n-1) y xs
 
 theSymbol :: Mode -> Maybe String
 theSymbol NONE = Nothing
