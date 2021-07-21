@@ -6,6 +6,7 @@ dependencies:
   - QuickCheck
 default-extensions:
   - DuplicateRecordFields
+  - OverloadedLabels
 library:
   source-dirs: src
   ghc-options:

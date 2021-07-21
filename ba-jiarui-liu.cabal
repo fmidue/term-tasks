@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 84c6d8f3ecc5d18d37aa0faa424195ed62cf87d457e6972f0f61a8b2f96f41eb
+-- hash: 71e427d7ff83d07373859db3c0c4f80b31b9758cd1d3d69d2a814269a55d8e05
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -28,6 +28,7 @@ library
       src
   default-extensions:
       DuplicateRecordFields
+      OverloadedLabels
   ghc-options: -Wall -Werror
   build-depends:
       QuickCheck
@@ -45,6 +46,7 @@ test-suite ba-jiarui-liu-test
       test
   default-extensions:
       DuplicateRecordFields
+      OverloadedLabels
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck
