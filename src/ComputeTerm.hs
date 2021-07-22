@@ -22,7 +22,7 @@ diffTypeTerms :: Signature -> [Term] -> [Type] -> [[Term]]
 diffTypeTerms sig ts = map (sameTypeTerms sig ts)
 
 allTerms :: Signature -> [FunctionSymbol] -> [Term] -> [Term]
-allTerms sig fs ts = concatMap (\x -> map (Term (symbol x)) (sequence(diffTypeTerms sig ts ((arguments :: FunctionSymbol -> [Type]) x)))) fs
+allTerms sig fs ts = concatMap (\x -> map (Term (symbol x)) (sequence(diffTypeTerms sig ts (#arguments x)))) fs
 
 subterms :: Int -> Signature -> [Term] -> [Term]
 subterms n sig w = if null (getAllT \\ w) || length getAllT >= n
@@ -30,5 +30,3 @@ subterms n sig w = if null (getAllT \\ w) || length getAllT >= n
                       else subterms n sig (w ++ (getAllT \\ w))
                          where func = allFunctions sig
                                getAllT = allTerms sig func w
-
-

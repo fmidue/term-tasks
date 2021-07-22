@@ -26,15 +26,15 @@ arbTerm sig m a b fs = do
       then return Nothing
       -- Here do as the original vision
       else do
-        let n = division (length (#arguments one :: [Type])) a b
+        let n = division (length (#arguments one)) a b
         if null n
         then return Nothing
         else do
           n' <- elements n
-          let l = length ((arguments :: FunctionSymbol -> [Type]) one)
+          let l = length (#arguments one)
           modeList <- newModes l newMode
           -- zip 3 :: [a] -> [b] -> [c] -> [(a,b,c)]
-          termList <- mapM (\(ml,t,(a',b')) -> arbTerm sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one :: [Type]) n')
+          termList <- mapM (\(ml,t,(a',b')) -> arbTerm sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')
           let termList' = sequence termList
           case termList' of
             Nothing -> return Nothing
@@ -99,5 +99,3 @@ isConstant (FunctionSymbol _ xs _) = null xs
 isOnce :: Mode -> Bool
 isOnce (ONCE _) = True
 isOnce _ = False
-
-
