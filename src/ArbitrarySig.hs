@@ -3,49 +3,47 @@ import DataType
 import Test.QuickCheck
 import Data.List (nub)
 
-diffOrder :: Signature -> Gen Signature
-diffOrder (Signature fs) = do
+swapOrder :: Signature -> Gen Signature
+swapOrder (Signature fs) = do
     let available = filter (\x -> length (nub (#arguments x)) >=2) fs
     one <- elements available
-    (a,b) <- twoDiffTypes (#arguments one)
+    (a,b) <- twoDiffPositions (length (#arguments one))
     let newArg = swap a b (#arguments one)
         newFs = FunctionSymbol (newSymbol(symbol one)) newArg (funcType one)
     return (Signature (newFs:fs))
 
-swap :: Type -> Type -> [Type] -> [Type]
+swap :: Int -> Int -> [Type] -> [Type]
 swap _ _ [] = []
-swap n m (x:xs)
-  | n == x = m : swap n m xs
-  | m == x = n : swap n m xs
-  | otherwise = x : swap n m xs
+swap n m xs = left ++ [b] ++ middle ++ [a] ++ right
+                where a = xs !! n
+                      b = xs !! m
+                      left = take n xs
+                      right = drop (m+1) xs
+                      middle = take (m-n-1) (drop (n+1) xs)
 
-twoDiffTypes :: [Type] -> Gen (Type,Type)
-twoDiffTypes [] = error "This will never happen!"
-twoDiffTypes ts = do
-    a <- elements ts
-    b <- elements ts
-    if a == b
-    then twoDiffTypes ts
-    else return (a,b)
+twoDiffPositions :: Int -> Gen (Int,Int)
+twoDiffPositions 0 = error "This will never happen!"
+twoDiffPositions 1 = error "This will never happen!"
+twoDiffPositions n = do
+    a <- suchThat (chooseInt (0,n-1)) (<n-1)
+    b <- suchThat (chooseInt (0,n-1)) (\x -> x/=a && x>a)
+    return (a,b)
 
 newSymbol :: String -> String
 newSymbol s = s ++ "'"
 
-diffLength :: Signature -> Gen Signature
-diffLength (Signature fs) = do
+duplicateArg :: Signature -> Gen Signature
+duplicateArg (Signature fs) = do
     let available = filter (not. null. #arguments) fs
     one <- elements available
-    oneType <- elements (#arguments one)
-    let newArg = duplicateType oneType (#arguments one)
+    n <- chooseInt (0,length (#arguments one)-1)
+    let newArg = duplicate n (#arguments one)
         newFs = FunctionSymbol (newSymbol(symbol one)) newArg (funcType one)
     return (Signature (newFs:fs))
 
-duplicateType :: Type -> [Type] -> [Type]
-duplicateType _ [] = []
-duplicateType t (x:xs)
-    | t == x = t : t : duplicateType t xs
-    | otherwise = x : duplicateType t xs
-
-
+duplicate :: Int -> [Type] -> [Type]
+duplicate _ [] = []
+duplicate 0 (x:xs) = x : x : duplicate (-1) xs
+duplicate n (x:xs) = x : duplicate (n-1) xs
 
 
