@@ -31,3 +31,21 @@ twoDiffTypes ts = do
 newSymbol :: String -> String
 newSymbol s = s ++ "'"
 
+diffLength :: Signature -> Gen Signature
+diffLength (Signature fs) = do
+    let available = filter (not. null. #arguments) fs
+    one <- elements available
+    oneType <- elements (#arguments one)
+    let newArg = duplicateType oneType (#arguments one)
+        newFs = FunctionSymbol (newSymbol(symbol one)) newArg (funcType one)
+    return (Signature (newFs:fs))
+
+duplicateType :: Type -> [Type] -> [Type]
+duplicateType _ [] = []
+duplicateType t (x:xs)
+    | t == x = t : t : duplicateType t xs
+    | otherwise = x : duplicateType t xs
+
+
+
+
