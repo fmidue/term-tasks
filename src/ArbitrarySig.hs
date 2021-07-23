@@ -2,6 +2,7 @@ module ArbitrarySig where
 import DataType
 import Test.QuickCheck
 import Data.List (nub)
+import GetSignatureInfo (allTypes)
 
 swapOrder :: Signature -> Gen Signature
 swapOrder (Signature fs) = do
@@ -25,8 +26,8 @@ twoDiffPositions :: Int -> Gen (Int,Int)
 twoDiffPositions 0 = error "This will never happen!"
 twoDiffPositions 1 = error "This will never happen!"
 twoDiffPositions n = do
-    a <- suchThat (chooseInt (0,n-1)) (<n-1)
-    b <- suchThat (chooseInt (0,n-1)) (\x -> x/=a && x>a)
+    a <- chooseInt (0,n-2)
+    b <- chooseInt (0,n-1) `suchThat` (\x -> x/=a && x>a)
     return (a,b)
 
 newSymbol :: String -> String
@@ -46,4 +47,25 @@ duplicate _ [] = []
 duplicate 0 (x:xs) = x : x : duplicate (-1) xs
 duplicate n (x:xs) = x : duplicate (n-1) xs
 
+oneMoreArg :: Signature -> Gen Signature
+oneMoreArg sig@(Signature fs) = do
+    let available = filter (\x -> length (nub (#arguments x)) >=2) fs
+    one <- elements available
+    oneType <- elements (allTypes sig)
+    let newArg = #arguments one ++ [oneType]
+        newFs = FunctionSymbol (newSymbol(symbol one)) newArg (funcType one)
+    return (Signature (newFs:fs))
 
+oneLessArg :: Signature -> Gen Signature
+oneLessArg (Signature fs) = do
+    let available = filter (not. null. #arguments) fs
+    one <- elements available
+    position <- chooseInt (0,length (#arguments one)-1)
+    let newArg = deleteByPosition position (#arguments one)
+        newFs = FunctionSymbol (newSymbol(symbol one)) newArg (funcType one)
+    return (Signature (newFs:fs))
+
+deleteByPosition :: Int -> [Type] -> [Type]
+deleteByPosition _ [] = []
+deleteByPosition 0 (_:ts) = deleteByPosition (-1) ts
+deleteByPosition n (t:ts) = t : deleteByPosition (n-1) ts
