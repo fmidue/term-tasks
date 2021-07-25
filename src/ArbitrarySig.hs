@@ -1,7 +1,13 @@
-module ArbitrarySig where
+module ArbitrarySig (
+    swapOrder,
+    duplicateArg,
+    oneMoreArg,
+    oneLessArg,
+    oneDiffType
+)where
 import DataType
 import Test.QuickCheck
-import Data.List (nub)
+import Data.List (nub,delete)
 import GetSignatureInfo (allTypes)
 
 swapOrder :: Signature -> Gen (Signature,String)
@@ -75,11 +81,14 @@ deleteByPosition :: Int -> [Type] -> [Type]
 deleteByPosition n ts = [t | (i,t) <- zip [0..] ts, i /= n]
 
 oneDiffType :: Signature -> Gen (Signature,String)
-oneDiffType (Signature fs) = do
+oneDiffType sig@(Signature fs) = do
     let available = filter (not. null. #arguments) fs
     one <- elements available
     position <- chooseInt (0,length (#arguments one)-1)
-    t <- elements (#arguments one) `suchThat` (/=(#arguments one !! position))
+    let types = allTypes sig
+        newList = delete (#arguments one !! position) types
+    t <- elements newList
+--    t <- elements (#arguments one) `suchThat` (/=(#arguments one !! position))
     let newArg = replace position t (#arguments one)
         newSym = newSymbol(symbol one)
         newFs = FunctionSymbol newSym newArg (funcType one)

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5e4ebc989fb698c5ac610e797d583c35c2c94b1180989590cd8bfc7a03c40288
+-- hash: 2b5bfd41fe61c3d47ceb7d5de1cc2842a3e8f1a199ed1ef6ad77bf1ad917ea05
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -13,11 +13,11 @@ build-type:     Simple
 library
   exposed-modules:
       ArbitrarySig
-      CheckError
       ComputeTerm
       DataType
       DealWithTerm
       GetSignatureInfo
+      InvalidTerm
       OneTerm
       ValidCheck
   other-modules:
