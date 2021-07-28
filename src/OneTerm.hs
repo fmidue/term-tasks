@@ -17,7 +17,7 @@ oneValidTerm sig@(Signature fs) (Just s) a b = arbTerm sig (ONCE s) a b fs
 arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
 arbTerm sig m a b fs = do
 -- select one function symbol from fs. If symbol of "one" is the given symbol, newMode is changed from ONCE to NO
-  x <- selectOne m fs
+  x <- funcsymbolWithMode m fs
   case x of
     Nothing -> return Nothing
     -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
@@ -38,7 +38,7 @@ arbTerm sig m a b fs = do
           let termList' = sequence termList
           case termList' of
             Nothing -> return Nothing
-            Just ts -> return (Just (Term (symbol one) ts))
+            Just ts -> return (Just (Term (#symbol one) ts))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
@@ -71,20 +71,24 @@ theTuples xs = map tuplify2 (transpose xs)
 isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
-selectOne ::Mode -> [FunctionSymbol] -> Gen (Maybe (FunctionSymbol,Mode))
-selectOne _ [] = return Nothing
-selectOne NONE fs = do one <- elements fs
-                       return (Just(one,NONE))
-selectOne (NO s) fs = do if null fs'
-                         then return Nothing
-                         else do one <- elements fs'
-                                 return (Just(one,NO s))
-                                   where fs' = filter (\x -> symbol x /= s) fs
+funcsymbolWithMode ::Mode -> [FunctionSymbol] -> Gen (Maybe (FunctionSymbol,Mode))
+funcsymbolWithMode _ [] = return Nothing
+funcsymbolWithMode NONE fs = do
+  one <- elements fs
+  return (Just(one,NONE))
+funcsymbolWithMode (NO s) fs = do
+  if null fs'
+  then return Nothing
+  else do
+    one <- elements fs'
+    return (Just(one,NO s))
+      where fs' = filter (\x -> #symbol x /= s) fs
 -- if the given symbol is just seleted, the Mode change to NO and return
-selectOne (ONCE s) fs = do one <- elements fs
-                           if symbol one == s
-                           then return (Just(one,NO s))
-                           else return (Just(one,ONCE s))
+funcsymbolWithMode (ONCE s) fs = do
+  one <- elements fs
+  if #symbol one == s
+  then return (Just(one,NO s))
+  else return (Just(one,ONCE s))
 
 newModes :: Int -> Mode -> Gen [Mode]
 newModes 0 _ = return []

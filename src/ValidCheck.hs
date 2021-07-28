@@ -8,17 +8,17 @@ import GetSignatureInfo (theType,allConstants,allSymbols,theArgumentsTypes)
 import DealWithTerm (termSymbols)
 
 isValid :: Signature -> Term -> Bool
-isValid sig t = all (`elem` allSymbols sig) (termSymbols t) && validType t sig
+isValid sig t = all (`elem` allSymbols sig) (termSymbols t) && isValidType t sig
 
-validType :: Term -> Signature -> Bool
-validType (Term s xs) w = validType' (fromJust (theArgumentsTypes w s)) xs w
+isValidType :: Term -> Signature -> Bool
+isValidType (Term s xs) w = isValidType' (fromJust (theArgumentsTypes w s)) xs w
 
-validType' :: [Type] ->[Term] -> Signature -> Bool
-validType' [] [] _ = True
-validType' [] xs _ = null xs
-validType' xs [] _ = null xs
-validType' (t:ts) (Term s []:xs) w = validType' ts xs w && theType w s == Just t && s `elem` map symbol (allConstants w)
-validType' (t:ts) (Term s x':xs) w = validType (Term s x') w && validType' ts xs w && theType w s == Just t
+isValidType' :: [Type] ->[Term] -> Signature -> Bool
+isValidType' [] [] _ = True
+isValidType' [] xs _ = null xs
+isValidType' xs [] _ = null xs
+isValidType' (t:ts) (Term s []:xs) w = isValidType' ts xs w && theType w s == Just t && s `elem` map #symbol (allConstants w)
+isValidType' (t:ts) (Term s x':xs) w = isValidType (Term s x') w && isValidType' ts xs w && theType w s == Just t
 
 
 

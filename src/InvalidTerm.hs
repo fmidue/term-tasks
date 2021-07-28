@@ -20,7 +20,7 @@ newSignature sig TYPE = oneDiffType sig
 
 originalSymbol :: String -> Term -> Term
 originalSymbol s' (Term s ts)
-  | s == s' = Term (take 1 s) ts
+  | s == s' = Term (init s) ts
   | otherwise = Term s (map (originalSymbol s') ts)
 
 invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Maybe Term]

@@ -4,15 +4,15 @@ module AllTerm (
 
 import GetSignatureInfo (allSameTypes)
 import DataType
-import Data.List (transpose)
+import Data.List (transpose,nub)
 import Control.Monad (replicateM)
-import Data.Maybe (isJust)
+import Data.Maybe (catMaybes)
 
 data Mode = NONE | NO String | ONCE String   deriving (Show,Eq)
 
-validTerms :: Signature -> Maybe String -> Int -> Int -> [Maybe Term]
-validTerms sig@(Signature fs) Nothing a b = filter isJust (arbTerms sig NONE a b fs)
-validTerms sig@(Signature fs) (Just s) a b = filter isJust (arbTerms sig (ONCE s) a b fs)
+validTerms :: Signature -> Maybe String -> Int -> Int -> [Term]
+validTerms sig@(Signature fs) Nothing a b = catMaybes (nub(arbTerms sig NONE a b fs))
+validTerms sig@(Signature fs) (Just s) a b = catMaybes (nub(arbTerms sig (ONCE s) a b fs))
 
 arbTerms :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> [Maybe Term]
 arbTerms sig m a b fs = do
@@ -38,7 +38,7 @@ arbTerms sig m a b fs = do
           let termList' = sequence termList
           case termList' of
             Nothing -> return Nothing
-            Just ts -> return (Just (Term (symbol one) ts))
+            Just ts -> return (Just (Term (#symbol one) ts))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
@@ -82,10 +82,10 @@ funcsymbolWithModes (NO s) fs = do
   else do
     one <- fs'
     return (Just(one,NO s))
-      where fs' = filter (\x -> symbol x /= s) fs
+      where fs' = filter (\x -> #symbol x /= s) fs
 funcsymbolWithModes (ONCE s) fs = do
   one <- fs
-  if symbol one == s
+  if #symbol one == s
   then return (Just(one,NO s))
   else return (Just(one,ONCE s))
 
