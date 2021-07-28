@@ -9,10 +9,7 @@ import Data.Maybe (isJust)
 oneInvalidTerm :: Signature -> Error -> Int-> Int -> Gen (Maybe Term)
 oneInvalidTerm sig e a b = do
     (newSig,s) <- newSignature sig e
-    term <- oneValidTerm newSig (Just s) a b
-    case term of
-        Nothing -> return Nothing
-        Just t -> return (Just (originalSymbol s t))
+    oneValidTerm newSig (Just s) a b `suchThat` isJust
 
 newSignature :: Signature -> Error -> Gen (Signature,String)
 newSignature sig SWAP = swapOrder sig
@@ -30,6 +27,6 @@ invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Maybe Term]
 invalidTerms _ [] _ _ = return []
 invalidTerms sig ((0,_):ls) a b = invalidTerms sig ls a b
 invalidTerms sig ((n,e):ls) a b = do
-  term <- oneInvalidTerm sig e a b `suchThat` isJust
+  term <- oneInvalidTerm sig e a b
   nextTerm <- invalidTerms sig ((n-1,e):ls) a b
   return (term:nextTerm)
