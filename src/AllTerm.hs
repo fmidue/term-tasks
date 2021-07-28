@@ -1,49 +1,44 @@
 module AllTerm (
-  oneValidTerm
+  validTerms
 )where
 
-import Test.QuickCheck
 import GetSignatureInfo (allSameTypes)
 import DataType
 import Data.List (transpose)
 import Control.Monad (replicateM)
+import Data.Maybe (isJust)
 
 data Mode = NONE | NO String | ONCE String   deriving (Show,Eq)
 
-oneValidTerm :: Signature -> Maybe String -> Int -> Int -> Gen [Maybe Term]
-oneValidTerm sig@(Signature fs) Nothing a b = arbTerm sig NONE a b fs
-oneValidTerm sig@(Signature fs) (Just s) a b = arbTerm sig (ONCE s) a b fs
+validTerms :: Signature -> Maybe String -> Int -> Int -> [Maybe Term]
+validTerms sig@(Signature fs) Nothing a b = filter isJust (arbTerms sig NONE a b fs)
+validTerms sig@(Signature fs) (Just s) a b = filter isJust (arbTerms sig (ONCE s) a b fs)
 
-arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen [(Maybe Term)]
-arbTerm _ _ _ _ [] = return []
-arbTerm sig m a b (f:fs) = do
+arbTerms :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> [Maybe Term]
+arbTerms sig m a b fs = do
 -- select one function symbol from fs. If symbol of "one" is the given symbol, newMode is changed from ONCE to NO
-  x <- selectOne m f
+  x <- funcsymbolWithModes m fs
   case x of
-    Nothing -> return [Nothing]
+    Nothing -> return Nothing
     -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
     Just (one,newMode) -> do
       if isConstant one && isOnce newMode
-      then return [Nothing]
+      then return Nothing
       -- Here do as the original vision
       else do
-        let n = division (length (#arguments one :: [Type])) a b
+        let n = division (length (#arguments one)) a b
         if null n
-        then return [Nothing]
+        then return Nothing
         else do
-          n' <- elements n
-          let l = length ((arguments :: FunctionSymbol -> [Type]) one)
+          n' <- n
+          let l = length (#arguments one)
           modeList <- newModes l newMode
-          termList <- mapM (\(ml,t,(a',b')) -> arbTerm sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one :: [Type]) n')
-          termList' <- mapM (tt (symbol one)) termList
-          nextTerm <- arbTerm sig m a b fs
-          return (termList'++nextTerm)
-
-tt :: String -> [Maybe Term] -> Gen (Maybe Term)
-tt s ts =
-  case sequence ts of
-    Nothing -> return Nothing
-    Just term -> return (Just (Term s term))
+          -- zip 3 :: [a] -> [b] -> [c] -> [(a,b,c)]
+          termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')
+          let termList' = sequence termList
+          case termList' of
+            Nothing -> return Nothing
+            Just ts -> return (Just (Term (symbol one) ts))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
@@ -76,20 +71,28 @@ theTuples xs = map tuplify2 (transpose xs)
 isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
-selectOne ::Mode -> FunctionSymbol -> Gen (Maybe (FunctionSymbol,Mode))
-selectOne NONE fs = return (Just(fs,NONE))
-selectOne (NO s) fs = do if symbol fs == s
-                         then return Nothing
-                         else return (Just(fs,NO s))
--- if the given symbol is just seleted, the Mode change to NO and return
-selectOne (ONCE s) fs = do if symbol fs == s
-                           then return (Just(fs,NO s))
-                           else return (Just(fs,ONCE s))
+funcsymbolWithModes :: Mode -> [FunctionSymbol] -> [Maybe (FunctionSymbol,Mode)]
+funcsymbolWithModes _ [] = return Nothing
+funcsymbolWithModes NONE fs = do
+  one <- fs
+  return (Just(one,NONE))
+funcsymbolWithModes (NO s) fs = do
+  if null fs'
+  then return Nothing
+  else do
+    one <- fs'
+    return (Just(one,NO s))
+      where fs' = filter (\x -> symbol x /= s) fs
+funcsymbolWithModes (ONCE s) fs = do
+  one <- fs
+  if symbol one == s
+  then return (Just(one,NO s))
+  else return (Just(one,ONCE s))
 
-newModes :: Int -> Mode -> Gen [Mode]
+newModes :: Int -> Mode -> [[Mode]]
 newModes 0 _ = return []
 newModes n (ONCE s) = do
-  n' <- chooseInt (0,n-1)
+  n' <- [0..n-1]
   return [ if j == n' then ONCE s else NO s | j <- [0 .. n-1] ]
 newModes n m = return (replicate n m)
 
@@ -99,5 +102,3 @@ isConstant (FunctionSymbol _ xs _) = null xs
 isOnce :: Mode -> Bool
 isOnce (ONCE _) = True
 isOnce _ = False
-
-
