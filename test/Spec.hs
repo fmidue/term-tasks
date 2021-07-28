@@ -7,7 +7,6 @@ import ValidCheck
 import ArbitrarySig
 import GetSignatureInfo
 import DealWithTerm
-import CheckError
 import OneTerm
 import Test.QuickCheck
 import Examples.Signatures
@@ -80,6 +79,8 @@ main = hspec $ do
     forAll (oneValidTerm signature5 (Just "b") 1 8) (\x -> isJust x ==> isValid signature5 (fromJust x))
   prop "check oneValidTerm (signature6)" $
     forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> isValid signature6 (fromJust x))
+--  prop "check oneValidTerm (signature6)" $
+--    forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> cover 50 (isValid signature6 (fromJust x)))
 
 
 

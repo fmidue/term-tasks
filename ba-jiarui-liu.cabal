@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2b5bfd41fe61c3d47ceb7d5de1cc2842a3e8f1a199ed1ef6ad77bf1ad917ea05
+-- hash: f567062a4d94eb53907cd4a9dd8e52579f3f6326176d2158d16fd311d0aa19a5
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -12,6 +12,7 @@ build-type:     Simple
 
 library
   exposed-modules:
+      AllTerm
       ArbitrarySig
       ComputeTerm
       DataType

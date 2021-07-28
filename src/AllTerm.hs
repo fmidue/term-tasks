@@ -1,0 +1,103 @@
+module AllTerm (
+  oneValidTerm
+)where
+
+import Test.QuickCheck
+import GetSignatureInfo (allSameTypes)
+import DataType
+import Data.List (transpose)
+import Control.Monad (replicateM)
+
+data Mode = NONE | NO String | ONCE String   deriving (Show,Eq)
+
+oneValidTerm :: Signature -> Maybe String -> Int -> Int -> Gen [Maybe Term]
+oneValidTerm sig@(Signature fs) Nothing a b = arbTerm sig NONE a b fs
+oneValidTerm sig@(Signature fs) (Just s) a b = arbTerm sig (ONCE s) a b fs
+
+arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen [(Maybe Term)]
+arbTerm _ _ _ _ [] = return []
+arbTerm sig m a b (f:fs) = do
+-- select one function symbol from fs. If symbol of "one" is the given symbol, newMode is changed from ONCE to NO
+  x <- selectOne m f
+  case x of
+    Nothing -> return [Nothing]
+    -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
+    Just (one,newMode) -> do
+      if isConstant one && isOnce newMode
+      then return [Nothing]
+      -- Here do as the original vision
+      else do
+        let n = division (length (#arguments one :: [Type])) a b
+        if null n
+        then return [Nothing]
+        else do
+          n' <- elements n
+          let l = length ((arguments :: FunctionSymbol -> [Type]) one)
+          modeList <- newModes l newMode
+          termList <- mapM (\(ml,t,(a',b')) -> arbTerm sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one :: [Type]) n')
+          termList' <- mapM (tt (symbol one)) termList
+          nextTerm <- arbTerm sig m a b fs
+          return (termList'++nextTerm)
+
+tt :: String -> [Maybe Term] -> Gen (Maybe Term)
+tt s ts =
+  case sequence ts of
+    Nothing -> return Nothing
+    Just term -> return (Just (Term s term))
+
+division ::Int -> Int -> Int -> [[(Int,Int)]]
+division 0 1 _ = [[]]
+division n a b
+  | a > b  = []
+  | n >= a = division n (n + 1) b
+  | otherwise = filter isValidTuples ts
+                    where ts = map (theTuples . newLists n) (division' n a b)
+
+division' :: Int -> Int -> Int -> [[Int]]
+division' n a b = [x ++ y | x <- validLists a (theLists n a), y <- validLists b (theLists n b)]
+
+theLists ::Int -> Int -> [[Int]]
+theLists n a = replicateM n [1..a-1]
+
+validLists :: Int -> [[Int]] -> [[Int]]
+validLists a = filter ((==a-1) . sum)
+
+newLists :: Int -> [Int] -> [[Int]]
+newLists n xs = a : [b]
+                  where (a,b) = splitAt n xs
+
+tuplify2 :: [Int] -> (Int,Int)
+tuplify2 [x,y] = (x,y)
+tuplify2 _ = error "This will never happen!"
+
+theTuples :: [[Int]] -> [(Int,Int)]
+theTuples xs = map tuplify2 (transpose xs)
+
+isValidTuples :: [(Int,Int)] -> Bool
+isValidTuples = all (uncurry (<=))
+
+selectOne ::Mode -> FunctionSymbol -> Gen (Maybe (FunctionSymbol,Mode))
+selectOne NONE fs = return (Just(fs,NONE))
+selectOne (NO s) fs = do if symbol fs == s
+                         then return Nothing
+                         else return (Just(fs,NO s))
+-- if the given symbol is just seleted, the Mode change to NO and return
+selectOne (ONCE s) fs = do if symbol fs == s
+                           then return (Just(fs,NO s))
+                           else return (Just(fs,ONCE s))
+
+newModes :: Int -> Mode -> Gen [Mode]
+newModes 0 _ = return []
+newModes n (ONCE s) = do
+  n' <- chooseInt (0,n-1)
+  return [ if j == n' then ONCE s else NO s | j <- [0 .. n-1] ]
+newModes n m = return (replicate n m)
+
+isConstant :: FunctionSymbol -> Bool
+isConstant (FunctionSymbol _ xs _) = null xs
+
+isOnce :: Mode -> Bool
+isOnce (ONCE _) = True
+isOnce _ = False
+
+
