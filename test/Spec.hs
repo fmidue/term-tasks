@@ -134,17 +134,17 @@ main = hspec $ do
   specify "The size of generated terms is really in the range (signature6)" $
     all (\t -> between (size t) 2 10) (validTerms signature6 (Just "e") 2 10)
 
-  specify "The size of generated terms is really in the range (signature1)" $
+  specify "A certain symbol contains exactly once (signature1)" $
     all (isOnce "t" . termSymbols) (validTerms signature1 (Just "t") 1 8)
-  specify "The size of generated terms is really in the range (signature2)" $
+  specify "A certain symbol contains exactly once (signature2)" $
     all (isOnce "b" . termSymbols) (validTerms signature2 (Just "b") 3 10)
-  specify "The size of generated terms is really in the range (signature3)" $
+  specify "A certain symbol contains exactly once (signature3)" $
     all (isOnce "h" . termSymbols) (validTerms signature3 (Just "h") 4 9)
-  specify "The size of generated terms is really in the range (signature4)" $
+  specify "A certain symbol contains exactly once (signature4)" $
     all (isOnce "z" . termSymbols) (validTerms signature4 (Just "z") 1 4)
-  specify "The size of generated terms is really in the range (signature5)" $
+  specify "A certain symbol contains exactly once (signature5)" $
     all (isOnce "c" . termSymbols) (validTerms signature5 (Just "c") 4 4)
-  specify "The size of generated terms is really in the range (signature6)" $
+  specify "A certain symbol contains exactly once (signature6)" $
     all (isOnce "e". termSymbols) (validTerms signature6 (Just "e") 2 10)
 
 size :: Term -> Int
