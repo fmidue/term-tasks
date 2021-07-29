@@ -8,6 +8,7 @@ import ArbitrarySig
 import GetSignatureInfo
 import DealWithTerm
 import OneTerm
+import AllTerm
 import Test.QuickCheck
 import Examples.Signatures
 import Data.Maybe (isJust,fromJust)
@@ -79,17 +80,87 @@ main = hspec $ do
     forAll (oneValidTerm signature5 (Just "b") 1 8) (\x -> isJust x ==> isValid signature5 (fromJust x))
   prop "check oneValidTerm (signature6)" $
     forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> isValid signature6 (fromJust x))
---  prop "check oneValidTerm (signature6)" $
---    forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> cover 50 (isValid signature6 (fromJust x)))
 
+  prop "Every term that can be generated with term should also be generatable with validTerms(signature1)" $
+    forAll (elements (term 15 signature1)) (\x -> x `elem` validTerms signature1 Nothing (size x) (size x))
+  prop "Every term that can be generated with term should also be generatable with validTerms(signature2)" $
+    forAll (elements (term 10 signature2)) (\x -> x `elem` validTerms signature2 Nothing (size x) (size x))
+  prop "Every term that can be generated with term should also be generatable with validTerms(signature3)" $
+    forAll (elements (term 20 signature3)) (\x -> x `elem` validTerms signature3 Nothing (size x) (size x))
+  prop "Every term that can be generated with term should also be generatable with validTerms(signature4)" $
+    forAll (elements (term 10 signature4)) (\x -> x `elem` validTerms signature4 Nothing (size x) (size x))
+  prop "Every term that can be generated with term should also be generatable with validTerms(signature5)" $
+    forAll (elements (term 30 signature5)) (\x -> x `elem` validTerms signature5 Nothing (size x) (size x))
+  prop "Every term that can be generated with term should also be generatable with validTerms(signature6)" $
+    forAll (elements (term 15 signature6)) (\x -> x `elem` validTerms signature6 Nothing (size x) (size x))
 
+  prop "Every term that can be generated with validTerms should also be generatable with term (signature1)" $
+    forAll (elements(validTerms signature1 Nothing 1 8)) (\x -> x `elem` concatMap (`term` signature1) [1..])
+  prop "Every term that can be generated with validTerms should also be generatable with term (signature2)" $
+    forAll (elements(validTerms signature2 Nothing 3 10)) (\x -> x `elem` concatMap (`term` signature2) [1..])
+  prop "Every term that can be generated with validTerms should also be generatable with term (signature3)" $
+    forAll (elements(validTerms signature3 Nothing 4 9)) (\x -> x `elem` concatMap (`term` signature3) [1..])
+  prop "Every term that can be generated with validTerms should also be generatable with term (signature4)" $
+    forAll (elements(validTerms signature4 Nothing 1 4)) (\x -> x `elem` concatMap (`term` signature4) [1..])
+  prop "Every term that can be generated with validTerms should also be generatable with term (signature5)" $
+    forAll (elements(validTerms signature5 Nothing 4 4)) (\x -> x `elem` concatMap (`term` signature5) [1..])
+  prop "Every term that can be generated with validTerms should also be generatable with term (signature6)" $
+    forAll (elements(validTerms signature6 Nothing 2 10)) (\x -> x `elem` concatMap (`term` signature6) [1..])
 
-selectOneFunc :: Signature -> Gen Signature
-selectOneFunc sig = do
-  let con = allConstants sig
-      f = allFunctions sig
-  fList <- elements f
-  return (Signature (con++f))
+--  size (elements (term 15 signature1)) elem validTerms signature1 Nothing s s
+  specify "The size of generated terms is really in the range (signature1)" $
+    all (\t -> between (size t) 1 8) (validTerms signature1 Nothing 1 8)
+  specify "The size of generated terms is really in the range (signature2)" $
+    all (\t -> between (size t) 3 10) (validTerms signature2 Nothing 3 10)
+  specify "The size of generated terms is really in the range (signature3)" $
+    all (\t -> between (size t) 4 9) (validTerms signature3 Nothing 4 9)
+  specify "The size of generated terms is really in the range (signature4)" $
+    all (\t -> between (size t) 1 4) (validTerms signature4 Nothing 1 4)
+  specify "The size of generated terms is really in the range (signature5)" $
+    all (\t -> between (size t) 4 4) (validTerms signature5 Nothing 4 4)
+  specify "The size of generated terms is really in the range (signature6)" $
+    all (\t -> between (size t) 2 10) (validTerms signature6 Nothing 2 10)
+
+  specify "The size of generated terms is really in the range (signature1)" $
+    all (\t -> between (size t) 1 8) (validTerms signature1 (Just "t") 1 8)
+  specify "The size of generated terms is really in the range (signature2)" $
+    all (\t -> between (size t) 3 10) (validTerms signature2 (Just "b") 3 10)
+  specify "The size of generated terms is really in the range (signature3)" $
+    all (\t -> between (size t) 4 9) (validTerms signature3 (Just "h") 4 9)
+  specify "The size of generated terms is really in the range (signature4)" $
+    all (\t -> between (size t) 1 4) (validTerms signature4 (Just "z") 1 4)
+  specify "The size of generated terms is really in the range (signature5)" $
+    all (\t -> between (size t) 4 4) (validTerms signature5 (Just "c") 4 4)
+  specify "The size of generated terms is really in the range (signature6)" $
+    all (\t -> between (size t) 2 10) (validTerms signature6 (Just "e") 2 10)
+
+  specify "The size of generated terms is really in the range (signature1)" $
+    all (isOnce "t" . termSymbols) (validTerms signature1 (Just "t") 1 8)
+  specify "The size of generated terms is really in the range (signature2)" $
+    all (isOnce "b" . termSymbols) (validTerms signature2 (Just "b") 3 10)
+  specify "The size of generated terms is really in the range (signature3)" $
+    all (isOnce "h" . termSymbols) (validTerms signature3 (Just "h") 4 9)
+  specify "The size of generated terms is really in the range (signature4)" $
+    all (isOnce "z" . termSymbols) (validTerms signature4 (Just "z") 1 4)
+  specify "The size of generated terms is really in the range (signature5)" $
+    all (isOnce "c" . termSymbols) (validTerms signature5 (Just "c") 4 4)
+  specify "The size of generated terms is really in the range (signature6)" $
+    all (isOnce "e". termSymbols) (validTerms signature6 (Just "e") 2 10)
+
+size :: Term -> Int
+size fs = 1 + size' (#arguments fs)
+
+size' :: [Term] -> Int
+size' [] = 0
+size' (f:fs)
+  | null (#arguments f) = 1 + size' fs
+  | otherwise = 1 + size' (#arguments f) + size' fs
+
+between :: Int -> Int -> Int -> Bool
+between n a b = n >= a && n <= b
+
+isOnce :: String -> [String] -> Bool
+isOnce s ls = length (filter (== s) ls) == 1
 
 -- maybe also for terms of a specific type
 termsOfType :: Int -> Type -> Signature -> [Term]

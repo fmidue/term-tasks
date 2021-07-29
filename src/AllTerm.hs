@@ -11,8 +11,8 @@ import Data.Maybe (catMaybes)
 data Mode = NONE | NO String | ONCE String   deriving (Show,Eq)
 
 validTerms :: Signature -> Maybe String -> Int -> Int -> [Term]
-validTerms sig@(Signature fs) Nothing a b = catMaybes (nub(arbTerms sig NONE a b fs))
-validTerms sig@(Signature fs) (Just s) a b = catMaybes (nub(arbTerms sig (ONCE s) a b fs))
+validTerms sig@(Signature fs) Nothing a b = nub(catMaybes(arbTerms sig NONE a b fs))
+validTerms sig@(Signature fs) (Just s) a b = nub(catMaybes(arbTerms sig (ONCE s) a b fs))
 
 arbTerms :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> [Maybe Term]
 arbTerms sig m a b fs = do
