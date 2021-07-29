@@ -14,10 +14,10 @@ oneValidTerm :: Signature -> Maybe String -> Int -> Int -> Gen (Maybe Term)
 oneValidTerm sig@(Signature fs) Nothing a b = arbTerm sig NONE a b fs
 oneValidTerm sig@(Signature fs) (Just s) a b = arbTerm sig (ONCE s) a b fs
 
-arbTerm :: Signature -> Mode -> Int -> Int -> [FunctionSymbol] -> Gen (Maybe Term)
+arbTerm :: Signature -> Mode -> Int -> Int -> [Symbol] -> Gen (Maybe Term)
 arbTerm sig m a b fs = do
 -- select one function symbol from fs. If symbol of "one" is the given symbol, newMode is changed from ONCE to NO
-  x <- funcsymbolWithMode m fs
+  x <- symbolWithMode m fs
   case x of
     Nothing -> return Nothing
     -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
@@ -71,12 +71,12 @@ theTuples xs = map tuplify2 (transpose xs)
 isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
-funcsymbolWithMode ::Mode -> [FunctionSymbol] -> Gen (Maybe (FunctionSymbol,Mode))
-funcsymbolWithMode _ [] = return Nothing
-funcsymbolWithMode NONE fs = do
+symbolWithMode ::Mode -> [Symbol] -> Gen (Maybe (Symbol,Mode))
+symbolWithMode _ [] = return Nothing
+symbolWithMode NONE fs = do
   one <- elements fs
   return (Just(one,NONE))
-funcsymbolWithMode (NO s) fs = do
+symbolWithMode (NO s) fs = do
   if null fs'
   then return Nothing
   else do
@@ -84,7 +84,7 @@ funcsymbolWithMode (NO s) fs = do
     return (Just(one,NO s))
       where fs' = filter (\x -> #symbol x /= s) fs
 -- if the given symbol is just seleted, the Mode change to NO and return
-funcsymbolWithMode (ONCE s) fs = do
+symbolWithMode (ONCE s) fs = do
   one <- elements fs
   if #symbol one == s
   then return (Just(one,NO s))
@@ -97,8 +97,8 @@ newModes n (ONCE s) = do
   return [ if j == n' then ONCE s else NO s | j <- [0 .. n-1] ]
 newModes n m = return (replicate n m)
 
-isConstant :: FunctionSymbol -> Bool
-isConstant (FunctionSymbol _ xs _) = null xs
+isConstant :: Symbol -> Bool
+isConstant (Symbol _ xs _) = null xs
 
 isOnce :: Mode -> Bool
 isOnce (ONCE _) = True

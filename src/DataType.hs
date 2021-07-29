@@ -10,8 +10,8 @@ import GHC.Records
 
 newtype Type = Type String   deriving (Show,Eq)
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Show,Eq)
-newtype Signature = Signature [FunctionSymbol]   deriving (Show,Eq)
-data FunctionSymbol = FunctionSymbol {symbol :: String, arguments :: [Type], funcType :: Type}   deriving (Show,Eq)
+newtype Signature = Signature [Symbol]   deriving (Show,Eq)
+data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type}   deriving (Show,Eq)
 data Error = SWAP | DUPLICATE | TYPE | ONEMORE | ONELESS   deriving (Show,Eq)
 
 -- IsLabel orphan instance for (->) --

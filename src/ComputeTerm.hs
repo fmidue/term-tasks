@@ -21,7 +21,7 @@ sameTypeTerms sig ts t = filter (\x -> t == fromJust(theType sig (#symbol x))) t
 diffTypeTerms :: Signature -> [Term] -> [Type] -> [[Term]]
 diffTypeTerms sig ts = map (sameTypeTerms sig ts)
 
-allTerms :: Signature -> [FunctionSymbol] -> [Term] -> [Term]
+allTerms :: Signature -> [Symbol] -> [Term] -> [Term]
 allTerms sig fs ts = concatMap (\x -> map (Term (#symbol x)) (sequence(diffTypeTerms sig ts (#arguments x)))) fs
 
 subterms :: Int -> Signature -> [Term] -> [Term]

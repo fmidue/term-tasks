@@ -1,5 +1,5 @@
 module ArbitrarySig (
-    swapOrder,
+    swapArgOrder,
     duplicateArg,
     oneMoreArg,
     oneLessArg,
@@ -10,14 +10,14 @@ import Test.QuickCheck
 import Data.List (nub,delete)
 import GetSignatureInfo (allTypes)
 
-swapOrder :: Signature -> Gen (Signature,String)
-swapOrder (Signature fs) = do
+swapArgOrder :: Signature -> Gen (Signature,String)
+swapArgOrder (Signature fs) = do
     let available = filter (\x -> length (nub (#arguments x)) >=2) fs
     one <- elements available
     (a,b) <- twoDiffPositions (length (#arguments one))
     let newArg = swap a b (#arguments one)
         newSym = newSymbol(#symbol one)
-        newFs = FunctionSymbol newSym newArg (funcType one)
+        newFs = Symbol newSym newArg (result one)
     return (Signature (newFs:fs),newSym)
 
 swap :: Int -> Int -> [Type] -> [Type]
@@ -47,7 +47,7 @@ duplicateArg (Signature fs) = do
     n <- chooseInt (0,length (#arguments one)-1)
     let newArg = duplicate n (#arguments one)
         newSym = newSymbol(#symbol one)
-        newFs = FunctionSymbol newSym newArg (funcType one)
+        newFs = Symbol newSym newArg (result one)
     return (Signature (newFs:fs),newSym)
 
 duplicate :: Int -> [Type] -> [Type]
@@ -61,7 +61,7 @@ oneMoreArg sig@(Signature fs) = do
     position <- chooseInt (0,length (#arguments one)-1)
     let newArg = newTypes position oneType (#arguments one)
         newSym = newSymbol(#symbol one)
-        newFs = FunctionSymbol newSym newArg (funcType one)
+        newFs = Symbol newSym newArg (result one)
     return (Signature (newFs:fs),newSym)
 
 newTypes :: Int -> Type -> [Type] -> [Type]
@@ -74,7 +74,7 @@ oneLessArg (Signature fs) = do
     position <- chooseInt (0,length (#arguments one)-1)
     let newArg = newTypes' position (#arguments one)
         newSym = newSymbol(#symbol one)
-        newFs = FunctionSymbol newSym newArg (funcType one)
+        newFs = Symbol newSym newArg (result one)
     return (Signature (newFs:fs),newSym)
 
 newTypes' :: Int -> [Type] -> [Type]
@@ -91,7 +91,7 @@ oneDiffType sig@(Signature fs) = do
 --    t <- elements (#arguments one) `suchThat` (/=(#arguments one !! position))
     let newArg = replace position t (#arguments one)
         newSym = newSymbol(#symbol one)
-        newFs = FunctionSymbol newSym newArg (funcType one)
+        newFs = Symbol newSym newArg (result one)
     return (Signature (newFs:fs),newSym)
 
 replace :: Int -> Type -> [Type] -> [Type]

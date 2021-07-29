@@ -2,7 +2,7 @@ module InvalidTerm where
 
 import Test.QuickCheck
 import DataType
-import ArbitrarySig (swapOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType)
+import ArbitrarySig (swapArgOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType)
 import OneTerm (oneValidTerm)
 import AllTerm (validTerms)
 import Data.Maybe (isJust,fromJust)
@@ -14,7 +14,7 @@ oneInvalidTerm sig e a b = do
     return (originalSymbol s (fromJust term))
 
 newSignature :: Signature -> Error -> Gen (Signature,String)
-newSignature sig SWAP = swapOrder sig
+newSignature sig SWAP = swapArgOrder sig
 newSignature sig DUPLICATE = duplicateArg sig
 newSignature sig ONEMORE = oneMoreArg sig
 newSignature sig ONELESS = oneLessArg sig
