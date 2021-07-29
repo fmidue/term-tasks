@@ -23,22 +23,19 @@ arbTerms sig m a b fs = do
     -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
     Just (one,newMode) -> do
       if isConstant one && isOnce newMode
-      then return Nothing
+      then []
       -- Here do as the original vision
       else do
         let n = division (length (#arguments one)) a b
-        if null n
-        then return Nothing
-        else do
-          n' <- n
-          let l = length (#arguments one)
-          modeList <- newModes l newMode
-          -- zip 3 :: [a] -> [b] -> [c] -> [(a,b,c)]
-          termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')
-          let termList' = sequence termList
-          case termList' of
-            Nothing -> return Nothing
-            Just ts -> return (Just (Term (#symbol one) ts))
+        n' <- n
+        let l = length (#arguments one)
+        modeList <- newModes l newMode
+        -- zip 3 :: [a] -> [b] -> [c] -> [(a,b,c)]
+        termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')
+        let termList' = sequence termList
+        case termList' of
+          Nothing -> []
+          Just ts -> return (Just (Term (#symbol one) ts))
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
