@@ -166,12 +166,7 @@ isOnce s ls = length (filter (== s) ls) == 1
 termsOfType :: Int -> Type -> Signature -> [Term]
 termsOfType n t sig = sameTypeTerms sig (term n sig) t
 
--- can tansform [Term] in more readable forms
-printTerm :: Int -> Signature -> [String]
-printTerm n xs = map termForm (term n xs)
 
-printTermsOfType :: Int -> Type -> Signature -> [String]
-printTermsOfType n t xs = map termForm (termsOfType n t xs)
 
 
 
