@@ -7,7 +7,6 @@ import ValidCheck
 import ArbitrarySig
 import GetSignatureInfo
 import DealWithTerm
-import OneTerm
 import AllTerm
 import Test.QuickCheck
 import Examples.Signatures
@@ -68,18 +67,18 @@ main = hspec $ do
     Term "b" [Term "e" [Term "d" [Term "c"[Term "b" [Term "a" []]]]]] `elem` termsOfType 20 (Type "B") signature5
   specify "c(a,b,f) is a term of Type B that can be built from signature6" $
     Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
-  prop "check oneValidTerm (signature1)" $
-    forAll (oneValidTerm signature1 (Just "u") 1 10) (\x -> isJust x ==> isValid signature1 (fromJust x))
-  prop "check oneValidTerm (signature2)" $
-    forAll (oneValidTerm signature2 (Just "e") 1 6) (\x -> isJust x ==> isValid signature2 (fromJust x))
-  prop "check oneValidTerm (signature3)" $
-    forAll (oneValidTerm signature3 (Just "f") 3 8) (\x -> isJust x ==> isValid signature3 (fromJust x))
-  prop "check oneValidTerm (signature4)" $
-    forAll (oneValidTerm signature4 Nothing 3 8) (\x -> isJust x ==> isValid signature4 (fromJust x))
-  prop "check oneValidTerm (signature5)" $
-    forAll (oneValidTerm signature5 (Just "b") 1 8) (\x -> isJust x ==> isValid signature5 (fromJust x))
-  prop "check oneValidTerm (signature6)" $
-    forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> isValid signature6 (fromJust x))
+  prop "check validTerms (signature1)" $
+    forAll (elements(validTerms signature1 (Just "u") 1 10)) (\x -> isValid signature1 x)
+  prop "check validTerms (signature2)" $
+    forAll (elements(validTerms signature2 (Just "e") 1 6)) (\x -> isValid signature2 x)
+  prop "check validTerms (signature3)" $
+    forAll (elements(validTerms signature3 (Just "f") 3 8)) (\x -> isValid signature3 x)
+  prop "check validTerms (signature4)" $
+    forAll (elements(validTerms signature4 Nothing 3 8)) (\x -> isValid signature4 x)
+  prop "check validTerms (signature5)" $
+    forAll (elements(validTerms signature5 (Just "b") 1 8)) (\x -> isValid signature5 x)
+  prop "check validTerms (signature6)" $
+    forAll (elements(validTerms signature6 (Just "a") 1 4)) (\x -> isValid signature6 x)
 
   prop "Every term that can be generated with term should also be generatable with validTerms(signature1)" $
     forAll (elements (term 15 signature1)) (\x -> x `elem` validTerms signature1 Nothing (size x) (size x))

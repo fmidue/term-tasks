@@ -54,7 +54,7 @@ isValidTuples = all (uncurry (<=))
 
 symbolWithModes :: Mode -> [Symbol] -> [(Symbol,Mode)]
 symbolWithModes NONE fs = [(one,NONE) | one <- fs]
-symbolWithModes (NO s) fs = [(one,NO s) | one <- filter (\x -> #symbol x /= s) fs]
+symbolWithModes (NO s) fs = [(one,NO s) | one <- fs, #symbol one /= s]
 symbolWithModes (ONCE s) fs = [if #symbol one == s then (one,NO s) else (one,ONCE s) | one <- fs]
 
 newModes :: Int -> Mode -> [[Mode]]

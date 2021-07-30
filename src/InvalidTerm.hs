@@ -3,15 +3,13 @@ module InvalidTerm where
 import Test.QuickCheck
 import DataType
 import ArbitrarySig (swapArgOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType)
-import OneTerm (oneValidTerm)
 import AllTerm (validTerms)
-import Data.Maybe (isJust,fromJust)
 
 oneInvalidTerm :: Signature -> Error -> Int-> Int -> Gen Term
 oneInvalidTerm sig e a b = do
     (newSig,s) <- newSignature sig e
-    term <- oneValidTerm newSig (Just s) a b `suchThat` isJust
-    return (originalSymbol s (fromJust term))
+    term <- elements (validTerms newSig (Just s) a b)
+    return (originalSymbol s term)
 
 newSignature :: Signature -> Error -> Gen (Signature,String)
 newSignature sig SWAP = swapArgOrder sig
