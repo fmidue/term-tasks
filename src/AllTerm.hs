@@ -14,21 +14,12 @@ validTerms sig@(Signature fs) Nothing a b = nub(arbTerms sig NONE a b fs)
 validTerms sig@(Signature fs) (Just s) a b = nub(arbTerms sig (ONCE s) a b fs)
 
 arbTerms :: Signature -> Mode -> Int -> Int -> [Symbol] -> [Term]
-arbTerms sig m a b fs = do
--- select one function symbol from fs. If symbol of "one" is the given symbol, newMode is changed from ONCE to NO
-  (one,newMode) <- symbolWithModes m fs
-  -- Here is the leaf node. When "one" is constant and it doesn't choose that symbol, return Nothing.
-  if isConstant one && isOnce newMode
-  then []
-  -- Here do as the original vision
-  else do
-    let n = division (length (#arguments one)) a b
-    n' <- n
-    let l = length (#arguments one)
-    modeList <- newModes l newMode
-    -- zip 3 :: [a] -> [b] -> [c] -> [(a,b,c)]
-    termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')
-    return (Term (#symbol one) termList)
+arbTerms sig m a b fs = [Term (#symbol one) termList |
+                         (one,newMode) <- symbolWithModes m fs,
+                         not (isConstant one && isOnce newMode),
+                         n' <- division (length (#arguments one)) a b,
+                         modeList <- newModes (length (#arguments one)) newMode,
+                         termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')]
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]
@@ -62,26 +53,14 @@ isValidTuples :: [(Int,Int)] -> Bool
 isValidTuples = all (uncurry (<=))
 
 symbolWithModes :: Mode -> [Symbol] -> [(Symbol,Mode)]
-symbolWithModes _ [] = []
-symbolWithModes NONE fs = do
-  one <- fs
-  return (one,NONE)
-symbolWithModes (NO s) fs = do
-  one <- fs'
-  return (one,NO s)
-    where fs' = filter (\x -> #symbol x /= s) fs
-symbolWithModes (ONCE s) fs = do
-  one <- fs
-  if #symbol one == s
-  then return (one,NO s)
-  else return (one,ONCE s)
+symbolWithModes NONE fs = [(one,NONE) | one <- fs]
+symbolWithModes (NO s) fs = [(one,NO s) | one <- filter (\x -> #symbol x /= s) fs]
+symbolWithModes (ONCE s) fs = [if #symbol one == s then (one,NO s) else (one,ONCE s) | one <- fs]
 
 newModes :: Int -> Mode -> [[Mode]]
-newModes 0 _ = return []
-newModes n (ONCE s) = do
-  n' <- [0..n-1]
-  return [ if j == n' then ONCE s else NO s | j <- [0 .. n-1] ]
-newModes n m = return (replicate n m)
+newModes 0 _ = [[]]
+newModes n (ONCE s) = [[if j == n' then ONCE s else NO s | j <- [0 .. n-1], n' <- [0..n-1]]]
+newModes n m = [replicate n m]
 
 isConstant :: Symbol -> Bool
 isConstant (Symbol _ xs _) = null xs

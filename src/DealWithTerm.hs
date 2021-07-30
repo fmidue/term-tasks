@@ -1,11 +1,9 @@
 module DealWithTerm (
    termSymbols,
-   termSymbols',
-   termForm
+   termSymbols'
    ) where
 
 import DataType
-import Data.List (intercalate)
 
 termSymbols :: Term -> [String]
 termSymbols (Term x xs) = x : termSymbols' xs
