@@ -7,7 +7,7 @@ import DataType
 import Data.List (transpose,nub)
 import Control.Monad (replicateM)
 
-data Mode = NONE | NO String | ONCE String
+data Mode = NONE | NO String | ONCE String   deriving (Show,Eq)
 
 validTerms :: Signature -> Maybe String -> Int -> Int -> [Term]
 validTerms sig@(Signature fs) Nothing a b = nub(arbTerms sig NONE a b fs)
@@ -59,7 +59,7 @@ symbolWithModes (ONCE s) fs = [if #symbol one == s then (one,NO s) else (one,ONC
 
 newModes :: Int -> Mode -> [[Mode]]
 newModes 0 _ = [[]]
-newModes n (ONCE s) = [[if j == n' then ONCE s else NO s | j <- [0 .. n-1], n' <- [0..n-1]]]
+newModes n (ONCE s) = [[if j == n' then ONCE s else NO s | j <- [0 .. n-1]]|n' <- [0..n-1]]
 newModes n m = [replicate n m]
 
 isConstant :: Symbol -> Bool
