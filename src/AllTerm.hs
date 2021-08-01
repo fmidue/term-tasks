@@ -23,11 +23,14 @@ arbTerms sig m a b fs = [Term (#symbol one) termList |
                          modeList <- newModes (length (#arguments one)) newMode,
                          termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' . allSameTypes sig $t) (zip3 modeList (#arguments one) n')]
 
-oneValidTerm :: [Term] -> Gen (Maybe Term)
-oneValidTerm [] = return Nothing
-oneValidTerm ts = do
-  t <- elements ts
-  return (Just t)
+oneValidTerm :: Signature -> Maybe String -> Int -> Int -> Gen (Maybe Term)
+oneValidTerm sig s a b = do
+  let terms = validTerms sig s a b
+  case terms of
+    [] -> return Nothing
+    ts -> do
+      term <- elements ts
+      return (Just term)
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
 division 0 1 _ = [[]]

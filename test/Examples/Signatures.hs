@@ -2,7 +2,7 @@ module Examples.Signatures where
 
 import DataType
 
-signature1 = Signature [a1,b1,t1,u1,v1,w1,y1,z1]
+signature1 = Signature [a1,b1,t1,u1,v1,w1,x1,y1,z1]
 a1 = Symbol "a" [] (Type "A")
 b1 = Symbol "b" [] (Type "B")
 t1 = Symbol "t" [Type "B" ,Type "E"] (Type "D")
