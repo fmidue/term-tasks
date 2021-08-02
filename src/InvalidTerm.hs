@@ -3,7 +3,7 @@ module InvalidTerm where
 import Test.QuickCheck
 import DataType
 import ArbitrarySig (swapArgOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType)
-import AllTerm (validTerms,oneValidTerm)
+import ValidTerm (validTerms,oneValidTerm)
 import Data.Maybe (isJust,fromJust)
 
 oneInvalidTerm :: Signature -> Error -> Int-> Int -> Gen Term
