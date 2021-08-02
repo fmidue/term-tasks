@@ -11,14 +11,17 @@ import Data.List (nub,delete)
 import GetSignatureInfo (allTypes)
 
 swapArgOrder :: Signature -> Gen (Signature,String)
-swapArgOrder (Signature fs) = do
+swapArgOrder sig@(Signature fs) = do
     let available = filter (\x -> length (nub (#arguments x)) >=2) fs
     one <- elements available
     (a,b) <- twoDiffPositions (length (#arguments one))
-    let newArg = swap a b (#arguments one)
-        newSym = newSymbol(#symbol one)
-        newFs = Symbol newSym newArg (#result one)
-    return (Signature (newFs:fs),newSym)
+    if #arguments one !! a == #arguments one !! b
+    then swapArgOrder sig
+    else do
+        let newArg = swap a b (#arguments one)
+            newSym = newSymbol(#symbol one)
+            newFs = Symbol newSym newArg (#result one)
+        return (Signature (newFs:fs),newSym)
 
 swap :: Int -> Int -> [Type] -> [Type]
 swap _ _ [] = []
