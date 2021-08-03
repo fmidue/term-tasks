@@ -6,13 +6,16 @@ import ArbitrarySig (swapArgOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType
 import ValidTerm (validTerms,oneValidTerm)
 import Data.Maybe (isJust,fromJust)
 
-oneInvalidTerm :: Signature -> Error -> Int-> Int -> Gen Term
+oneInvalidTerm :: Signature -> Error -> Int-> Int -> Gen (Maybe Term)
 oneInvalidTerm sig e a b = do
-    (newSig,s) <- newSignature sig e
-    term <- oneValidTerm newSig (Just s) a b `suchThat` isJust
-    return (originalSymbol s (fromJust term))
+    new <- newSignature sig e
+    case new of
+      Nothing -> return Nothing
+      Just (newSig,s) -> do
+        term <- oneValidTerm newSig (Just s) a b `suchThat` isJust
+        return (Just(originalSymbol s (fromJust term)))
 
-newSignature :: Signature -> Error -> Gen (Signature,String)
+newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
 newSignature sig DUPLICATE = duplicateArg sig
 newSignature sig ONEMORE = oneMoreArg sig
@@ -24,7 +27,7 @@ originalSymbol s' (Term s ts)
   | s == s' = Term (init s) ts
   | otherwise = Term s (map (originalSymbol s') ts)
 
-invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Term]
+invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Maybe Term]
 invalidTerms _ [] _ _ = return []
 invalidTerms sig ((0,_):ls) a b = invalidTerms sig ls a b
 invalidTerms sig ((n,e):ls) a b = do
@@ -34,7 +37,10 @@ invalidTerms sig ((n,e):ls) a b = do
 
 invalidTerms' :: Signature -> Error -> Int-> Int -> Gen [Term]
 invalidTerms' sig e a b = do
-    (newSig,s) <- newSignature sig e
-    let terms = validTerms newSig (Just s) a b
-        terms' = map (originalSymbol s) terms
-    return terms'
+    new <- newSignature sig e
+    case new of
+      Nothing -> return []
+      Just (newSig,s) -> do
+        let terms = validTerms newSig (Just s) a b
+            terms' = map (originalSymbol s) terms
+        return terms'
