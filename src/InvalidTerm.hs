@@ -18,7 +18,7 @@ oneInvalidTerm sig e a b = do
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
 newSignature sig DUPLICATE = duplicateArg sig
-newSignature sig ONEMORE = oneMoreArg sig
+newSignature sig ONEMORE = fmap Just (oneMoreArg sig)
 newSignature sig ONELESS = oneLessArg sig
 newSignature sig TYPE = oneDiffType sig
 

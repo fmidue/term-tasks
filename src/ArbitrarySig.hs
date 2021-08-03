@@ -63,7 +63,7 @@ duplicateArg (Signature fs) = do
 duplicate :: Int -> [Type] -> [Type]
 duplicate n ts = take n ts ++ [ts !! n] ++ drop n ts
 
-oneMoreArg :: Signature -> Gen (Maybe(Signature,String))
+oneMoreArg :: Signature -> Gen (Signature,String)
 oneMoreArg sig@(Signature fs) = do
     one <- elements fs
     oneType <- elements (allTypes sig)
@@ -71,7 +71,7 @@ oneMoreArg sig@(Signature fs) = do
     let newArg = newTypes position oneType (#arguments one)
         newSym = newSymbol(#symbol one)
         newFs = Symbol newSym newArg (#result one)
-    return (Just(Signature (newFs:fs),newSym))
+    return (Signature (newFs:fs),newSym)
 
 newTypes :: Int -> Type -> [Type] -> [Type]
 newTypes n t' ts =  take n ts ++ [t'] ++ drop n ts
