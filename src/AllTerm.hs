@@ -1,4 +1,6 @@
-module AllTerm where
+module AllTerm (
+    allTerms
+)where
 
 import Test.QuickCheck
 import DataType
