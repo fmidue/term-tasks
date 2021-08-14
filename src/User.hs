@@ -2,17 +2,18 @@ module User where
 
 import Test.QuickCheck
 import DataType
-import AllTerm (allTerms)
+import AllTerm (allTerms,allTerms')
 import InvalidTerm (invalidTerms,invalidTerms')
 import ValidTerm(validTerms)
 import Data.List (intercalate)
 import Data.Maybe (catMaybes)
+import Data.Bifunctor (second)
 
 toSignature :: [(String,[String],String)] -> [Symbol]
-toSignature xs = map (\(s,ts,r)->Symbol s (toType ts) (Type r)) xs
+toSignature = map (\(s,ts,r)->Symbol s (toType ts) (Type r))
 
 toType :: [String] -> [Type]
-toType xs = map Type xs
+toType = map Type
 
 toError :: String -> Error
 toError "SwapUp" = SWAP
@@ -23,11 +24,20 @@ toError "OneArgumentsLess" = ONELESS
 toError _ = error "This will never happen!"
 
 toErrors :: [(Int,String)] -> [(Int,Error)]
-toErrors xs = map (\(n,e)-> (n,toError e)) xs
+toErrors = map (second toError)
 
 transTerm :: Term -> String
 transTerm (Term x []) = x
 transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
+
+randomTerms :: Int -> Int -> [[Term]] -> Gen [[Term]]
+randomTerms _ _ [] = return []
+randomTerms num1 num2 ts = do
+    let a = head ts
+        b = last ts
+    a' <- vectorOf num1 (elements a)
+    b' <- vectorOf num2 (elements b)
+    return [a',b']
 
 main :: IO ()
 main = do
@@ -42,38 +52,38 @@ main = do
             a <- readLn :: IO Int
             putStr "b="
             b <- readLn :: IO Int
-            putStrLn "Please input the symbol you want to present exactly once (only in valid terms): "
+            putStrLn "Please input the symbol you want to present exactly once (only in correct terms): "
             s <- readLn :: IO (Maybe String)
-            putStrLn "Please input the number of valid terms (number1) and invalid terms (number2) you need: "
+            putStrLn "Please input the number of correct terms (number1) and incorrect terms (number2) you need: "
             putStr "number1="
             number1 <- readLn :: IO Int
             putStr "number2="
             number2 <- readLn :: IO Int
             let sig' = Signature(toSignature sig)
-                validterms = map transTerm (take number1 (validTerms sig' s a b))
-            putStr "Do you want to generate invalid terms with different error types? (Y/N):"
+            correctTerms <- generate (vectorOf number1 (elements (validTerms sig' s a b)))
+            let correctTerms' = map transTerm correctTerms
+            putStr "Do you want to generate incorrect terms with different error types? (Y/N):"
             answer' <- getLine
             case answer' of
                 "Y" -> do
-                    putStrLn "Please input the error type and number of invalid terms in this type: "
+                    putStrLn "Please input the error type and number of incorrect terms in this type: "
                     e <- readLn :: IO [(Int,String)]
-                    let e' = toErrors e
-                    invalidterms <- generate (invalidTerms sig' e' a b)
-                    let invalidterms' = map transTerm (catMaybes invalidterms)
+                    incorrectTerms <- generate(invalidTerms sig' (toErrors e) a b)
+                    incorrectTerms' <- generate (vectorOf number2 (elements incorrectTerms))
+                    let incorrectTerms'' = map transTerm (catMaybes incorrectTerms')
                     print "Here are correct terms given to students:"
-                    print validterms
-                    print "Here are correct terms given to students:"
-                    print invalidterms'
+                    print correctTerms'
+                    print "Here are incorrect terms given to students:"
+                    print incorrectTerms''
                 "N" -> do
-                    putStrLn "Please input the error type you want to use in invalid terms: "
+                    putStrLn "Please input the error type you want to use in incorrect terms: "
                     e <- readLn :: IO String
-                    let e' = toError e
-                    invalidterms <- generate (invalidTerms' sig' e' a b)
-                    let invalidterms' = map transTerm (take number2 invalidterms)
+                    incorrectTerms <- generate (invalidTerms' sig' (toError e) a b)
+                    let incorrectTerms' = map transTerm (take number2 incorrectTerms)
                     print "Here are correct terms given to students:"
-                    print validterms
-                    print "Here are correct terms given to students:"
-                    print invalidterms'
+                    print correctTerms'
+                    print "Here are incorrect terms given to students:"
+                    print incorrectTerms'
                 _ -> main
         "N" -> do
             putStrLn "Please input the symbols you want to use: "
@@ -87,18 +97,41 @@ main = do
             b <- readLn :: IO Int
             putStrLn "Please input the largest length of a symbol in this signature:"
             l <- readLn :: IO Int
-            putStrLn "Please input the number of valid terms (number1) and invalid terms (number2) you need: "
+            putStrLn "Please input the number of correct terms (number1) and incorrect terms (number2) you need: "
             putStr "number1="
             number1 <- readLn :: IO Int
             putStr "number2="
             number2 <- readLn :: IO Int
-            putStrLn "Please input the error type you want to use in invalid terms: "
-            e <- readLn :: IO String
-            let types' = toType types
-                e' = toError e
-            terms <- generate (allTerms ls types' e' l a b)
-            let terms' = [map transTerm (take number1 (head terms)), map transTerm (take number2 (last terms))]
-            print terms'
+            putStr "Do you want to generate incorrect terms with different error types? (Y/N):"
+            answer' <- getLine
+            case answer' of
+                "Y" -> do
+                    putStrLn "Please input the error type and number of incorrect terms in this type: "
+                    e <- readLn :: IO [(Int,String)]
+                    (sig,terms) <- generate(allTerms ls (toType types) (toErrors e) l a b number1 number2)
+                    terms' <- generate (randomTerms number1 number2 terms)
+                    let correctTerms = map transTerm (head terms')
+                        incorrectTerms = map transTerm (last terms')
+                    print "This is the generated signature:"
+                    print sig
+                    print "Here are correct terms given to students:"
+                    print correctTerms
+                    print "Here are incorrect terms given to students:"
+                    print incorrectTerms
+                "N" -> do
+                    putStrLn "Please input the error type you want to use in incorrect terms: "
+                    e <- readLn :: IO String
+                    (sig,terms) <- generate(allTerms' ls (toType types) (toError e) l a b number1 number2)
+                    terms' <- generate (randomTerms number1 number2 terms)
+                    let correctTerms = map transTerm (head terms')
+                        incorrectTerms = map transTerm (last terms')
+                    print "This is the generated signature:"
+                    print sig
+                    print "Here are correct terms given to students:"
+                    print correctTerms
+                    print "Here are incorrect terms given to students:"
+                    print incorrectTerms
+                _ -> main
         _ -> main
 
 
