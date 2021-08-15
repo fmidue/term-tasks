@@ -13,6 +13,6 @@ allTerms s ts e n a b num1 num2 = do
     sig <- arbSignature s ts n
     let validT = validTerms sig Nothing a b
     invalidT <- invalidTerms sig e a b
-    if length validT > num1 && length invalidT > num2
+    if length validT >= num1 && length invalidT >= num2
     then return (sig,(validT, invalidT))
     else allTerms s ts e n a b num1 num2
