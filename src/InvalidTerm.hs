@@ -1,19 +1,12 @@
-module InvalidTerm where
+module InvalidTerm (
+  invalidTerms,
+  differentTerms
+)where
 
 import Test.QuickCheck
 import DataType
 import ArbitrarySig (swapArgOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType)
-import ValidTerm (validTerms,oneValidTerm)
-import Data.Maybe (isJust,fromJust)
-
-oneInvalidTerm :: Signature -> Error -> Int-> Int -> Gen (Maybe Term)
-oneInvalidTerm sig e a b = do
-    new <- newSignature sig e
-    case new of
-      Nothing -> return Nothing
-      Just (newSig,s) -> do
-        term <- oneValidTerm newSig (Just s) a b `suchThat` isJust
-        return (Just(originalSymbol s (fromJust term)))
+import ValidTerm (validTerms)
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
@@ -27,13 +20,20 @@ originalSymbol s' (Term s ts)
   | s == s' = Term (init s) ts
   | otherwise = Term s (map (originalSymbol s') ts)
 
-invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Maybe Term]
+differentTerms :: [Term] -> Int -> Gen [Term]
+differentTerms _ 0 = return []
+differentTerms ts n = do
+    nextTerm <- differentTerms ts (n-1)
+    t <- elements ts `suchThat` (`notElem` nextTerm)
+    return (t:nextTerm)
+
+invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Term]
 invalidTerms _ [] _ _ = return []
-invalidTerms sig ((0,_):ls) a b = invalidTerms sig ls a b
 invalidTerms sig ((n,e):ls) a b = do
-  term <- oneInvalidTerm sig e a b
-  nextTerm <- invalidTerms sig ((n-1,e):ls) a b
-  return (term:nextTerm)
+  terms <- invalidTerms' sig e a b
+  terms' <- differentTerms terms (min n (length terms))
+  nextTerm <- invalidTerms sig ls a b
+  return (terms'++nextTerm)
 
 invalidTerms' :: Signature -> Error -> Int-> Int -> Gen [Term]
 invalidTerms' sig e a b = do
