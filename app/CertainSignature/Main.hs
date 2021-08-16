@@ -1,7 +1,7 @@
 module Main where
 
 import Test.QuickCheck
-import DataType
+import DataType (Signature(..),Symbol(..),Type(..),Term(..),Error(..),transTerm,toType)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 
