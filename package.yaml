@@ -24,3 +24,25 @@ tests:
     dependencies:
       - ba-jiarui-liu
       - hspec
+executables:
+  CertainSignature:
+    main: CertainSignature.hs
+    source-dirs: app
+    ghc-options:
+    - -O2
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ba-jiarui-liu
+
+  RandomSignature:
+    main: RandomSignature.hs
+    source-dirs: app
+    ghc-options:
+    - -O2
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ba-jiarui-liu

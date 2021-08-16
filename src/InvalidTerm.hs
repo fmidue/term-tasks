@@ -4,16 +4,17 @@ module InvalidTerm (
 )where
 
 import Test.QuickCheck
-import DataType
-import ArbitrarySig (swapArgOrder,duplicateArg,oneMoreArg,oneLessArg,oneDiffType)
+import DataType (Signature(..),Term(..),Error(..))
+import ArbitrarySig (swapArgOrder,oneMoreArg,oneLessArg,oneDiffType,wrongSymbol,wrongSymbol')
 import ValidTerm (validTerms)
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
-newSignature sig DUPLICATE = duplicateArg sig
 newSignature sig ONEMORE = fmap Just (oneMoreArg sig)
 newSignature sig ONELESS = oneLessArg sig
 newSignature sig TYPE = oneDiffType sig
+newSignature sig SYMBOL = fmap Just (wrongSymbol sig)
+newSignature sig SYMBOLTYPE = fmap Just (wrongSymbol' sig)
 
 originalSymbol :: String -> Term -> Term
 originalSymbol s' (Term s ts)
@@ -27,13 +28,13 @@ differentTerms ts n = do
     t <- elements ts `suchThat` (`notElem` nextTerm)
     return (t:nextTerm)
 
-invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [Term]
+invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [[Term]]
 invalidTerms _ [] _ _ = return []
 invalidTerms sig ((n,e):ls) a b = do
   terms <- invalidTerms' sig e a b
   terms' <- differentTerms terms (min n (length terms))
   nextTerm <- invalidTerms sig ls a b
-  return (terms'++nextTerm)
+  return (terms':nextTerm)
 
 invalidTerms' :: Signature -> Error -> Int-> Int -> Gen [Term]
 invalidTerms' sig e a b = do

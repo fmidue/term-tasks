@@ -4,8 +4,7 @@ module ValidTerm (
 )where
 
 import Test.QuickCheck
-import GetSignatureInfo (allSameTypes)
-import DataType
+import DataType (Signature(..),Symbol(..),Term(..),allSameTypes)
 import Data.List (transpose,nub)
 import Control.Monad (replicateM)
 

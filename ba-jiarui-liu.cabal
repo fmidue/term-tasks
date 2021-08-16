@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 46c1281c0efa3583f782decff693d26f74f0be1e8ab98f1eca3528b4355fc49b
+-- hash: 0ad8dcd2d78fe787f4ad49bd310f64d9fe3105664da3686050ea0fe8cbe08204
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -15,10 +15,7 @@ library
       AllTerm
       ArbitrarySig
       DataType
-      DealWithTerm
-      GetSignatureInfo
       InvalidTerm
-      User
       ValidTerm
   other-modules:
       Paths_ba_jiarui_liu
