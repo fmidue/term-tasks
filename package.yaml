@@ -26,8 +26,8 @@ tests:
       - hspec
 executables:
   CertainSignature:
-    main: CertainSignature.hs
-    source-dirs: app
+    main: Main.hs
+    source-dirs: app/CertainSignature
     ghc-options:
     - -O2
     - -threaded
@@ -37,8 +37,8 @@ executables:
     - ba-jiarui-liu
 
   RandomSignature:
-    main: RandomSignature.hs
-    source-dirs: app
+    main: Main.hs
+    source-dirs: app/RandomSignature
     ghc-options:
     - -O2
     - -threaded

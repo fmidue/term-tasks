@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0ad8dcd2d78fe787f4ad49bd310f64d9fe3105664da3686050ea0fe8cbe08204
+-- hash: 9e2e17fd20470e0693c1f981b3741731f55dafb19f3cbf9cc34cca1098534aaf
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -27,6 +27,40 @@ library
   ghc-options: -Wall -Werror
   build-depends:
       QuickCheck
+    , base
+    , split
+  default-language: Haskell2010
+
+executable CertainSignature
+  main-is: Main.hs
+  other-modules:
+      Paths_ba_jiarui_liu
+  hs-source-dirs:
+      app/CertainSignature
+  default-extensions:
+      DuplicateRecordFields
+      OverloadedLabels
+  ghc-options: -O2 -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , ba-jiarui-liu
+    , base
+    , split
+  default-language: Haskell2010
+
+executable RandomSignature
+  main-is: Main.hs
+  other-modules:
+      Paths_ba_jiarui_liu
+  hs-source-dirs:
+      app/RandomSignature
+  default-extensions:
+      DuplicateRecordFields
+      OverloadedLabels
+  ghc-options: -O2 -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , ba-jiarui-liu
     , base
     , split
   default-language: Haskell2010

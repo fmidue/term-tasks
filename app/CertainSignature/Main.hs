@@ -1,4 +1,4 @@
-module CertainSignature where
+module Main where
 
 import Test.QuickCheck
 import DataType
@@ -8,8 +8,8 @@ import ValidTerm(validTerms)
 toSignature :: [(String,[String],String)] -> [Symbol]
 toSignature = map (\(s,ts,r)->Symbol s (toType ts) (Type r))
 
-certainSignature :: IO ()
-certainSignature = do
+main :: IO ()
+main = do
     putStrLn "Please input the signature you want to use: "
     sig <- readLn :: IO [(String,[String],String)]
     putStr "Please input the size of terms ([a,b]):\na="
