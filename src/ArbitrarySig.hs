@@ -116,7 +116,7 @@ wrongSymbol' sig@(Signature fs) = do
     typeList <- vectorOf l (elements types)
     t <- elements types
     newSym <- elements symbols
-    if Symbol newSym typeList t `elem` fs
+    if (typeList,t) `elem` args
     then wrongSymbol' sig
     else do
         let newSym' = newSymbol newSym

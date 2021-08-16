@@ -31,8 +31,8 @@ allConstants (Signature fs) = filter (null . #arguments) fs
 allTypes :: Signature -> [Type]
 allTypes (Signature fs) = nub (concatMap #arguments fs ++ map #result fs)
 
-allArguments :: Signature -> [[Type]]
-allArguments (Signature fs) = map #arguments fs
+allArguments :: Signature -> [([Type],Type)]
+allArguments (Signature fs) = map (\x-> (#arguments x,#result x)) fs
 
 theType :: Signature -> String -> Maybe Type
 theType (Signature fs) s = fmap #result (find ((== s) . #symbol) fs)
