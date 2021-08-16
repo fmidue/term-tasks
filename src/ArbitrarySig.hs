@@ -112,14 +112,17 @@ wrongSymbol' sig@(Signature fs) = do
         symbols = allSymbols sig
         args = allArguments sig
         lengths = map length args
-    l <- elements lengths
+    l <- chooseInt (0,maximum lengths)
     typeList <- vectorOf l (elements types)
     t <- elements types
     newSym <- elements symbols
-    let newSym' = newSymbol newSym
-        newSym'' = newSymbol newSym'
-        newFs = Symbol newSym'' typeList t
-    return (Signature (newFs:fs),newSym'')
+    if Symbol newSym typeList t `elem` fs
+    then wrongSymbol' sig
+    else do
+        let newSym' = newSymbol newSym
+            newSym'' = newSymbol newSym'
+            newFs = Symbol newSym'' typeList t
+        return (Signature (newFs:fs),newSym'')
 
 arbSignature :: [String] -> [Type] -> Int -> Gen Signature
 arbSignature s ts n = do

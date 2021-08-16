@@ -1,9 +1,10 @@
 module Main where
 
 import Test.QuickCheck
-import DataType (Signature(..),Symbol(..),Type(..),Term(..),Error(..),transTerm,toType)
+import DataType (Signature(..),Symbol(..),Type(..),Error(..),transTerm,toType)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
+import AllTerm (theLength,theSum)
 
 toSignature :: [(String,[String],String)] -> [Symbol]
 toSignature = map (\(s,ts,r)->Symbol s (toType ts) (Type r))
@@ -23,8 +24,10 @@ main = do
     let sig' = Signature(toSignature sig)
         correctTerms = validTerms sig' Nothing a b
     correctTerms' <-generate (differentTerms correctTerms (min number (length correctTerms)))
-    incorrectTerms <- generate(invalidTerms sig' e a b)
+    incorrectTerms <- generate(invalidTerms sig' e a b `suchThat` (\x->theSum e == theLength x))
     let correctTerms'' = map transTerm correctTerms'
         incorrectTerms' = map (map transTerm) incorrectTerms
-    putStrLn ("Here are correct terms given to students:\n" ++ show correctTerms'')
+    if number > length correctTerms
+    then putStrLn ("Unfortunately, there are not enough correct terms. Here are correct terms given to students:\n" ++ show correctTerms'')
+    else putStrLn ("Here are correct terms given to students:\n" ++ show correctTerms'')
     putStrLn ("Here are incorrect terms given to students:\n" ++ show incorrectTerms')

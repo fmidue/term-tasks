@@ -1,5 +1,7 @@
 module AllTerm (
-    allTerms
+    allTerms,
+    theLength,
+    theSum
 )where
 
 import Test.QuickCheck
