@@ -7,7 +7,7 @@ module DataType where
 
 import GHC.OverloadedLabels
 import GHC.Records
-import Data.List (nub,find,intercalate)
+import Data.List (nub,intercalate)
 
 newtype Type = Type String   deriving Eq
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Show,Eq)
@@ -22,36 +22,24 @@ instance HasField x r a => IsLabel x (r -> a) where
 allSymbols :: Signature -> [String]
 allSymbols (Signature fs) = map #symbol fs
 
-allFunctions :: Signature -> [Symbol]
-allFunctions (Signature fs) = filter (not . null . #arguments) fs
-
-allConstants :: Signature -> [Symbol]
-allConstants (Signature fs) = filter (null . #arguments) fs
-
 allTypes :: Signature -> [Type]
 allTypes (Signature fs) = nub (concatMap #arguments fs ++ map #result fs)
 
 allArgsResults :: Signature -> [([Type],Type)]
 allArgsResults (Signature fs) = map (\x-> (#arguments x,#result x)) fs
 
-theType :: Signature -> String -> Maybe Type
-theType (Signature fs) s = fmap #result (find ((== s) . #symbol) fs)
-
-theArgumentsTypes :: Signature -> String -> Maybe [Type]
-theArgumentsTypes (Signature fs) s = fmap #arguments (find ((== s) . #symbol) fs)
-
 allSameTypes :: Signature -> Type -> [Symbol]
 allSameTypes (Signature fs) t = filter ((== t) . #result) fs
-
-termSymbols :: Term -> [String]
-termSymbols (Term x xs) = x : termSymbols' xs
-
-termSymbols' :: [Term] -> [String]
-termSymbols' = concatMap termSymbols
 
 transTerm :: Term -> String
 transTerm (Term x []) = x
 transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
+
+transSignature :: Signature -> [String]
+transSignature (Signature fs) = map (\(Symbol s ts (Type t))-> s ++ ":" ++ concatMap (\(Type s')->s' ++ "->") ts ++ t) fs
+
+toSignature :: [(String,[String],String)] -> Signature
+toSignature list = Signature (map (\(s,ts,r)->Symbol s (toType ts) (Type r)) list)
 
 toType :: [String] -> [Type]
 toType = map Type

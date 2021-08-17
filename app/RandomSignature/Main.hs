@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Test.QuickCheck
-import DataType (Error(..),Type(..),Symbol(..),Signature(..),transTerm,toType)
+import DataType (Error(..),transTerm,toType,transSignature)
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
 import System.IO
@@ -47,9 +47,5 @@ main = do
     putStrLn ("Here are correct terms given to students:\n" ++ show correctTerms'')
     putStrLn ("Here are incorrect terms given to students:\n" ++ show incorrectTerms')
 
-transSignature :: Signature -> [String]
-transSignature (Signature fs) = map (\(Symbol s ts (Type t))-> s ++ ":" ++ toArguments ts ++ t) fs
 
-toArguments :: [Type] -> String
-toArguments ts = concatMap (\(Type s)->s ++ "->") ts
 

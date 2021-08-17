@@ -1,7 +1,5 @@
 module AllTerm (
-    allTerms,
-    theLength,
-    theSum
+    allTerms
 )where
 
 import Test.QuickCheck
@@ -15,14 +13,10 @@ allTerms s ts e n a b num = do
     sig <- arbSignature s ts n
     let validT = validTerms sig Nothing a b
     invalidT <- invalidTerms sig e a b
-    if length validT >= num && theLength invalidT == theSum e
+    if length validT >= num && sum (map length invalidT)  == sum (map fst e)
     then return (sig,(validT, invalidT))
     else allTerms s ts e n a b num
 
-theSum :: [(Int,Error)] -> Int
-theSum xs = sum (map fst xs)
 
-theLength :: [[Term]] -> Int
-theLength xs = sum (map length xs)
 
 

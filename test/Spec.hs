@@ -8,8 +8,11 @@ import InvalidTerm
 import ValidTerm
 import Test.QuickCheck
 import Examples.Signatures
+import Examples.Functions
+import Examples.ComputeTerm
+import Examples.ValidCheck
 import Data.Maybe (isJust,fromJust)
-import Data.List ((\\))
+import Data.List ((\\),nub,find,intercalate)
 
 
 main :: IO ()
@@ -181,43 +184,3 @@ isOnce s ls = length (filter (== s) ls) == 1
 -- maybe also for terms of a specific type
 termsOfType :: Int -> Type -> Signature -> [Term]
 termsOfType n t sig = sameTypeTerms sig (term n sig) t
-
--- ComputeTerm
-term :: Int -> Signature -> [Term]
-term n sig = take n (constant ++ subTerms n sig constant)
-                  where conSymbol = map #symbol (allConstants sig)
-                        constant = map (`Term` []) conSymbol
-
-sameTypeTerms :: Signature -> [Term] -> Type -> [Term]
-sameTypeTerms sig ts t = filter (\x -> t == fromJust(theType sig (#symbol x))) ts
-
-diffTypeTerms :: Signature -> [Term] -> [Type] -> [[Term]]
-diffTypeTerms sig ts = map (sameTypeTerms sig ts)
-
-theTerms :: Signature -> [Symbol] -> [Term] -> [Term]
-theTerms sig fs ts = concatMap (\x -> map (Term (#symbol x)) (sequence(diffTypeTerms sig ts (#arguments x)))) fs
-
-subTerms :: Int -> Signature -> [Term] -> [Term]
-subTerms n sig w = if null (getAllT \\ w) || length getAllT >= n
-                      then getAllT
-                      else subTerms n sig (w ++ (getAllT \\ w))
-                         where func = allFunctions sig
-                               getAllT = theTerms sig func w
-
--- ValidCheck
-isValid :: Signature -> Term -> Bool
-isValid sig t = all (`elem` allSymbols sig) (termSymbols t) && isValidType t sig
-
-isValidType :: Term -> Signature -> Bool
-isValidType (Term s xs) w = isValidType' (fromJust (theArgumentsTypes w s)) xs w
-
-isValidType' :: [Type] ->[Term] -> Signature -> Bool
-isValidType' [] [] _ = True
-isValidType' [] xs _ = null xs
-isValidType' xs [] _ = null xs
-isValidType' (t:ts) (Term s []:xs) w = isValidType' ts xs w && theType w s == Just t && s `elem` map #symbol (allConstants w)
-isValidType' (t:ts) (Term s x':xs) w = isValidType (Term s x') w && isValidType' ts xs w && theType w s == Just t
-
-
-
-

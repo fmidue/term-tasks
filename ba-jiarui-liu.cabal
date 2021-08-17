@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9e2e17fd20470e0693c1f981b3741731f55dafb19f3cbf9cc34cca1098534aaf
+-- hash: aed14d194403b0b53d13ebf2bde78618c44460301ac4eaabd21615ab1c89482a
 
 name:           ba-jiarui-liu
 version:        0.0.0
@@ -69,7 +69,10 @@ test-suite ba-jiarui-liu-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Examples.ComputeTerm
+      Examples.Functions
       Examples.Signatures
+      Examples.ValidCheck
       Paths_ba_jiarui_liu
   hs-source-dirs:
       test
