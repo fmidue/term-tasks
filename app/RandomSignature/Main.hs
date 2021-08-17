@@ -1,10 +1,11 @@
-module Main where
+module Main (main) where
 
 import Test.QuickCheck
 import DataType (Error(..),Type(..),Symbol(..),Signature(..),transTerm,toType)
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
 import System.IO
+import Data.List (intercalate)
 
 main ::IO ()
 main = do
@@ -31,7 +32,7 @@ main = do
     l_inp <- getLine
     let l = (if l_inp == "" then l_ex else read l_inp :: Int)
         e_ex = [(5,SWAP)]
-    putStrLn ("Please input the error type and number of incorrect terms in this type (default is " ++ show e_ex ++"):\nError types are: SWAP, TYPE, SYMBOL, SYMBOLTYPE, ONEMORE, ONELESS.")
+    putStrLn ("Please input the error type and number of incorrect terms in this type (default is " ++ show e_ex ++"):\nError types are: " ++ intercalate ", " (map show [minBound .. maxBound :: Error]) ++ ".")
     e_inp <- getLine
     let e = (if e_inp == "" then e_ex else read e_inp :: [(Int,Error)])
         number_ex = 5

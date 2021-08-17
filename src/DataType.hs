@@ -9,11 +9,11 @@ import GHC.OverloadedLabels
 import GHC.Records
 import Data.List (nub,find,intercalate)
 
-newtype Type = Type String   deriving (Show,Eq)
+newtype Type = Type String   deriving Eq
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Show,Eq)
-newtype Signature = Signature [Symbol]   deriving (Show,Eq)
-data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type}   deriving (Show,Eq)
-data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Show,Eq,Read)
+newtype Signature = Signature [Symbol]
+data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type}
+data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Show,Read,Bounded,Enum)
 
 -- IsLabel orphan instance for (->) --
 instance HasField x r a => IsLabel x (r -> a) where

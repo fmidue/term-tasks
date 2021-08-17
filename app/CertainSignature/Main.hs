@@ -1,4 +1,4 @@
-module Main where
+module Main (main) where
 
 import Test.QuickCheck
 import DataType (Signature(..),Symbol(..),Type(..),Error(..),transTerm,toType)
@@ -6,6 +6,7 @@ import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 import AllTerm (theLength,theSum)
 import System.IO
+import Data.List (intercalate)
 
 toSignature :: [(String,[String],String)] -> [Symbol]
 toSignature = map (\(s,ts,r)->Symbol s (toType ts) (Type r))
@@ -28,7 +29,7 @@ main = do
     b_inp <- getLine
     let b = (if b_inp == "" then b_ex else read b_inp :: Int)
         e_ex = [(5,SWAP)]
-    putStrLn ("Please input the error type and number of incorrect terms in this type (default is " ++ show e_ex ++"):\nError types are: SWAP, TYPE, SYMBOL, SYMBOLTYPE, ONEMORE, ONELESS.")
+    putStrLn ("Please input the error type and number of incorrect terms in this type (default is " ++ show e_ex ++"):\nError types are: " ++ intercalate ", " (map show [minBound .. maxBound :: Error]) ++ ".")
     e_inp <- getLine
     let e = (if e_inp == "" then e_ex else read e_inp :: [(Int,Error)])
         number_ex = 5
