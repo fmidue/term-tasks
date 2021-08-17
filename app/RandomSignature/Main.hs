@@ -4,9 +4,11 @@ import Test.QuickCheck
 import DataType (Error(..),transTerm,toType)
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
+import System.IO
 
 main ::IO ()
 main = do
+    hSetBuffering stdout NoBuffering
     putStrLn "Please input the symbols you want to use: "
     ls <- readLn :: IO [String]
     putStrLn "Please input the type names of types you want to use:"

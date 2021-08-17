@@ -5,12 +5,14 @@ import DataType (Signature(..),Symbol(..),Type(..),Error(..),transTerm,toType)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 import AllTerm (theLength,theSum)
+import System.IO
 
 toSignature :: [(String,[String],String)] -> [Symbol]
 toSignature = map (\(s,ts,r)->Symbol s (toType ts) (Type r))
 
 main :: IO ()
 main = do
+    hSetBuffering stdout NoBuffering
     putStrLn "Please input the signature you want to use: "
     sig <- readLn :: IO [(String,[String],String)]
     putStr "Please input the size of terms ([a,b]):\na="

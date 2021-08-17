@@ -111,7 +111,7 @@ wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         symbols = allSymbols sig
         args = allArguments sig
-        lengths = map length args
+        lengths = map (length . fst) args
     l <- chooseInt (0,maximum lengths)
     typeList <- vectorOf l (elements types)
     t <- elements types
