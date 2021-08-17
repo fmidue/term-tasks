@@ -7,7 +7,7 @@ module ArbitrarySig (
     wrongSymbol',
     arbSignature
 )where
-import DataType (Signature(..),Symbol(..),Type(..),allTypes,allArguments,allSymbols)
+import DataType (Signature(..),Symbol(..),Type(..),allTypes,allArgsResults,allSymbols)
 import Test.QuickCheck
 import Data.List (nub,delete)
 
@@ -110,7 +110,7 @@ wrongSymbol' :: Signature -> Gen (Signature,String)
 wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         symbols = allSymbols sig
-        args = allArguments sig
+        args = allArgsResults sig
         lengths = map (length . fst) args
     l <- chooseInt (0,maximum lengths)
     typeList <- vectorOf l (elements types)
