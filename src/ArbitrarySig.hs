@@ -110,13 +110,13 @@ wrongSymbol' :: Signature -> Gen (Signature,String)
 wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         symbols = allSymbols sig
-        args = allArgsResults sig
-        lengths = map (length . fst) args
+        argsAndRes = allArgsResults sig
+        lengths = map (length . fst) argsAndRes
     l <- chooseInt (0,maximum lengths)
     typeList <- vectorOf l (elements types)
     t <- elements types
     newSym <- elements symbols
-    if (typeList,t) `elem` args
+    if (typeList,t) `elem` argsAndRes
     then wrongSymbol' sig
     else do
         let newSym' = newSymbol newSym
