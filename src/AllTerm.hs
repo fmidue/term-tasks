@@ -2,8 +2,8 @@ module AllTerm (
     allTerms
 )where
 
-import Test.QuickCheck
-import DataType (Signature(..),Type(..),Term(..),Error(..))
+import Test.QuickCheck (Gen)
+import DataType (Signature, Type, Term, Error)
 import ArbitrarySig (arbSignature)
 import ValidTerm (validTerms)
 import InvalidTerm (invalidTerms)

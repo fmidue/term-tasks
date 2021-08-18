@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Test.QuickCheck
+import Test.QuickCheck (generate)
 import DataType (Error(..),transTerm,toType,transSignature)
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)

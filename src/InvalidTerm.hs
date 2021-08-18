@@ -3,8 +3,8 @@ module InvalidTerm (
   differentTerms
 )where
 
-import Test.QuickCheck
-import DataType (Signature(..),Symbol(..),Term(..),Error(..),Type(..),allTypes,allArgsResults,allSymbols)
+import Test.QuickCheck (Gen, elements, suchThat, vectorOf, chooseInt)
+import DataType (Signature(..), Symbol(..), Term(..), Error(..), Type, allTypes, allArgsResults, allSymbols)
 import ValidTerm (validTerms)
 import Data.List (nub,delete)
 

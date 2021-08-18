@@ -2,7 +2,6 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 
 import DataType
-import ArbitrarySig
 import AllTerm
 import InvalidTerm
 import ValidTerm
@@ -12,7 +11,6 @@ import Examples.Functions
 import Examples.ComputeTerm
 import Examples.ValidCheck
 import Data.Maybe (isJust,fromJust)
-import Data.List ((\\),nub,find,intercalate)
 
 
 main :: IO ()

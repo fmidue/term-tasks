@@ -3,12 +3,12 @@ module ValidTerm (
   oneValidTerm
 )where
 
-import Test.QuickCheck
+import Test.QuickCheck (Gen, elements)
 import DataType (Signature(..),Symbol(..),Term(..),allSameTypes)
 import Data.List (transpose,nub)
 import Control.Monad (replicateM)
 
-data Mode = NONE | NO String | ONCE String   deriving (Show,Eq)
+data Mode = NONE | NO String | ONCE String
 
 validTerms :: Signature -> Maybe String -> Int -> Int -> [Term]
 validTerms sig@(Signature fs) Nothing a b = nub(arbTerms sig NONE a b fs)

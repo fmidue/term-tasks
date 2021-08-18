@@ -1,8 +1,8 @@
 module ArbitrarySig (
     arbSignature
 )where
-import DataType (Signature(..),Symbol(..),Type(..))
-import Test.QuickCheck
+import DataType (Signature(..), Symbol(..), Type)
+import Test.QuickCheck (Gen, elements, vectorOf)
 
 arbSignature :: [String] -> [Type] -> Int -> Gen Signature
 arbSignature s ts n = do
