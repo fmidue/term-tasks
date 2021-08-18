@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Test.QuickCheck
-import DataType (Error(..),transTerm,toSignature)
+import DataType (Error(..),transTerm,transSignature,toSignature)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 import System.IO
@@ -11,14 +11,14 @@ main :: IO ()
 main = do
     hSetBuffering stdout NoBuffering
     putStrLn "Whenever you just press Enter, the default value will be taken"
-    putStrLn "Please input the signature you want to use (default is [x:A,y:B,z:C,f:A->A->B,g:A->B->C,h:A->B->C->D]): "
-    putStrLn "You only need to input name, arguments types and result type. Example: funtion symbol f:A->A->B, written as [\"f\",[\"A\",\"A\"],\"B\"]"
     let sig_ex = [("x",[],"A"),("y",[],"B"),("z",[],"C"),("f",["A","A"],"B"),("g",["A","B"],"C"),("h",["A","B","C"],"D")]
+    putStrLn $ "Please input the signature you want to use (default is [" ++ intercalate "," (transSignature (toSignature sig_ex)) ++ "]): "
+    putStrLn "You only need to input name, arguments types and result type. Example: funtion symbol f:A->A->B, written as [\"f\",[\"A\",\"A\"],\"B\"]"
     sig_inp <- getLine
     let sig = (if sig_inp == "" then sig_ex else read sig_inp :: [(String,[String],String)])
         a_ex = 1
         b_ex = 10
-    putStr "Please input the size range [a,b] of terms (default is [1,10] ):\na="
+    putStr $ "Please input the size range [a,b] of terms (default is [" ++ show a_ex ++ "," ++ show b_ex ++ "] ):\na="
     a_inp <- getLine
     let a = (if a_inp == "" then a_ex else read a_inp :: Int)
     putStr "b="
@@ -29,7 +29,7 @@ main = do
     e_inp <- getLine
     let e = (if e_inp == "" then e_ex else read e_inp :: [(Int,Error)])
         number_ex = 5
-    putStr "Please input the number of correct terms you need (default is 5):\nnumber="
+    putStr $ "Please input the number of correct terms you need (default is " ++ show number_ex ++ "):\nnumber="
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
     let sig' = toSignature sig
