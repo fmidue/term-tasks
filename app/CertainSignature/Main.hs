@@ -39,6 +39,6 @@ main = do
     let correctTerms'' = map transTerm correctTerms'
         incorrectTerms' = map (map transTerm) incorrectTerms
     if number > length correctTerms
-    then putStrLn ("Unfortunately, there are not enough correct terms. Here are correct terms given to students:\n" ++ show correctTerms'')
-    else putStrLn ("Here are correct terms given to students:\n" ++ show correctTerms'')
-    putStrLn ("Here are incorrect terms given to students:\n" ++ show incorrectTerms')
+    then putStrLn "Unfortunately, there are not enough correct terms. Here are correct terms given to students:" >> mapM_ print correctTerms''
+    else putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
+    putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'

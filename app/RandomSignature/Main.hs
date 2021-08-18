@@ -43,9 +43,6 @@ main = do
     correctTerms' <- generate (differentTerms correctTerms number)
     let correctTerms'' = map transTerm correctTerms'
         incorrectTerms' = map (map transTerm) incorrectTerms
-    putStrLn ("Here are function symbols and constants in the generated signature:\n" ++ show (transSignature sig))
-    putStrLn ("Here are correct terms given to students:\n" ++ show correctTerms'')
-    putStrLn ("Here are incorrect terms given to students:\n" ++ show incorrectTerms')
-
-
-
+    putStrLn "Here are function symbols and constants in the generated signature:" >> mapM_ putStrLn (transSignature sig)
+    putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
+    putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'
