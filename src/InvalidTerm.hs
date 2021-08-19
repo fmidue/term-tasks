@@ -103,7 +103,7 @@ wrongSymbol (Signature fs) = do
         newFs = Symbol newSym' (#arguments one) (#result one)
     return (Signature (newFs:fs),newSym')
 
-wrongSymbol' :: Signature -> Gen (Signature,String)
+wrongSymbol' :: Signature -> Gen (Maybe(Signature,String))
 wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         symbols = allSymbols sig
@@ -114,12 +114,12 @@ wrongSymbol' sig@(Signature fs) = do
     t <- elements types
     newSym <- elements symbols
     if (typeList,t) `elem` argsAndRes
-    then wrongSymbol' sig
+    then return Nothing
     else do
         let newSym' = newSymbol newSym
             newSym'' = newSymbol newSym'
             newFs = Symbol newSym'' typeList t
-        return (Signature (newFs:fs),newSym'')
+        return (Just(Signature (newFs:fs),newSym''))
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
@@ -127,7 +127,7 @@ newSignature sig ONEMORE = fmap Just (oneMoreArg sig)
 newSignature sig ONELESS = oneLessArg sig
 newSignature sig TYPE = oneDiffType sig
 newSignature sig SYMBOL = fmap Just (wrongSymbol sig)
-newSignature sig SYMBOLTYPE = fmap Just (wrongSymbol' sig)
+newSignature sig SYMBOLTYPE = wrongSymbol' sig
 
 originalSymbol :: String -> Term -> Term
 originalSymbol s' (Term s ts)
