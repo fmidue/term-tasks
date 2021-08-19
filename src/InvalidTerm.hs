@@ -106,20 +106,28 @@ wrongSymbol (Signature fs) = do
 wrongSymbol' :: Signature -> Gen (Maybe(Signature,String))
 wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
-        symbols = allSymbols sig
-        argsAndRes = allArgsResults sig
-        lengths = map (length . fst) argsAndRes
-    l <- chooseInt (0,maximum lengths)
-    typeList <- vectorOf l (elements types)
-    t <- elements types
-    newSym <- elements symbols
-    if (typeList,t) `elem` argsAndRes
+        n = length types
+    if length fs >= (number n n) * n
     then return Nothing
     else do
-        let newSym' = newSymbol newSym
-            newSym'' = newSymbol newSym'
-            newFs = Symbol newSym'' typeList t
-        return (Just(Signature (newFs:fs),newSym''))
+        let symbols = allSymbols sig
+            argsAndRes = allArgsResults sig
+            lengths = map (length . fst) argsAndRes
+        l <- chooseInt (0,maximum lengths)
+        typeList <- vectorOf l (elements types)
+        t <- elements types
+        newSym <- elements symbols
+        if (typeList,t) `elem` argsAndRes
+        then wrongSymbol' sig
+        else do
+            let newSym' = newSymbol newSym
+                newSym'' = newSymbol newSym'
+                newFs = Symbol newSym'' typeList t
+            return (Just(Signature (newFs:fs),newSym''))
+
+number :: Int -> Int -> Int
+number _ 0 = 0
+number n m = n^m + number n (m-1)
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
