@@ -105,25 +105,29 @@ wrongSymbol (Signature fs) = do
 
 wrongSymbol' :: Signature -> Gen (Maybe(Signature,String))
 wrongSymbol' sig@(Signature fs) = do
-    let types = allTypes sig
-        n = length types
-    if length fs >= (number n n) * n
+    let available = filter (not. null. #arguments) fs
+    if null available
     then return Nothing
     else do
-        let symbols = allSymbols sig
+        let types = allTypes sig
+            n = length types
+            symbols = allSymbols sig
             argsAndRes = allArgsResults sig
             lengths = map (length . fst) argsAndRes
-        l <- chooseInt (0,maximum lengths)
-        typeList <- vectorOf l (elements types)
-        t <- elements types
-        newSym <- elements symbols
-        if (typeList,t) `elem` argsAndRes
-        then wrongSymbol' sig
+        if length available == number n (maximum lengths) * n
+        then return Nothing
         else do
-            let newSym' = newSymbol newSym
-                newSym'' = newSymbol newSym'
-                newFs = Symbol newSym'' typeList t
-            return (Just(Signature (newFs:fs),newSym''))
+            l <- chooseInt (0,maximum lengths)
+            typeList <- vectorOf l (elements types)
+            t <- elements types
+            newSym <- elements symbols
+            if (typeList,t) `elem` argsAndRes
+            then wrongSymbol' sig
+            else do
+                let newSym' = newSymbol newSym
+                    newSym'' = newSymbol newSym'
+                    newFs = Symbol newSym'' typeList t
+                return (Just(Signature (newFs:fs),newSym''))
 
 number :: Int -> Int -> Int
 number _ 0 = 0
