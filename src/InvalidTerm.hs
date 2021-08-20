@@ -3,8 +3,8 @@ module InvalidTerm (
   differentTerms
 )where
 
-import Test.QuickCheck (Gen, elements, suchThat, vectorOf, chooseInt)
-import DataType (Signature(..), Symbol(..), Term(..), Error(..), Type, allTypes, allArgsResults, allSymbols)
+import Test.QuickCheck (Gen, elements, suchThat, chooseInt)
+import DataType (Signature(..), Symbol(..), Term(..), Error(..), Type(..), allTypes, allArgsResults, allSymbols)
 import ValidTerm (validTerms)
 import Data.List (nub,delete)
 
@@ -105,33 +105,24 @@ wrongSymbol (Signature fs) = do
 
 wrongSymbol' :: Signature -> Gen (Maybe(Signature,String))
 wrongSymbol' sig@(Signature fs) = do
-    let available = filter (not. null. #arguments) fs
+    let types = allTypes sig
+        argsAndRes = allArgsResults sig
+        lengths = map (length . fst) argsAndRes
+        available = filter (`elem` argsAndRes) (combination (maximum lengths) types)
     if null available
     then return Nothing
     else do
-        let types = allTypes sig
-            n = length types
-            symbols = allSymbols sig
-            argsAndRes = allArgsResults sig
-            lengths = map (length . fst) argsAndRes
-        if length available == number n (maximum lengths) * n
-        then return Nothing
-        else do
-            l <- chooseInt (0,maximum lengths)
-            typeList <- vectorOf l (elements types)
-            t <- elements types
-            newSym <- elements symbols
-            if (typeList,t) `elem` argsAndRes
-            then wrongSymbol' sig
-            else do
-                let newSym' = newSymbol newSym
-                    newSym'' = newSymbol newSym'
-                    newFs = Symbol newSym'' typeList t
-                return (Just(Signature (newFs:fs),newSym''))
+        let symbols = allSymbols sig
+        (typeList,t) <- elements available
+        newSym <- elements symbols
+        let newSym' = newSymbol newSym
+            newSym'' = newSymbol newSym'
+            newFs = Symbol newSym'' typeList t
+        return (Just(Signature (newFs:fs),newSym''))
 
-number :: Int -> Int -> Int
-number _ 0 = 0
-number n m = n^m + number n (m-1)
+combination :: Int -> [Type] -> [([Type],Type)]
+combination 0 ts = map (\t-> ([],t)) ts
+combination n ts = concatMap (\t-> map (\x->(x,t)) [x| x <- mapM (const ts) [1..n]]) ts ++ combination (n-1) ts
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
