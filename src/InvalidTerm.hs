@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 module InvalidTerm (
   invalidTerms,
   differentTerms
@@ -108,7 +109,7 @@ wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         argsAndRes = allArgsResults sig
         lengths = map (length . fst) argsAndRes
-        available = filter (`elem` argsAndRes) (combination (maximum lengths) types)
+        available = filter (`notElem` argsAndRes) (combination (maximum lengths) types)
     if null available
     then return Nothing
     else do
@@ -121,8 +122,8 @@ wrongSymbol' sig@(Signature fs) = do
         return (Just(Signature (newFs:fs),newSym''))
 
 combination :: Int -> [Type] -> [([Type],Type)]
-combination 0 ts = map (\t-> ([],t)) ts
-combination n ts = concatMap (\t-> map (\x->(x,t)) [x| x <- mapM (const ts) [1..n]]) ts ++ combination (n-1) ts
+combination 0 ts = map ([],) ts
+combination n ts = concatMap (\t-> [(,t) x | x <- mapM (const ts) [1 .. n]]) ts ++ combination (n-1) ts
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
