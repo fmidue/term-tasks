@@ -5,9 +5,10 @@ module InvalidTerm (
 )where
 
 import Test.QuickCheck (Gen, elements, suchThat, chooseInt)
-import DataType (Signature(..), Symbol(..), Term(..), Error(..), Type(..), allTypes, allArgsResults, allSymbols)
+import DataType (Signature(..), Symbol(..), Term(..), Error(..), Type, allTypes, allArgsResults, allSymbols)
 import ValidTerm (validTerms)
-import Data.List (nub,delete)
+import Data.List (nub,delete,(\\))
+import Control.Monad (replicateM)
 
 swapArgOrder :: Signature -> Gen (Maybe(Signature,String))
 swapArgOrder sig@(Signature fs) = do
@@ -109,7 +110,7 @@ wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         argsAndRes = allArgsResults sig
         lengths = map (length . fst) argsAndRes
-        available = filter (`notElem` argsAndRes) (combination (maximum lengths) types)
+        available = (combination (maximum lengths) types) \\ argsAndRes
     if null available
     then return Nothing
     else do
@@ -123,7 +124,7 @@ wrongSymbol' sig@(Signature fs) = do
 
 combination :: Int -> [Type] -> [([Type],Type)]
 combination 0 ts = map ([],) ts
-combination n ts = concatMap (\t-> [(,t) x | x <- mapM (const ts) [1 .. n]]) ts ++ combination (n-1) ts
+combination n ts = concatMap (\t-> [(,t) x | x <- replicateM n ts]) ts ++ combination (n-1) ts
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
