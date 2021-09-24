@@ -1,4 +1,4 @@
-name: ba-jiarui-liu
+name: term-tasks
 extra-source-files: []
 dependencies:
   - base
@@ -13,7 +13,7 @@ library:
     - -Wall
     - -Werror
 tests:
-  ba-jiarui-liu-test:
+  term-tasks-test:
     main: Spec.hs
     source-dirs:
       - test
@@ -22,7 +22,7 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - ba-jiarui-liu
+      - term-tasks
       - hspec
 executables:
   CertainSignature:
@@ -34,7 +34,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - ba-jiarui-liu
+    - term-tasks
 
   RandomSignature:
     main: Main.hs
@@ -45,4 +45,4 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - ba-jiarui-liu
+    - term-tasks
