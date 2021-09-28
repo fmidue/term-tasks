@@ -32,35 +32,17 @@ oneValidTerm sig s a b = do
       return (Just term)
 
 division ::Int -> Int -> Int -> [[(Int,Int)]]
-division 0 1 _ = [[]]
 division n a b
   | a > b  = []
+  | n == 0 && a == 1 = [[]]
   | n >= a = division n (n + 1) b
-  | otherwise = filter isValidTuples ts
-                    where ts = map (theTuples . newLists n) (division' n a b)
-
-division' :: Int -> Int -> Int -> [[Int]]
-division' n a b = [x ++ y | x <- validLists a (theLists n a), y <- validLists b (theLists n b)]
-
-theLists ::Int -> Int -> [[Int]]
-theLists n a = replicateM n [1..a-1]
-
-validLists :: Int -> [[Int]] -> [[Int]]
-validLists a = filter ((==a-1) . sum)
-
-newLists :: Int -> [Int] -> [[Int]]
-newLists n xs = a : [b]
-                  where (a,b) = splitAt n xs
-
-tuplify2 :: [Int] -> (Int,Int)
-tuplify2 [x,y] = (x,y)
-tuplify2 _ = error "This will never happen!"
-
-theTuples :: [[Int]] -> [(Int,Int)]
-theTuples xs = map tuplify2 (transpose xs)
-
-isValidTuples :: [(Int,Int)] -> Bool
-isValidTuples = all (uncurry (<=))
+  | n == 0 = []
+  | otherwise = recursively n (a - 1) (b - 1)
+  where
+    recursively :: Int -> Int -> Int -> [[(Int,Int)]]
+    recursively 1 a b = [[(a,b)]]
+    recursively n a b
+      = [ (i,j) : ds | i <- [1 .. a - n + 1], j <- [i .. i + b - a], ds <- recursively (n - 1) (a - i) (b - j) ]
 
 symbolWithModes :: Mode -> [Symbol] -> [(Symbol,Mode)]
 symbolWithModes NONE fs = [(one,NONE) | one <- fs]
