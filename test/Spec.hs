@@ -68,43 +68,56 @@ main = hspec $ do
   specify "c(a,b,f) is a term of Type B that can be built from signature6" $
     Term "c" [Term "a" [],Term "b" [],Term "f" []] `elem` termsOfType 20 (Type "B") signature6
   prop "check oneValidTerm (signature1)" $
-    forAll (oneValidTerm signature1 (Just "t") 1 8) (\x -> isJust x ==> isValid signature1 (fromJust x))
+    forAll (oneValidTerm signature1 (Just "t") 1 8 `suchThat` isJust) (\x -> isValid signature1 (fromJust x))
   prop "check oneValidTerm (signature2)" $
-    forAll (oneValidTerm signature2 (Just "e") 1 6) (\x -> isJust x ==> isValid signature2 (fromJust x))
+    forAll (oneValidTerm signature2 (Just "e") 1 6 `suchThat` isJust) (\x -> isValid signature2 (fromJust x))
   prop "check oneValidTerm (signature3)" $
-    forAll (oneValidTerm signature3 (Just "f") 3 8) (\x -> isJust x ==> isValid signature3 (fromJust x))
+    forAll (oneValidTerm signature3 (Just "f") 3 8 `suchThat` isJust) (\x -> isValid signature3 (fromJust x))
   prop "check oneValidTerm (signature4)" $
-    forAll (oneValidTerm signature4 Nothing 3 8) (\x -> isJust x ==> isValid signature4 (fromJust x))
+    forAll (oneValidTerm signature4 Nothing 3 8 `suchThat` isJust) (\x -> isValid signature4 (fromJust x))
   prop "check oneValidTerm (signature5)" $
-    forAll (oneValidTerm signature5 (Just "b") 1 8) (\x -> isJust x ==> isValid signature5 (fromJust x))
+    forAll (oneValidTerm signature5 (Just "b") 1 8 `suchThat` isJust) (\x -> isValid signature5 (fromJust x))
   prop "check oneValidTerm (signature6)" $
-    forAll (oneValidTerm signature6 (Just "a") 1 4) (\x -> isJust x ==> isValid signature6 (fromJust x))
+    forAll (oneValidTerm signature6 (Just "a") 1 4 `suchThat` isJust) (\x -> isValid signature6 (fromJust x))
 
   prop "Every term that can be generated with term should also be generatable with validTerms(signature1)" $
-    forAll (elements (term 15 signature1)) (\x -> x `elem` validTerms signature1 Nothing (size x) (size x))
+    all (\x -> x `elem` validTerms signature1 Nothing (size x) (size x)) (term 125 signature1)
   prop "Every term that can be generated with term should also be generatable with validTerms(signature2)" $
-    forAll (elements (term 10 signature2)) (\x -> x `elem` validTerms signature2 Nothing (size x) (size x))
+    all (\x -> x `elem` validTerms signature2 Nothing (size x) (size x)) (term 100 signature2)
   prop "Every term that can be generated with term should also be generatable with validTerms(signature3)" $
-    forAll (elements (term 20 signature3)) (\x -> x `elem` validTerms signature3 Nothing (size x) (size x))
+    all (\x -> x `elem` validTerms signature3 Nothing (size x) (size x)) (term 150 signature3)
   prop "Every term that can be generated with term should also be generatable with validTerms(signature4)" $
-    forAll (elements (term 10 signature4)) (\x -> x `elem` validTerms signature4 Nothing (size x) (size x))
+    all (\x -> x `elem` validTerms signature4 Nothing (size x) (size x)) (term 100 signature4)
   prop "Every term that can be generated with term should also be generatable with validTerms(signature5)" $
-    forAll (elements (term 30 signature5)) (\x -> x `elem` validTerms signature5 Nothing (size x) (size x))
+    all (\x -> x `elem` validTerms signature5 Nothing (size x) (size x)) (term 200 signature5)
   prop "Every term that can be generated with term should also be generatable with validTerms(signature6)" $
-    forAll (elements (term 15 signature6)) (\x -> x `elem` validTerms signature6 Nothing (size x) (size x))
+    all (\x -> x `elem` validTerms signature6 Nothing (size x) (size x)) (term 125 signature6)
+
+  prop "Every term containing 'a' exactly once should be generatable with respective validTerms-call (signature1)" $
+    all (\x -> x `elem` validTerms signature1 (Just "a") (size x) (size x)) (filter (isOnce "a" . termSymbols) $ term 125 signature1)
+  prop "Every term containing 'b' exactly once should be generatable with respective validTerms-call (signature2)" $
+    all (\x -> x `elem` validTerms signature2 (Just "b") (size x) (size x)) (filter (isOnce "b" . termSymbols) $ term 100 signature2)
+  prop "Every term containing 'h' exactly once should be generatable with respective validTerms-call (signature3)" $
+    all (\x -> x `elem` validTerms signature3 (Just "h") (size x) (size x)) (filter (isOnce "h" . termSymbols) $ term 150 signature3)
+  prop "Every term containing 'd' exactly once should be generatable with respective validTerms-call (signature4)" $
+    all (\x -> x `elem` validTerms signature4 (Just "d") (size x) (size x)) (filter (isOnce "d" . termSymbols) $ term 100 signature4)
+  prop "Every term containing 'c' exactly once should be generatable with respective validTerms-call (signature5)" $
+    all (\x -> x `elem` validTerms signature5 (Just "c") (size x) (size x)) (filter (isOnce "c" . termSymbols) $ term 200 signature5)
+  prop "Every term containing 'c' exactly once should be generatable with respective validTerms-call (signature6)" $
+    all (\x -> x `elem` validTerms signature6 (Just "c") (size x) (size x)) (filter (isOnce "c" . termSymbols) $ term 125 signature6)
 
   prop "Every term that can be generated with validTerms should also be generatable with term (signature1)" $
-    forAll (elements(validTerms signature1 Nothing 1 8)) (\x -> x `elem` concatMap (`term` signature1) [1..])
+    all (\x -> x `elem` concatMap (`term` signature1) [1..]) (validTerms signature1 Nothing 1 8)
   prop "Every term that can be generated with validTerms should also be generatable with term (signature2)" $
-    forAll (elements(validTerms signature2 Nothing 3 10)) (\x -> x `elem` concatMap (`term` signature2) [1..])
+    all (\x -> x `elem` concatMap (`term` signature2) [1..]) (validTerms signature2 Nothing 3 10)
   prop "Every term that can be generated with validTerms should also be generatable with term (signature3)" $
-    forAll (elements(validTerms signature3 Nothing 4 9)) (\x -> x `elem` concatMap (`term` signature3) [1..])
+    all (\x -> x `elem` concatMap (`term` signature3) [1..]) (validTerms signature3 Nothing 4 9)
   prop "Every term that can be generated with validTerms should also be generatable with term (signature4)" $
-    forAll (elements(validTerms signature4 Nothing 1 4)) (\x -> x `elem` concatMap (`term` signature4) [1..])
+    all (\x -> x `elem` concatMap (`term` signature4) [1..]) (validTerms signature4 Nothing 1 4)
   prop "Every term that can be generated with validTerms should also be generatable with term (signature5)" $
-    forAll (elements(validTerms signature5 Nothing 4 4)) (\x -> x `elem` concatMap (`term` signature5) [1..])
+    all (\x -> x `elem` concatMap (`term` signature5) [1..]) (validTerms signature5 Nothing 4 4)
   prop "Every term that can be generated with validTerms should also be generatable with term (signature6)" $
-    forAll (elements(validTerms signature6 Nothing 2 10)) (\x -> x `elem` concatMap (`term` signature6) [1..])
+    all (\x -> x `elem` concatMap (`term` signature6) [1..]) (validTerms signature6 Nothing 2 10)
 
   specify "The size of generated terms is really in the range (signature1)" $
     all (\t -> between (size t) 1 8) (validTerms signature1 Nothing 1 8)
