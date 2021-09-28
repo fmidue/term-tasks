@@ -5,8 +5,7 @@ module ValidTerm (
 
 import Test.QuickCheck (Gen, elements)
 import DataType (Signature(..),Symbol(..),Term(..),allSameTypes)
-import Data.List (transpose,nub)
-import Control.Monad (replicateM)
+import Data.List (nub)
 
 data Mode = NONE | NO String | ONCE String
 
@@ -40,9 +39,9 @@ division n a b
   | otherwise = recursively n (a - 1) (b - 1)
   where
     recursively :: Int -> Int -> Int -> [[(Int,Int)]]
-    recursively 1 a b = [[(a,b)]]
-    recursively n a b
-      = [ (i,j) : ds | i <- [1 .. a - n + 1], j <- [i .. i + b - a], ds <- recursively (n - 1) (a - i) (b - j) ]
+    recursively 1 u v = [[(u,v)]]
+    recursively m u v
+      = [ (i,j) : ds | i <- [1 .. u - m + 1], j <- [i .. i + v - u], ds <- recursively (m - 1) (u - i) (v - j) ]
 
 symbolWithModes :: Mode -> [Symbol] -> [(Symbol,Mode)]
 symbolWithModes NONE fs = [(one,NONE) | one <- fs]
