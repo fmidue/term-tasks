@@ -1,0 +1,51 @@
+
+module Records where
+
+import DataType (Error(..))
+
+
+
+data Base = Base
+            { termSizeRange :: (Int,Int)
+            , incorrectTerms :: [(Int,Error)]
+            , correctTerms :: Int
+            }
+
+dBase :: Base
+dBase = Base
+        { termSizeRange = (1,10)
+        , incorrectTerms = [(5,SWAP)]
+        , correctTerms = 5
+        }
+
+
+
+
+data Certain = Certain {
+                 signatures :: [(String,[String],String)]
+               , baseConf :: Base
+               }
+
+dCertain :: Certain
+dCertain = Certain
+           { signatures = [("x",[],"A"),("y",[],"B"),("z",[],"C"),("f",["A","A"],"B"),("g",["A","B"],"C"),("h",["A","B","C"],"D")]
+           , baseConf = dBase
+           }
+
+
+
+
+data Random = Random {
+                 symbols :: [String]
+               , types :: [String]
+               , maxArgs :: Int
+               , baseConf :: Base
+               }
+
+dRandom :: Random
+dRandom = Random
+           { symbols = ["f","g","h"]
+           , types = ["A","B","C"]
+           , maxArgs = 5
+           , baseConf = dBase
+           }
