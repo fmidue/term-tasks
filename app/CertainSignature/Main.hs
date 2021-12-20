@@ -1,3 +1,5 @@
+{-# language RecordWildCards #-}
+
 module Main (main) where
 
 import Test.QuickCheck (generate, suchThat)
@@ -6,6 +8,26 @@ import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 import System.IO
 import Data.List (intercalate)
+import Records
+
+
+
+withConf :: Certain -> IO ()
+withConf Certain{baseConf = Base{..},..} = do
+    hSetBuffering stdout NoBuffering
+    let (a,b) = termSizeRange
+        sig' = toSignature signatures
+        correctTerms = validTerms sig' Nothing a b
+    correctTerms' <-generate (differentTerms correctTerms (min properTerms (length correctTerms)))
+    incorrectTerms <- generate(invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x)))
+    let correctTerms'' = map transTerm correctTerms'
+        incorrectTerms' = map (map transTerm) incorrectTerms
+    if properTerms > length correctTerms
+    then putStrLn "Unfortunately, there are not enough correct terms. Here are correct terms given to students:" >> mapM_ print correctTerms''
+    else putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
+    putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'
+
+
 
 main :: IO ()
 main = do

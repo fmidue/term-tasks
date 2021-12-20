@@ -1,3 +1,6 @@
+{-# language RecordWildCards #-}
+
+
 module Main (main) where
 
 import Test.QuickCheck (generate)
@@ -6,6 +9,22 @@ import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
 import System.IO
 import Data.List (intercalate)
+import Records
+
+
+withConf :: Random -> IO ()
+withConf Random{baseConf = Base{..},..} = do
+    hSetBuffering stdout NoBuffering
+    let (a,b) = termSizeRange
+    (sig,(correctTerms,incorrectTerms)) <- generate(allTerms symbols (toType types) wrongTerms maxArgs a b properTerms)
+    correctTerms' <- generate (differentTerms correctTerms properTerms)
+    let correctTerms'' = map transTerm correctTerms'
+        incorrectTerms' = map (map transTerm) incorrectTerms
+    putStrLn "Here are function symbols and constants in the generated signature:" >> mapM_ putStrLn (transSignature sig)
+    putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
+    putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'
+
+
 
 main ::IO ()
 main = do
