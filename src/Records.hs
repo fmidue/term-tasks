@@ -7,15 +7,15 @@ import DataType (Error(..))
 
 data Base = Base
             { termSizeRange :: (Int,Int)
-            , incorrectTerms :: [(Int,Error)]
-            , correctTerms :: Int
+            , wrongTerms :: [(Int,Error)]
+            , properTerms :: Int
             }
 
 dBase :: Base
 dBase = Base
         { termSizeRange = (1,10)
-        , incorrectTerms = [(5,SWAP)]
-        , correctTerms = 5
+        , wrongTerms = [(5,SWAP)]
+        , properTerms = 5
         }
 
 
