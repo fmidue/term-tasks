@@ -4,7 +4,8 @@ module Main (main) where
 
 import Test.QuickCheck (Gen, generate, suchThat)
 import DataType (Error(..), toSignature, Term)
-import InvalidTerm (invalidTerms,differentTerms)
+import Auxiliary (different)
+import InvalidTerm (invalidTerms)
 import ValidTerm(validTerms)
 import System.IO
 import Data.List (intercalate)
@@ -17,7 +18,7 @@ withConf :: Certain -> Gen (Bool, [Term], [[Term]])
 withConf Certain{signatures, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
     let sig' = toSignature signatures
         correctTerms = validTerms sig' Nothing a b
-    correctTerms' <- differentTerms correctTerms (min properTerms (length correctTerms))
+    correctTerms' <- different correctTerms (min properTerms (length correctTerms))
     incorrectTerms <- invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x))
     return (properTerms > length correctTerms, correctTerms', incorrectTerms)
 

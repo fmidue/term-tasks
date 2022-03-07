@@ -4,8 +4,8 @@ module Main (main) where
 
 import Test.QuickCheck (Gen, generate)
 import DataType (Signature, Error(..), Type(..), Term)
+import Auxiliary (different)
 import AllTerm (allTerms)
-import InvalidTerm (differentTerms)
 import System.IO
 import Data.List (intercalate)
 import Records
@@ -14,7 +14,7 @@ import Records
 withConf :: Random -> Gen (Signature, [Term], [[Term]])
 withConf Random{symbols, types, maxArgs, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
     (sig,(correctTerms,incorrectTerms)) <- allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms
-    correctTerms' <- differentTerms correctTerms properTerms
+    correctTerms' <- different correctTerms properTerms
     return (sig, correctTerms', incorrectTerms)
 
 
