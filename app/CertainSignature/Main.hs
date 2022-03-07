@@ -1,4 +1,4 @@
-{-# language RecordWildCards #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Main (main) where
 
@@ -13,9 +13,8 @@ import Records
 
 
 withConf :: Certain -> Gen (Bool, [String], [[String]])
-withConf Certain{baseConf = Base{..},..} = do
-    let (a,b) = termSizeRange
-        sig' = toSignature signatures
+withConf Certain{signatures, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
+    let sig' = toSignature signatures
         correctTerms = validTerms sig' Nothing a b
     correctTerms' <- differentTerms correctTerms (min properTerms (length correctTerms))
     incorrectTerms <- invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x))

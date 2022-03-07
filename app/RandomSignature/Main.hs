@@ -1,5 +1,4 @@
-{-# language RecordWildCards #-}
-
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Main (main) where
 
@@ -13,8 +12,7 @@ import Records
 
 
 withConf :: Random -> Gen (Signature, [String], [[String]])
-withConf Random{baseConf = Base{..},..} = do
-    let (a,b) = termSizeRange
+withConf Random{symbols, types, maxArgs, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
     (sig,(correctTerms,incorrectTerms)) <- allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms
     correctTerms' <- differentTerms correctTerms properTerms
     let correctTerms'' = map show correctTerms'
