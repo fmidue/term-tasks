@@ -110,7 +110,7 @@ wrongSymbol' sig@(Signature fs) = do
     let types = allTypes sig
         argsAndRes = allArgsResults sig
         lengths = map (length . fst) argsAndRes
-        available = (combination (maximum lengths) types) \\ argsAndRes
+        available = combination (maximum lengths) types \\ argsAndRes
     if null available
     then return Nothing
     else do
