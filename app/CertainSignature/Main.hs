@@ -3,7 +3,7 @@
 module Main (main) where
 
 import Test.QuickCheck (generate, suchThat)
-import DataType (Error(..),transTerm,transSignature,toSignature)
+import DataType (Error(..), toSignature)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 import System.IO
@@ -19,8 +19,8 @@ withConf Certain{baseConf = Base{..},..} = do
         correctTerms = validTerms sig' Nothing a b
     correctTerms' <-generate (differentTerms correctTerms (min properTerms (length correctTerms)))
     incorrectTerms <- generate(invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x)))
-    let correctTerms'' = map transTerm correctTerms'
-        incorrectTerms' = map (map transTerm) incorrectTerms
+    let correctTerms'' = map show correctTerms'
+        incorrectTerms' = map (map show) incorrectTerms
     return (properTerms > length correctTerms, correctTerms'', incorrectTerms')
 
 
@@ -39,7 +39,7 @@ main = do
         }
         = dCertain
     putStrLn "Whenever you just press Enter, the default value will be taken"
-    putStrLn $ "Please input the signature you want to use (default is [" ++ intercalate "," (transSignature (toSignature sig_ex)) ++ "]): "
+    putStrLn $ "Please input the signature you want to use (default is " ++ show (toSignature sig_ex) ++ "): "
     putStrLn "You only need to input name, arguments types and result type. Example: funtion symbol f:A->A->B, written as [\"f\",[\"A\",\"A\"],\"B\"]"
     sig_inp <- getLine
     let sig = (if sig_inp == "" then sig_ex else read sig_inp :: [(String,[String],String)])

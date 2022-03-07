@@ -4,7 +4,7 @@
 module Main (main) where
 
 import Test.QuickCheck (generate)
-import DataType (Signature, Error(..),transTerm,toType,transSignature)
+import DataType (Signature, Error(..), Type(..))
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
 import System.IO
@@ -15,10 +15,10 @@ import Records
 withConf :: Random -> IO (Signature, [String], [[String]])
 withConf Random{baseConf = Base{..},..} = do
     let (a,b) = termSizeRange
-    (sig,(correctTerms,incorrectTerms)) <- generate(allTerms symbols (toType types) wrongTerms maxArgs a b properTerms)
+    (sig,(correctTerms,incorrectTerms)) <- generate(allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms)
     correctTerms' <- generate (differentTerms correctTerms properTerms)
-    let correctTerms'' = map transTerm correctTerms'
-        incorrectTerms' = map (map transTerm) incorrectTerms
+    let correctTerms'' = map show correctTerms'
+        incorrectTerms' = map (map show) incorrectTerms
     return (sig, correctTerms'', incorrectTerms')
 
 
@@ -72,6 +72,6 @@ main = do
         , properTerms = number
         }
       }
-    putStrLn "Here are function symbols and constants in the generated signature:" >> mapM_ putStrLn (transSignature sig)
+    putStrLn "Here are function symbols and constants in the generated signature:" >> print sig
     putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
     putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'
