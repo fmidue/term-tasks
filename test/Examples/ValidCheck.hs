@@ -12,7 +12,7 @@ isValidType (Term s xs) w = isValidType' (fromJust (theArgumentsTypes w s)) xs w
 
 isValidType' :: [Type] ->[Term] -> Signature -> Bool
 isValidType' [] [] _ = True
-isValidType' [] xs _ = null xs
-isValidType' xs [] _ = null xs
+isValidType' [] _  _ = False
+isValidType' _  [] _ = False
 isValidType' (t:ts) (Term s []:xs) w = isValidType' ts xs w && theType w s == Just t && s `elem` map #symbol (allConstants w)
 isValidType' (t:ts) (Term s x':xs) w = isValidType (Term s x') w && isValidType' ts xs w && theType w s == Just t
