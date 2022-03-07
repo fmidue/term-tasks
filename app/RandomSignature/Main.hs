@@ -3,7 +3,7 @@
 
 module Main (main) where
 
-import Test.QuickCheck (generate)
+import Test.QuickCheck (Gen, generate)
 import DataType (Signature, Error(..), Type(..))
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
@@ -12,11 +12,11 @@ import Data.List (intercalate)
 import Records
 
 
-withConf :: Random -> IO (Signature, [String], [[String]])
+withConf :: Random -> Gen (Signature, [String], [[String]])
 withConf Random{baseConf = Base{..},..} = do
     let (a,b) = termSizeRange
-    (sig,(correctTerms,incorrectTerms)) <- generate(allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms)
-    correctTerms' <- generate (differentTerms correctTerms properTerms)
+    (sig,(correctTerms,incorrectTerms)) <- allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms
+    correctTerms' <- differentTerms correctTerms properTerms
     let correctTerms'' = map show correctTerms'
         incorrectTerms' = map (map show) incorrectTerms
     return (sig, correctTerms'', incorrectTerms')
@@ -62,7 +62,7 @@ main = do
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
     (sig, correctTerms'', incorrectTerms') <-
-      withConf $ Random
+      generate $ withConf $ Random
       { symbols = ls
       , types = types
       , maxArgs = l

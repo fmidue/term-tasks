@@ -2,7 +2,7 @@
 
 module Main (main) where
 
-import Test.QuickCheck (generate, suchThat)
+import Test.QuickCheck (Gen, generate, suchThat)
 import DataType (Error(..), toSignature)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
@@ -12,13 +12,13 @@ import Records
 
 
 
-withConf :: Certain -> IO (Bool, [String], [[String]])
+withConf :: Certain -> Gen (Bool, [String], [[String]])
 withConf Certain{baseConf = Base{..},..} = do
     let (a,b) = termSizeRange
         sig' = toSignature signatures
         correctTerms = validTerms sig' Nothing a b
-    correctTerms' <-generate (differentTerms correctTerms (min properTerms (length correctTerms)))
-    incorrectTerms <- generate(invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x)))
+    correctTerms' <- differentTerms correctTerms (min properTerms (length correctTerms))
+    incorrectTerms <- invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x))
     let correctTerms'' = map show correctTerms'
         incorrectTerms' = map (map show) incorrectTerms
     return (properTerms > length correctTerms, correctTerms'', incorrectTerms')
@@ -56,7 +56,7 @@ main = do
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
     (tooFewTerms, correctTerms'', incorrectTerms') <-
-      withConf $ Certain
+      generate $ withConf $ Certain
       { signatures = sig
       , baseConf = Base
         {termSizeRange = (a,b)
