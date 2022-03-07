@@ -1,7 +1,7 @@
 
 module Records where
 
-import DataType (Error(..))
+import DataType (Error(..), Signature, toSignature)
 
 
 
@@ -22,13 +22,13 @@ dBase = Base
 
 
 data Certain = Certain {
-                 signatures :: [(String,[String],String)]
+                 signatures :: Signature
                , baseConf :: Base
                }
 
 dCertain :: Certain
 dCertain = Certain
-           { signatures = [("x",[],"A"),("y",[],"B"),("z",[],"C"),("f",["A","A"],"B"),("g",["A","B"],"C"),("h",["A","B","C"],"D")]
+           { signatures = toSignature [("x",[],"A"),("y",[],"B"),("z",[],"C"),("f",["A","A"],"B"),("g",["A","B"],"C"),("h",["A","B","C"],"D")]
            , baseConf = dBase
            }
 
