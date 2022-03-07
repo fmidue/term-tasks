@@ -3,24 +3,23 @@
 module Main (main) where
 
 import Test.QuickCheck (Gen, generate, suchThat)
-import DataType (Error(..), toSignature)
+import DataType (Error(..), toSignature, Term)
 import InvalidTerm (invalidTerms,differentTerms)
 import ValidTerm(validTerms)
 import System.IO
 import Data.List (intercalate)
+import Control.Monad (when)
 import Records
 
 
 
-withConf :: Certain -> Gen (Bool, [String], [[String]])
+withConf :: Certain -> Gen (Bool, [Term], [[Term]])
 withConf Certain{signatures, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
     let sig' = toSignature signatures
         correctTerms = validTerms sig' Nothing a b
     correctTerms' <- differentTerms correctTerms (min properTerms (length correctTerms))
     incorrectTerms <- invalidTerms sig' wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x))
-    let correctTerms'' = map show correctTerms'
-        incorrectTerms' = map (map show) incorrectTerms
-    return (properTerms > length correctTerms, correctTerms'', incorrectTerms')
+    return (properTerms > length correctTerms, correctTerms', incorrectTerms)
 
 
 
@@ -54,7 +53,7 @@ main = do
     putStr $ "Please input the number of correct terms you need (default is " ++ show number_ex ++ "):\nnumber="
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
-    (tooFewTerms, correctTerms'', incorrectTerms') <-
+    (tooFewTerms, correctTerms', incorrectTerms) <-
       generate $ withConf $ Certain
       { signatures = sig
       , baseConf = Base
@@ -62,7 +61,8 @@ main = do
         , wrongTerms = e
         , properTerms = number }
       }
-    if tooFewTerms
-    then putStrLn "Unfortunately, there are not enough correct terms. Here are correct terms given to students:" >> mapM_ print correctTerms''
-    else putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
-    putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'
+    when tooFewTerms $ putStrLn "Unfortunately, there are not enough correct terms."
+    putStrLn "Here are correct terms given to students:"
+    mapM_ print correctTerms'
+    putStrLn "Here are incorrect terms given to students:"
+    mapM_ print incorrectTerms

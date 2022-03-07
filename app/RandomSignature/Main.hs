@@ -3,7 +3,7 @@
 module Main (main) where
 
 import Test.QuickCheck (Gen, generate)
-import DataType (Signature, Error(..), Type(..))
+import DataType (Signature, Error(..), Type(..), Term)
 import AllTerm (allTerms)
 import InvalidTerm (differentTerms)
 import System.IO
@@ -11,13 +11,11 @@ import Data.List (intercalate)
 import Records
 
 
-withConf :: Random -> Gen (Signature, [String], [[String]])
+withConf :: Random -> Gen (Signature, [Term], [[Term]])
 withConf Random{symbols, types, maxArgs, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
     (sig,(correctTerms,incorrectTerms)) <- allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms
     correctTerms' <- differentTerms correctTerms properTerms
-    let correctTerms'' = map show correctTerms'
-        incorrectTerms' = map (map show) incorrectTerms
-    return (sig, correctTerms'', incorrectTerms')
+    return (sig, correctTerms', incorrectTerms)
 
 
 
@@ -59,7 +57,7 @@ main = do
     putStr $ "Please input the number of correct terms you need (default is " ++ show number_ex ++ "):\nnumber="
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
-    (sig, correctTerms'', incorrectTerms') <-
+    (sig, correctTerms', incorrectTerms) <-
       generate $ withConf $ Random
       { symbols = ls
       , types = types
@@ -70,6 +68,9 @@ main = do
         , properTerms = number
         }
       }
-    putStrLn "Here are function symbols and constants in the generated signature:" >> print sig
-    putStrLn "Here are correct terms given to students:" >> mapM_ print correctTerms''
-    putStrLn "Here are incorrect terms given to students:" >> mapM_ print incorrectTerms'
+    putStrLn "Here are function symbols and constants in the generated signature:"
+    print sig
+    putStrLn "Here are correct terms given to students:"
+    mapM_ print correctTerms'
+    putStrLn "Here are incorrect terms given to students:"
+    mapM_ print incorrectTerms
