@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 
 module Records where
 
@@ -13,9 +14,9 @@ data Base = Base
 
 dBase :: Base
 dBase = Base
-        { termSizeRange = (1,10)
-        , wrongTerms = [(5,SWAP)]
-        , properTerms = 5
+        { termSizeRange = (5,10)
+        , wrongTerms = map (1,) [minBound .. maxBound]
+        , properTerms = 6
         }
 
 
