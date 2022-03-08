@@ -11,15 +11,12 @@ import Data.List (nub,intercalate)
 
 newtype Type = Type String   deriving Eq
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving Eq
-newtype Signature = Signature [Symbol]
+newtype Signature = Signature [Symbol]  deriving Show
 data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type}
 data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Show,Read,Bounded,Enum)
 
-instance Show Signature where
-  show sig = "[ " ++ intercalate ", " (transSignature sig) ++ " ]"
-    where
-      transSignature :: Signature -> [String]
-      transSignature (Signature fs) = map (\(Symbol s ts (Type t))-> s ++ ":" ++ concatMap (\(Type s')->s' ++ "->") ts ++ t) fs
+instance Show Symbol where
+  show (Symbol s ts (Type t)) = s ++ " : " ++ if null ts then t else intercalate " x " (map (\(Type s') -> s') ts) ++ " -> " ++ t
 
 instance Show Term where
   show = transTerm
