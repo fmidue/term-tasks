@@ -1,24 +1,11 @@
-{-# LANGUAGE NamedFieldPuns #-}
-
 module Main (main) where
 
-import Test.QuickCheck (Gen, generate)
-import DataType (Signature, Error(..), Type(..), Term)
-import Auxiliary (different)
-import AllTerm (allTerms)
+import Test.QuickCheck (generate)
+import DataType (Error(..))
 import System.IO
 import Data.List (intercalate)
 import Records
-
-
-withConf :: Random -> Gen (Signature, [Term], [[Term]])
-withConf Random{symbols, types, maxArgs, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
-    (sig,(correctTerms,incorrectTerms)) <- allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms
-    correctTerms' <- different correctTerms properTerms
-    return (sig, correctTerms', incorrectTerms)
-
-
-
+import qualified Tasks.RandomSignature as RandomSignature
 
 main ::IO ()
 main = do
@@ -41,7 +28,7 @@ main = do
     let ls = (if ls_inp == "" then ls_ex else read ls_inp :: [String])
     putStrLn ("Please input the type names of types you want to use (default is " ++ show types_ex ++ "):\nExample: the type name of Type \"A\" is \"A\"")
     types_inp <- getLine
-    let types = (if types_inp == "" then types_ex else read types_inp :: [String])
+    let theTypes = (if types_inp == "" then types_ex else read types_inp :: [String])
     putStr $ "Please input the size range [a,b] of terms (default is [" ++ show a_ex ++ "," ++ show b_ex ++ "] ):\na="
     a_inp <- getLine
     let a = (if a_inp == "" then a_ex else read a_inp :: Int)
@@ -58,9 +45,9 @@ main = do
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
     (sig, correctTerms', incorrectTerms) <-
-      generate $ withConf $ Random
+      generate $ RandomSignature.task $ Random
       { symbols = ls
-      , types = types
+      , types = theTypes
       , maxArgs = l
       , baseConf = Base
         { termSizeRange = (a,b)

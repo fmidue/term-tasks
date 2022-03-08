@@ -1,27 +1,12 @@
-{-# LANGUAGE NamedFieldPuns #-}
-
 module Main (main) where
 
-import Test.QuickCheck (Gen, generate, suchThat)
-import DataType (Error(..), toSignature, Term)
-import Auxiliary (different)
-import InvalidTerm (invalidTerms)
-import ValidTerm(validTerms)
+import Test.QuickCheck (generate)
+import DataType (Error(..), toSignature)
 import System.IO
 import Data.List (intercalate)
 import Control.Monad (when)
 import Records
-
-
-
-withConf :: Certain -> Gen (Bool, [Term], [[Term]])
-withConf Certain{signatures, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
-    let correctTerms = validTerms signatures Nothing a b
-    correctTerms' <- different correctTerms (min properTerms (length correctTerms))
-    incorrectTerms <- invalidTerms signatures wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x))
-    return (properTerms > length correctTerms, correctTerms', incorrectTerms)
-
-
+import qualified Tasks.CertainSignature as CertainSignature
 
 main :: IO ()
 main = do
@@ -54,7 +39,7 @@ main = do
     number_inp <- getLine
     let number = (if number_inp == "" then number_ex else read number_inp :: Int)
     (tooFewTerms, correctTerms', incorrectTerms) <-
-      generate $ withConf $ Certain
+      generate $ CertainSignature.task $ Certain
       { signatures = sig
       , baseConf = Base
         {termSizeRange = (a,b)
