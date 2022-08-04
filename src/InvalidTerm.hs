@@ -123,8 +123,7 @@ wrongSymbol' sig@(Signature fs) = do
         return (Just(Signature (newFs:fs),newSym''))
 
 combination :: Int -> [Type] -> [([Type],Type)]
-combination 0 ts = map ([],) ts
-combination n ts = concatMap (\t-> [(,t) x | x <- replicateM n ts]) ts ++ combination (n-1) ts
+combination n ts = [(x,t) | i <- reverse [0..n], t <- ts, x <- replicateM i ts ]
 
 newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
 newSignature sig SWAP = swapArgOrder sig
@@ -136,7 +135,7 @@ newSignature sig SYMBOLTYPE = wrongSymbol' sig
 
 originalSymbol :: String -> Term -> Term
 originalSymbol s' (Term s ts)
-  | s == s' = Term (init s) ts
+  | s == s' = Term (init s) (map (originalSymbol s') ts)
   | otherwise = Term s (map (originalSymbol s') ts)
 
 invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [[Term]]
