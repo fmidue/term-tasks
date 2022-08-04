@@ -14,9 +14,9 @@ data Base = Base
 
 dBase :: Base
 dBase = Base
-        { termSizeRange = (5,10)
-        , wrongTerms = map (1,) [minBound .. maxBound]
-        , properTerms = 6
+        { termSizeRange = (6,10)
+        , wrongTerms = [(1,SWAP),(1,TYPE),(1,ONEMORE),(1,ONELESS)]
+        , properTerms = 5
         }
 
 
@@ -29,7 +29,7 @@ data Certain = Certain {
 
 dCertain :: Certain
 dCertain = Certain
-           { signatures = toSignature [("x",[],"A"),("y",[],"B"),("z",[],"C"),("f",["A","A"],"B"),("g",["A","B"],"C"),("h",["A","B","C"],"D")]
+           { signatures = toSignature [("d",[],"R"),("e",[],"S"),("f",[],"T"),("g",["R","R"],"S"),("h",["R","S"],"T"),("i",["R","S","T"],"U")]
            , baseConf = dBase
            }
 
