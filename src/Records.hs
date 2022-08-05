@@ -35,6 +35,22 @@ dCertain = Certain
 
 
 
+data Perturbed = Perturbed {
+                 symbols :: [String]
+               , types :: [String]
+               , sigs :: [([Int],Int)]
+               , baseConf :: Base
+               }
+
+dPerturbed :: Perturbed
+dPerturbed = Perturbed
+           { symbols = ["d","e","f","g","h","i"]
+           , types = ["R","S","T","U"]
+           , sigs = [ ([],1), ([],2), ([],3), ([1,1],2), ([1,2],3), ([1,2,3],4) ]
+           , baseConf = dBase
+           }
+
+
 
 data Random = Random {
                  symbols :: [String]

@@ -33,6 +33,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Werror
     dependencies:
     - term-tasks
 
@@ -44,5 +46,35 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Werror
     dependencies:
     - term-tasks
+
+  direct:
+    main: direct.hs
+    source-dirs: app/Autotool
+    ghc-options:
+    - -O2
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    dependencies:
+    - term-tasks
+    - extra
+
+  perturbed:
+    main: perturbed.hs
+    source-dirs: app/Autotool
+    ghc-options:
+    - -O2
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    dependencies:
+    - term-tasks
+    - extra
