@@ -2,3 +2,8 @@ resolver: lts-17.15
 packages:
   - .
 extra-deps:
+
+  - git: https://github.com/fmidue/output-monad.git
+    commit: d51169e89ecfc736e12f36732b08d53460c2bb4f
+    subdirs:
+      - output-monad

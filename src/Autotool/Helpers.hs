@@ -1,4 +1,4 @@
-module Helpers where
+module Autotool.Helpers where
 
 import DataType (Term)
 import Data.List.Extra (replace)

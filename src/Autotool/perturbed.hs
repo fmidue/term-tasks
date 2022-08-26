@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns, TupleSections #-}
 
-module Main (main) where
+module Autotool.Perturbed where
 
 import Test.QuickCheck (Gen, generate, shuffle)
 import DataType (Signature(..), Symbol(..), Type(..))
@@ -9,8 +9,8 @@ import Data.Maybe (fromJust)
 import Data.List (sortOn, elemIndex)
 import qualified Tasks.CertainSignature as CertainSignature
 
-import Helpers
-import Messages
+import Autotool.Helpers
+import Autotool.Messages
 
 perturbConfig :: Perturbed -> Gen Certain
 perturbConfig Perturbed { symbols, types, sigs, baseConf } = do
@@ -32,7 +32,9 @@ perturbConfig Perturbed { symbols, types, sigs, baseConf } = do
   return $ Certain {signatures = Signature sigs', baseConf}
 
 main :: IO ()
-main = do
+main = pure()
+{-
+  do
   let languageIsEnglish = False
   --
   actualConf@(Certain {signatures = Signature symbols'}) <- generate $ perturbConfig dPerturbed
@@ -50,3 +52,4 @@ main = do
   putStrLn $ text4 languageIsEnglish
   putStrLn "-------------\n"
   putStrLn $ "solution = " ++ show [ i | (i,True) <- zip [1 :: Int ..] correctness ] ++ "\n"
+  -}
