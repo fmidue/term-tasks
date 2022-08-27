@@ -17,12 +17,12 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputMonad m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie fuer die folgenden Terme, ob sie korrekt im Sinne der oben gegebenen Deklarationen sind:"
+    german "Entscheiden Sie für die folgenden Terme, ob sie korrekt im Sinne der oben gegebenen Deklarationen sind:"
     english "Decide for the following terms whether or not they are correct according to the declarations given above:"
 
 text3 :: OutputMonad m => LangM m
 text3 = paragraph $ translate $ do
-    german "Bitte geben Sie Ihre Antwort in Form einer Liste von Zahlen an, die alle korrekten Terme enthaelt."
+    german "Bitte geben Sie Ihre Antwort in Form einer Liste von Zahlen an, die alle korrekten Terme enthält."
     english "Please state your answer by giving a list of numbers, indicating all correct terms."
 
 text4 :: OutputMonad m => LangM m
