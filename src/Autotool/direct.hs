@@ -4,7 +4,7 @@
 
 module Autotool.Direct where
 
-import Test.QuickCheck --(generate, shuffle)
+import Test.QuickCheck (Gen, shuffle)
 import DataType (Signature(..))
 import Records (Certain(..), SigInstance(..))
 import qualified Tasks.CertainSignature as CertainSignature
@@ -19,30 +19,6 @@ import Control.Monad.Output (
   code
   )
 
-main :: IO ()
-main = pure()
-  {-let languageIsEnglish = False
-  --
-  let Signature symbols = #signatures dCertain
-  --
-  putStrLn $ text1 languageIsEnglish
-  putStrLn $ unlines (map (mathifySignature . show) symbols)
-  --
-  (False, correctTerms, incorrectTerms) <- generate (CertainSignature.task dCertain)
-  --
-  (correctness, theTerms) <- fmap unzip $ generate $ shuffle $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
-  --
-  putStrLn $ text2 languageIsEnglish
-  putStrLn $ unlines (map itemifyTerm (zip [1 :: Int ..] theTerms))
-  putStrLn $ text3 languageIsEnglish
-  putStrLn $ text4 languageIsEnglish
-  putStrLn "-------------\n"
-  putStrLn $ "solution = " ++ show [ i | (i,True) <- zip [1 :: Int ..] correctness ] ++ "\n"
--}
-
-
-
-
 
 
 description :: OutputMonad m => SigInstance -> LangM m
@@ -50,7 +26,7 @@ description SigInstance{..} = do
   text1
   indent $ code $ unlines $ map (mathifySignature . show) symbols
   text2
-  indent $ code $ unlines $ map itemifyTerm (zip [1 :: Int ..] all)
+  indent $ code $ unlines $ map itemifyTerm (zip [1 :: Int ..] terms)
   text3
   text4
 
@@ -58,22 +34,23 @@ description SigInstance{..} = do
 
 genInst :: MonadFail Gen => Certain -> Gen SigInstance
 genInst c@Certain{..} = do
-  let Signature symbols = signatures
   (False, correctTerms, incorrectTerms) <- CertainSignature.task c
   (correctness, theTerms) <- fmap unzip $ shuffle $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
-  return $ SigInstance symbols theTerms correctTerms (concat incorrectTerms)
+  let Signature symbols = signatures
+      correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
+  return $ SigInstance symbols theTerms correct
 
 
-verifyStatic :: OutputMonad m => SigInstance -> LangM m
-verifyStatic _
+verifyInst :: OutputMonad m => SigInstance -> LangM m
+verifyInst _
     | True = pure()
 
     | otherwise = pure()
 
 
 
-verifyQuiz :: OutputMonad m => Certain -> LangM m
-verifyQuiz _ = pure()
+verifyCertain :: OutputMonad m => Certain -> LangM m
+verifyCertain _ = pure()
 
 
 

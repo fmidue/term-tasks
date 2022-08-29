@@ -71,7 +71,6 @@ dRandom = Random
 
 data SigInstance = SigInstance {
                        symbols :: [Symbol]
-                    ,  all :: [Term]
-                    ,  correct :: [Term]
-                    ,  wrong :: [Term]
+                    ,  terms :: [Term]
+                    ,  correct :: [Int]
                     }
