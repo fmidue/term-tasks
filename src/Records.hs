@@ -1,6 +1,9 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections, DeriveGeneric #-}
 
 module Records where
+
+import Data.Typeable
+import GHC.Generics
 
 import DataType (Error(..), Signature, Symbol, Term, toSignature)
 
@@ -10,7 +13,7 @@ data Base = Base
             { termSizeRange :: (Int,Int)
             , wrongTerms :: [(Int,Error)]
             , properTerms :: Int
-            }
+            } deriving (Typeable, Generic)
 
 dBase :: Base
 dBase = Base
@@ -25,7 +28,7 @@ dBase = Base
 data Certain = Certain {
                  signatures :: Signature
                , baseConf :: Base
-               }
+               } deriving (Typeable, Generic)
 
 dCertain :: Certain
 dCertain = Certain
@@ -40,7 +43,7 @@ data Perturbed = Perturbed {
                , types :: [String]
                , sigs :: [([Int],Int)]
                , baseConf :: Base
-               }
+               } deriving (Typeable, Generic)
 
 dPerturbed :: Perturbed
 dPerturbed = Perturbed
@@ -73,4 +76,4 @@ data SigInstance = SigInstance {
                        symbols :: [Symbol]
                     ,  terms :: [Term]
                     ,  correct :: [Int]
-                    }
+                    } deriving (Typeable, Generic)
