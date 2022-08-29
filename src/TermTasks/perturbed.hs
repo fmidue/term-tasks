@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns, TupleSections, FlexibleContexts #-}
 
-module Autotool.Perturbed where
+module TermTasks.Perturbed where
 
 
 import Control.Monad.Output (LangM, OutputMonad, indent, code)
@@ -8,7 +8,7 @@ import Data.List (sortOn, elemIndex)
 import Data.Maybe (fromJust)
 import Test.QuickCheck (Gen, shuffle)
 
-import Autotool.Direct(genInst)
+import TermTasks.Direct(genInst)
 import DataType (Signature(..), Symbol(..), Type(..))
 import Records (Certain(..), Perturbed(..), SigInstance)
 

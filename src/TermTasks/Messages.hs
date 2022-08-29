@@ -1,4 +1,4 @@
-module Autotool.Messages where
+module TermTasks.Messages where
 
 import Control.Monad.Output (
   LangM,

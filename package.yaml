@@ -11,8 +11,8 @@ default-extensions:
 library:
   source-dirs: src
   exposed-modules:
-    - Autotool.Direct
-    - Autotool.Perturbed
+    - TermTasks.Direct
+    - TermTasks.Perturbed
   dependencies:
     - extra
 
