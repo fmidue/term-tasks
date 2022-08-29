@@ -6,16 +6,14 @@ module Autotool.Direct where
 
 import Test.QuickCheck --(generate, shuffle)
 import DataType (Signature(..))
-import Records (Certain(..))
+import Records (Certain(..), SigInstance(..))
 import qualified Tasks.CertainSignature as CertainSignature
 
 import Autotool.Helpers
 import Autotool.Messages
 
-import Control.Monad.IO.Class(liftIO, MonadIO)
 import Control.Monad.Output (
   LangM,
-  LangM',
   OutputMonad,
   indent,
   code
@@ -47,24 +45,26 @@ main = pure()
 
 
 
-description :: (MonadIO m, OutputMonad m, MonadFail (LangM' m)) => Certain -> LangM m
-description c@Certain{..} = do
-  let Signature symbols = signatures
-  (False, correctTerms, incorrectTerms) <- liftIO $ generate (CertainSignature.task c)
-  (_, theTerms) <- liftIO $ fmap unzip $ generate $ shuffle $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
+description :: OutputMonad m => SigInstance -> LangM m
+description SigInstance{..} = do
   text1
   indent $ code $ unlines $ map (mathifySignature . show) symbols
   text2
-  indent $ code $ unlines $ map itemifyTerm (zip [1 :: Int ..] theTerms)
+  indent $ code $ unlines $ map itemifyTerm (zip [1 :: Int ..] all)
   text3
   text4
 
 
 
+genInst :: MonadFail Gen => Certain -> Gen SigInstance
+genInst c@Certain{..} = do
+  let Signature symbols = signatures
+  (False, correctTerms, incorrectTerms) <- CertainSignature.task c
+  (correctness, theTerms) <- fmap unzip $ shuffle $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
+  return $ SigInstance symbols theTerms correctTerms (concat incorrectTerms)
 
 
-
-verifyStatic :: OutputMonad m => Certain -> LangM m
+verifyStatic :: OutputMonad m => SigInstance -> LangM m
 verifyStatic _
     | True = pure()
 
@@ -82,10 +82,10 @@ start = []
 
 
 
-partialGrade :: OutputMonad m => Certain -> [Int] -> LangM m
+partialGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
 partialGrade _ _ = pure()
 
 
 
-completeGrade :: OutputMonad m => Certain -> [Int] -> LangM m
+completeGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
 completeGrade _ _ = pure()

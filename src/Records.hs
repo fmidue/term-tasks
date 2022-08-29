@@ -2,7 +2,7 @@
 
 module Records where
 
-import DataType (Error(..), Signature, toSignature)
+import DataType (Error(..), Signature, Symbol, Term, toSignature)
 
 
 
@@ -66,3 +66,12 @@ dRandom = Random
            , maxArgs = 5
            , baseConf = dBase
            }
+
+
+
+data SigInstance = SigInstance {
+                       symbols :: [Symbol]
+                    ,  all :: [Term]
+                    ,  correct :: [Term]
+                    ,  wrong :: [Term]
+                    }
