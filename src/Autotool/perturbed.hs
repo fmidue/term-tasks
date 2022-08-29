@@ -2,20 +2,17 @@
 
 module Autotool.Perturbed where
 
-import Test.QuickCheck (Gen, shuffle)
-import DataType (Signature(..), Symbol(..), Type(..))
-import Records (Certain(..), Perturbed(..), SigInstance)
-import Control.Monad.Output (
-  LangM,
-  OutputMonad,
-  indent,
-  code
-  )
 
-import Data.Maybe (fromJust)
+import Control.Monad.Output (LangM, OutputMonad, indent, code)
 import Data.List (sortOn, elemIndex)
+import Data.Maybe (fromJust)
+import Test.QuickCheck (Gen, shuffle)
 
 import Autotool.Direct(genInst)
+import DataType (Signature(..), Symbol(..), Type(..))
+import Records (Certain(..), Perturbed(..), SigInstance)
+
+
 
 perturbConfig :: MonadFail Gen => Perturbed -> Gen SigInstance
 perturbConfig Perturbed { symbols, types, sigs, baseConf } = do

@@ -1,23 +1,16 @@
-{-# LANGUAGE TupleSections #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TupleSections, RecordWildCards, FlexibleContexts #-}
 
 module Autotool.Direct where
 
+
+import Control.Monad.Output(LangM, OutputMonad, indent, code)
 import Test.QuickCheck (Gen, shuffle)
-import DataType (Signature(..))
-import Records (Certain(..), SigInstance(..))
-import qualified Tasks.CertainSignature as CertainSignature
 
 import Autotool.Helpers
 import Autotool.Messages
-
-import Control.Monad.Output (
-  LangM,
-  OutputMonad,
-  indent,
-  code
-  )
+import DataType (Signature(..))
+import Records (Certain(..), SigInstance(..))
+import qualified Tasks.CertainSignature as CertainSignature
 
 
 

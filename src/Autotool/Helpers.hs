@@ -1,7 +1,8 @@
 module Autotool.Helpers where
 
-import DataType (Term)
 import Data.List.Extra (replace)
+import DataType (Term)
+
 
 mathifySignature :: String -> String
 mathifySignature s = "$" ++ replace "->" "\\to" (replace "x" "\\times" s) ++ "$\n"
