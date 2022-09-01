@@ -1,5 +1,3 @@
-{-# LANGUAGE TupleSections #-}
-
 module Records where
 
 import DataType (Error(..), Signature, toSignature)
