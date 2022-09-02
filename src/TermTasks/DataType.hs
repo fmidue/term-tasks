@@ -1,4 +1,4 @@
-module TermTasks.DataType (Symbol) where
+module TermTasks.DataType (Symbol,Term,Type) where
 
 
 import DataType
