@@ -14,6 +14,7 @@ library:
     - TermTasks.Direct
     - TermTasks.Perturbed
     - TermTasks.Records
+    - TermTasks.DataType
   dependencies:
     - extra
 
