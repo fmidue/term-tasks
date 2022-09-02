@@ -3,7 +3,7 @@
 module TermTasks.Direct where
 
 
-import Control.Monad.Output(LangM, OutputMonad, indent, code)
+import Control.Monad.Output(LangM, OutputMonad, indent, latex)
 import Test.QuickCheck (Gen, shuffle)
 
 import TermTasks.Helpers
@@ -17,9 +17,9 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputMonad m => SigInstance -> LangM m
 description SigInstance{..} = do
   text1
-  indent $ code $ unlines $ map (mathifySignature . show) symbols
+  indent $ latex $ unlines $ map (mathifySignature . show) symbols
   text2
-  indent $ code $ unlines $ map itemifyTerm (zip [1 :: Int ..] terms)
+  indent $ latex $ unlines $ map itemifyTerm (zip [1 :: Int ..] terms)
   text3
   text4
 
