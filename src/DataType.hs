@@ -3,16 +3,19 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# language DeriveGeneric #-}
+
 module DataType where
 
 import GHC.OverloadedLabels
 import GHC.Records
 import Data.List (nub,intercalate)
+import GHC.Generics
 
-newtype Type = Type String   deriving Eq
+newtype Type = Type String   deriving (Eq,Generic)
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving Eq
 newtype Signature = Signature [Symbol]  deriving Show
-data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type}
+data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
 data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Show,Read,Bounded,Enum)
 
 instance Show Symbol where
