@@ -75,7 +75,7 @@ verifyCertain Certain{..}
     usedTypes = map name $ concatMap arguments usedDefs
     usedResults = map (name . result) usedDefs
 
-    doubleDef = nub usedSymbols == usedSymbols
+    doubleDef = nub usedSymbols /= usedSymbols
     emptyStrings = any null usedSymbols || any null usedTypes || any null usedResults
 
 
