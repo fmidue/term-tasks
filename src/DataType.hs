@@ -13,7 +13,7 @@ import GHC.Records
 import Data.List (nub,intercalate)
 
 
-newtype Type = Type String   deriving (Eq,Generic)
+newtype Type = Type {name :: String}   deriving (Eq,Generic)
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Eq,Generic)
 newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic,Show)
 data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
