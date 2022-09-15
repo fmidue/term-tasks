@@ -1,14 +1,14 @@
-{-# LANGUAGE NamedFieldPuns, TupleSections, FlexibleContexts #-}
+{-# LANGUAGE NamedFieldPuns, TupleSections, FlexibleContexts, RecordWildCards #-}
 
 module TermTasks.Perturbed where
 
 
-import Control.Monad.Output (LangM, OutputMonad, indent, code)
-import Data.List (sortOn, elemIndex)
+import Control.Monad.Output (LangM, OutputMonad(indent, refuse), english, german, translate)
+import Data.List (elemIndex, nub, sortOn)
 import Data.Maybe (fromJust)
 import Test.QuickCheck (Gen, shuffle)
 
-import TermTasks.Direct(genInst)
+import TermTasks.Direct(genInst, verifyBase)
 import DataType (Signature(..), Symbol(..), Type(..))
 import Records (Certain(..), Perturbed(..), SigInstance)
 
@@ -36,6 +36,30 @@ perturbConfig Perturbed { symbols, types, sigs, baseConf } = do
 
 
 verifyPerturbed :: OutputMonad m => Perturbed -> LangM m
-verifyPerturbed _
-    | True = pure()
-    | otherwise = pure()
+verifyPerturbed Perturbed{..}
+     | emptyInput =
+        refuse $ indent $ translate $ do
+          english "The list of types and/or the list of symbols is empty."
+          german "Die Liste der Typen und/oder die Liste der Symbole ist leer."
+
+    | doubledSymbols =
+        refuse $ indent $ translate $ do
+          english "At least one symbol was given multiple times."
+          german "Mindestens ein Symbol wurde mehrfach angegeben."
+
+
+    | invalidType =
+        refuse $ indent $ translate $ do
+          english "At least one given definition uses an invalid type index."
+          german "Mindestens eine der Definitionen verwendet einen ungültigen Typen-Index."
+
+
+    | otherwise = verifyBase baseConf
+  where
+    emptyInput = null symbols || null types
+    doubledSymbols = nub symbols /= symbols
+    invalidType = let t = map fst sigs
+                      r = map snd sigs
+                  in
+                    any (`notElem` [1..length types]) $ concat $ r : t
+
