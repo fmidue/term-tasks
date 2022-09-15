@@ -90,8 +90,8 @@ verifyBase Base{..}
 
     | invalidInterval =
         refuse $ indent $ translate $ do
-          english "At least one error has been entered multiple times with different quantities. (may induce duplicate terms in task)"
-          german "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. (kann in doppelten Termen in der Aufgabe resultieren)"
+          english "The interval of the term lengths is invalid."
+          german "Das Intervall für die Termlänge ist ungültig."
 
 
     | duplicateError =
