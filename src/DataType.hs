@@ -15,7 +15,7 @@ import Data.List (nub,intercalate)
 
 newtype Type = Type String   deriving (Eq,Generic)
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Eq,Generic)
-newtype Signature = Signature [Symbol]  deriving (Generic,Show)
+newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic,Show)
 data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
 data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Show,Read,Bounded,Enum,Generic)
 
