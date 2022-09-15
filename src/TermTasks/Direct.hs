@@ -4,7 +4,7 @@ module TermTasks.Direct where
 
 
 import Data.List (nub)
-import Control.Monad.Output(LangM, OutputMonad, code, english, german, indent, refuse, translate)
+import Control.Monad.Output(LangM, OutputMonad(code, indent, refuse), english, german, translate)
 import Test.QuickCheck (Gen, shuffle)
 
 import TermTasks.Helpers
