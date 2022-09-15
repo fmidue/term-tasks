@@ -10,7 +10,7 @@ import Test.QuickCheck (Gen, shuffle)
 import TermTasks.Helpers
 import TermTasks.Messages
 import DataType (Signature(..), Symbol(..), Type(..))
-import Records (Certain(..), SigInstance(..))
+import Records (Base(..), Certain(..), SigInstance(..))
 import qualified Tasks.CertainSignature as CertainSignature
 
 
@@ -68,7 +68,7 @@ verifyCertain Certain{..}
           english "At least one of the given symbols is an empty String."
           german "Mindestens eines der Symbole wurde als leerer String angegeben."
 
-    | otherwise = pure () --verifyBase baseConf
+    | otherwise = verifyBase baseConf
   where
     usedDefs = definitions signatures
     usedSymbols = map symbol usedDefs
@@ -77,6 +77,36 @@ verifyCertain Certain{..}
 
     doubleDef = nub usedSymbols == usedSymbols
     emptyStrings = any null usedSymbols || any null usedTypes || any null usedResults
+
+
+
+verifyBase :: OutputMonad m => Base -> LangM m
+verifyBase Base{..}
+    | negativeAmounts =
+        refuse $ indent $ translate $ do
+          english "At least one quantity is given as a negative number."
+          german "Mindestens eine Anzahl wurde als negative Zahl angegeben."
+
+
+    | invalidInterval =
+        refuse $ indent $ translate $ do
+          english "At least one error has been entered multiple times with different quantities. (may induce duplicate terms in task)"
+          german "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. (kann in doppelten Termen in der Aufgabe resultieren)"
+
+
+    | duplicateError =
+        refuse $ indent $ translate $ do
+          english "At least one error has been entered multiple times with different quantities. (may induce duplicate terms in task)"
+          german "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. (kann in doppelten Termen in der Aufgabe resultieren)"
+
+
+    | otherwise = pure()
+  where
+    (lower,upper) = termSizeRange
+    negativeAmounts = any (<0) $ lower : upper : properTerms : map fst wrongTerms
+    invalidInterval = lower > upper
+    duplicateError = let errorTypes = map snd wrongTerms in nub errorTypes == errorTypes
+
 
 
 
