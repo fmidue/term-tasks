@@ -5,7 +5,7 @@ module Records where
 import Data.Typeable
 import GHC.Generics
 
-import DataType (Error(..), Signature, Symbol, Term, toSignature)
+import DataType (Error(..), Signature, Symbol(..), Term(..), Type(..), toSignature)
 
 
 
@@ -77,3 +77,10 @@ data SigInstance = SigInstance {
                     ,  terms :: [Term]
                     ,  correct :: [Int]
                     } deriving (Typeable, Generic)
+
+dSigInst :: SigInstance
+dSigInst = SigInstance {
+               symbols = [Symbol "f" [Type "a", Type "b"] (Type "c"), Symbol "g" [] (Type "a"), Symbol "h" [Type "a"] (Type "b")]
+            ,  terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "h" []]
+            ,  correct = [1]
+            }
