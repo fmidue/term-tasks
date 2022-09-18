@@ -15,8 +15,10 @@ library:
     - TermTasks.Perturbed
     - TermTasks.Records
     - TermTasks.DataType
+    - TermTasks.Parser
   dependencies:
     - extra
+    - parsec
 
   ghc-options:
     - -Wall
