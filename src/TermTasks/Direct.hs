@@ -48,10 +48,16 @@ verifyInst SigInstance{..}
           english "At least one of the given lists is empty."
           german "Mindestens eine der angegebenen Listen ist leer."
 
+    | doubleSolution =
+        refuse $ indent $ translate $ do
+          english "At least one correct index is given multiple times."
+          german "Mindestens ein Lösungsindex wurde mehrfach angegeben."
+
     | otherwise = pure()
   where
     notInRange = any (`notElem` [1 .. length terms + 1]) correct
     emptyInput = null symbols || null terms
+    doubleSolution = nub correct /= correct
 
 
 
