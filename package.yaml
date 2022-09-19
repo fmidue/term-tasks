@@ -22,6 +22,7 @@ library:
 
   ghc-options:
     - -Wall
+    - -Werror
 tests:
   term-tasks-test:
     main: Spec.hs

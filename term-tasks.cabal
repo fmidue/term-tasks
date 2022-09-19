@@ -34,7 +34,7 @@ library
   default-extensions:
       DuplicateRecordFields
       OverloadedLabels
-  ghc-options: -Wall
+  ghc-options: -Wall -Werror
   build-depends:
       QuickCheck
     , base
