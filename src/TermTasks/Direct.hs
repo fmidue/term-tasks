@@ -143,16 +143,16 @@ partialGrade SigInstance{..} sol
                   german $ "Ihre Lösung enthält " ++ show diff ++ ger ++ " zu viel."
               else
                 indent $ translate $ do
-                  english $ "Your solution is missing " ++ show diff ++ eng
+                  english $ "Your solution is missing " ++ show (abs diff) ++ eng
                   german $ "Ihre Lösung enthält " ++ show diff ++ ger ++ " zu wenig."
 
     | otherwise = pure()
   where
     nubSol = nub sol
-    invalidIndex = any (`notElem` [1..length terms+1]) nubSol
+    invalidIndex = any (`notElem` [1..length terms]) nubSol
     wrongAmount = length nubSol /= length correct
     diff =  length nubSol - length correct
-    (eng,ger) = if abs diff == 1 then ("index."," Index") else (" indices."," Indices")
+    (eng,ger) = if abs diff == 1 then (" index."," Index") else (" indices."," Indices")
 
 
 
@@ -178,4 +178,4 @@ completeGrade SigInstance{..} sol
   where
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
-    badTerms = map (terms !!) $ nubSol \\ correct
+    badTerms = map ((terms !!) . (subtract 1)) $ nubSol \\ correct
