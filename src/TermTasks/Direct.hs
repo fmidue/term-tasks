@@ -3,8 +3,9 @@
 module TermTasks.Direct where
 
 
-import Data.List (nub, sort)
-import Control.Monad.Output(LangM, OutputMonad(indent, latex, refuse), english, german, translate)
+import Data.List (nub, sort, (\\))
+import Control.Monad (when)
+import Control.Monad.Output (LangM, OutputMonad(indent, itemizeM, latex, refuse, text), english, german, translate)
 import Test.QuickCheck (Gen, shuffle)
 
 import TermTasks.Helpers
@@ -129,15 +130,30 @@ partialGrade SigInstance{..} sol
           german "Mindestens einer der Indices existiert nicht."
 
     | wrongAmount =
-        refuse $ indent $ translate $ do
-          english "The amount of indices is wrong."
-          german "Die Anzahl der Indices ist falsch."
+        refuse $ do
+          indent $ translate $ do
+            english "The amount of indices is wrong."
+            german "Die Anzahl der Indices ist falsch."
+
+          when moreFeedback $
+            if diff > 0
+              then
+                indent $ translate $ do
+                  english $ "Your solution contains " ++ show diff ++ " additional " ++ eng
+                  german $ "Ihre Lösung enthält " ++ show diff ++ ger ++ " zu viel."
+              else
+                indent $ translate $ do
+                  english $ "Your solution is missing " ++ show diff ++ eng
+                  german $ "Ihre Lösung enthält " ++ show diff ++ ger ++ " zu wenig."
 
     | otherwise = pure()
   where
     nubSol = nub sol
     invalidIndex = any (`notElem` [1..length terms+1]) nubSol
     wrongAmount = length nubSol /= length correct
+    diff =  length nubSol - length correct
+    (eng,ger) = if abs diff == 1 then ("index."," Index") else (" indices."," Indices")
+
 
 
 
@@ -145,10 +161,21 @@ partialGrade SigInstance{..} sol
 completeGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
 completeGrade SigInstance{..} sol
     | wrongSolution =
-        refuse $ indent $ translate $ do
-          english "Your solution is incorrect."
-          german "Ihre Lösung ist falsch."
+        refuse $ do
+          indent $ translate $ do
+            english "Your solution is incorrect."
+            german "Ihre Lösung ist falsch."
+          when moreFeedback $ indent $ do
+            translate $ do
+              english "These incorrect terms are part of your solution: "
+              german "Diese Terme aus Ihrer Lösung sind falsch: "
+            itemizeM $ map (text . show) badTerms
+
+
+
 
     | otherwise = pure()
   where
-    wrongSolution = sort (nub sol) /= sort correct
+    nubSol = nub sol
+    wrongSolution = sort nubSol /= sort correct
+    badTerms = map (terms !!) $ nubSol \\ correct
