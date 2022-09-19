@@ -15,7 +15,7 @@ import Data.List (nub,intercalate)
 
 newtype Type = Type {name :: String}   deriving (Eq,Generic)
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Eq,Generic)
-newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic,Show)
+newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic)
 data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
 data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Eq,Show,Read,Bounded,Enum,Generic)
 
@@ -28,6 +28,10 @@ instance Show Term where
       transTerm :: Term -> String
       transTerm (Term x []) = x
       transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
+
+instance Show Signature where
+  show = show . definitions
+
 
 -- IsLabel orphan instance for (->) --
 instance HasField x r a => IsLabel x (r -> a) where
