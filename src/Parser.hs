@@ -49,4 +49,16 @@ instance Parse Symbol where
 
 
 instance Parse Signature where
-  parser = Signature <$> many parser
+  parser = Signature <$> parser
+
+
+
+instance Parse a => Parse [a] where
+  parser = (trailSpaces listParse <?> "List")
+           <|> fail "Could not parse a list of values: The elements of a list are enclosed by square brackets '[ ]' and separated by commas."
+    where
+      listParse = do
+        withSpaces '[' <|> fail "could not parse an opening '['"
+        xs <- parser `sepBy` (withSpaces ',' <|> fail "parsed a wrong separator: Lists are comma-separated.")
+        withSpaces ']' <|> fail "could not parse an enclosing ']'"
+        pure xs
