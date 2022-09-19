@@ -24,10 +24,7 @@ withSpaces = void . trailSpaces . char
 
 
 instance Parse Term where
-  parser = do
-      symb <- trailSpaces $ many1 letter
-      args <- trailSpaces $ some <|> pure []
-      pure $ Term symb args
+  parser = Term <$> trailSpaces (many1 letter) <*> trailSpaces (some <|> pure [])
     where
       some = do
         withSpaces '('
@@ -52,6 +49,4 @@ instance Parse Symbol where
 
 
 instance Parse Signature where
-  parser = do
-    symbols <- many parser
-    pure $ Signature symbols
+  parser = Signature <$> many parser
