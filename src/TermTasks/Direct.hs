@@ -32,7 +32,7 @@ genInst c@Certain{..} = do
   (correctness, theTerms) <- fmap unzip $ shuffle $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
   let Signature symbols = signatures
       correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
-  return $ SigInstance symbols theTerms correct
+  return $ SigInstance symbols theTerms correct $ extraFeedback baseConf
 
 
 verifyInst :: OutputMonad m => SigInstance -> LangM m
