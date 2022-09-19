@@ -105,7 +105,7 @@ verifyBase Base{..}
     (lower,upper) = termSizeRange
     negativeAmounts = any (<0) $ lower : upper : properTerms : map fst wrongTerms
     invalidInterval = lower > upper
-    duplicateError = let errorTypes = map snd wrongTerms in nub errorTypes == errorTypes
+    duplicateError = let errorTypes = map snd wrongTerms in nub errorTypes /= errorTypes
 
 
 
