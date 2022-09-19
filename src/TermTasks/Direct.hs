@@ -3,7 +3,7 @@
 module TermTasks.Direct where
 
 
-import Data.List (nub)
+import Data.List (nub, sort)
 import Control.Monad.Output(LangM, OutputMonad(indent, latex, refuse), english, german, translate)
 import Test.QuickCheck (Gen, shuffle)
 
@@ -116,9 +116,33 @@ start = []
 
 
 partialGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
-partialGrade _ _ = pure()
+partialGrade SigInstance{..} sol
+    | invalidIndex =
+        refuse $ indent $ translate $ do
+          english "At least one index in the list does not exist."
+          german "Mindestens einer der Indices existiert nicht."
+
+    | wrongAmount =
+        refuse $ indent $ translate $ do
+          english "The amount of indices is wrong."
+          german "Die Anzahl der Indices ist falsch."
+
+    | otherwise = pure()
+  where
+    nubSol = nub sol
+    invalidIndex = any (`notElem` [1..length terms+1]) nubSol
+    wrongAmount = length nubSol /= length correct
+
 
 
 
 completeGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
-completeGrade _ _ = pure()
+completeGrade SigInstance{..} sol
+    | wrongSolution =
+        refuse $ indent $ translate $ do
+          english "Your solution is incorrect."
+          german "Ihre Lösung ist falsch."
+
+    | otherwise = pure()
+  where
+    wrongSolution = sort (nub sol) /= sort correct
