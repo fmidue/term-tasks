@@ -1,4 +1,12 @@
-module TermTasks.DataType (Error(..),Signature(..),Symbol(..),Term(..),Type(..)) where
+module TermTasks.DataType
+       (
+         Error
+       , Signature
+       , Symbol
+       , Term
+       , Type
+       ) where
+
 
 
 import DataType
