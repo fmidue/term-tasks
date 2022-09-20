@@ -4,7 +4,6 @@ dependencies:
   - base
   - split
   - QuickCheck
-  - output-monad
 default-extensions:
   - DuplicateRecordFields
   - OverloadedLabels
@@ -19,7 +18,7 @@ library:
   dependencies:
     - extra
     - parsec
-
+    - output-monad
   ghc-options:
     - -Wall
     - -Werror
