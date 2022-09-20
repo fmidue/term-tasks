@@ -1,4 +1,4 @@
-{-# LANGUAGE TupleSections, DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Records where
 
