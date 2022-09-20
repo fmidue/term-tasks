@@ -3,17 +3,21 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# language DeriveGeneric #-}
+
 module DataType where
 
+import GHC.Generics
 import GHC.OverloadedLabels
 import GHC.Records
 import Data.List (nub,intercalate)
 
-newtype Type = Type String   deriving Eq
-data Term = Term {symbol :: String, arguments :: [Term]}   deriving Eq
-newtype Signature = Signature [Symbol]  deriving Show
-data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type}
-data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Show,Read,Bounded,Enum)
+
+newtype Type = Type {name :: String}   deriving (Eq,Generic)
+data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Eq,Generic)
+newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic)
+data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
+data Error = SWAP | TYPE | ONEMORE | ONELESS | SYMBOL | SYMBOLTYPE   deriving (Eq,Show,Read,Bounded,Enum,Generic)
 
 instance Show Symbol where
   show (Symbol s ts (Type t)) = s ++ " : " ++ if null ts then t else intercalate " x " (map (\(Type s') -> s') ts) ++ " -> " ++ t
@@ -24,6 +28,10 @@ instance Show Term where
       transTerm :: Term -> String
       transTerm (Term x []) = x
       transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
+
+instance Show Signature where
+  show = show . definitions
+
 
 -- IsLabel orphan instance for (->) --
 instance HasField x r a => IsLabel x (r -> a) where

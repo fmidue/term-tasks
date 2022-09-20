@@ -4,11 +4,20 @@ dependencies:
   - base
   - split
   - QuickCheck
+  - extra
+  - parsec
+  - output-monad
 default-extensions:
   - DuplicateRecordFields
   - OverloadedLabels
 library:
   source-dirs: src
+  exposed-modules:
+    - TermTasks.Direct
+    - TermTasks.Perturbed
+    - TermTasks.Records
+    - TermTasks.DataType
+    - TermTasks.Parser
   ghc-options:
     - -Wall
     - -Werror
@@ -17,6 +26,7 @@ tests:
     main: Spec.hs
     source-dirs:
       - test
+      - src
     ghc-options:
       - -threaded
       - -rtsopts
@@ -24,57 +34,3 @@ tests:
     dependencies:
       - term-tasks
       - hspec
-executables:
-  CertainSignature:
-    main: Main.hs
-    source-dirs: app/CertainSignature
-    ghc-options:
-    - -O2
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - -Wall
-    - -Werror
-    dependencies:
-    - term-tasks
-
-  RandomSignature:
-    main: Main.hs
-    source-dirs: app/RandomSignature
-    ghc-options:
-    - -O2
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - -Wall
-    - -Werror
-    dependencies:
-    - term-tasks
-
-  direct:
-    main: direct.hs
-    source-dirs: app/Autotool
-    ghc-options:
-    - -O2
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - -Wall
-    - -Werror
-    dependencies:
-    - term-tasks
-    - extra
-
-  perturbed:
-    main: perturbed.hs
-    source-dirs: app/Autotool
-    ghc-options:
-    - -O2
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - -Wall
-    - -Werror
-    dependencies:
-    - term-tasks
-    - extra

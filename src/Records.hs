@@ -1,6 +1,11 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Records where
 
-import DataType (Error(..), Signature, toSignature)
+import Data.Typeable
+import GHC.Generics
+
+import DataType (Error(..), Signature, Symbol(..), Term(..), Type(..), toSignature)
 
 
 
@@ -8,13 +13,15 @@ data Base = Base
             { termSizeRange :: (Int,Int)
             , wrongTerms :: [(Int,Error)]
             , properTerms :: Int
-            }
+            , extraFeedback :: Bool
+            } deriving (Typeable, Generic)
 
 dBase :: Base
 dBase = Base
         { termSizeRange = (6,10)
         , wrongTerms = [(1,SWAP),(1,TYPE),(1,ONEMORE),(1,ONELESS)]
         , properTerms = 5
+        , extraFeedback = False
         }
 
 
@@ -23,7 +30,7 @@ dBase = Base
 data Certain = Certain {
                  signatures :: Signature
                , baseConf :: Base
-               }
+               } deriving (Typeable, Generic)
 
 dCertain :: Certain
 dCertain = Certain
@@ -38,7 +45,7 @@ data Perturbed = Perturbed {
                , types :: [String]
                , sigs :: [([Int],Int)]
                , baseConf :: Base
-               }
+               } deriving (Typeable, Generic)
 
 dPerturbed :: Perturbed
 dPerturbed = Perturbed
@@ -64,3 +71,20 @@ dRandom = Random
            , maxArgs = 5
            , baseConf = dBase
            }
+
+
+
+data SigInstance = SigInstance {
+                      symbols :: [Symbol]
+                    , terms :: [Term]
+                    , correct :: [Int]
+                    , moreFeedback :: Bool
+                    } deriving (Typeable, Generic)
+
+dSigInst :: SigInstance
+dSigInst = SigInstance {
+              symbols = [Symbol "f" [Type "a", Type "b"] (Type "c"), Symbol "g" [] (Type "a"), Symbol "h" [Type "a"] (Type "b")]
+            , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "h" []]
+            , correct = [1]
+            , moreFeedback = False
+            }

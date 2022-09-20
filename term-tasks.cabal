@@ -1,0 +1,89 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           term-tasks
+version:        0.0.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      TermTasks.Direct
+      TermTasks.Perturbed
+      TermTasks.Records
+      TermTasks.DataType
+      TermTasks.Parser
+  other-modules:
+      AllTerm
+      ArbitrarySig
+      Auxiliary
+      DataType
+      InvalidTerm
+      Parser
+      Records
+      Tasks.CertainSignature
+      Tasks.RandomSignature
+      TermTasks.Helpers
+      TermTasks.Messages
+      ValidTerm
+      Paths_term_tasks
+  hs-source-dirs:
+      src
+  default-extensions:
+      DuplicateRecordFields
+      OverloadedLabels
+  ghc-options: -Wall -Werror
+  build-depends:
+      QuickCheck
+    , base
+    , extra
+    , output-monad
+    , parsec
+    , split
+  default-language: Haskell2010
+
+test-suite term-tasks-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Examples.ComputeTerm
+      Examples.Functions
+      Examples.Signatures
+      Examples.ValidCheck
+      AllTerm
+      ArbitrarySig
+      Auxiliary
+      DataType
+      InvalidTerm
+      Parser
+      Records
+      Tasks.CertainSignature
+      Tasks.RandomSignature
+      TermTasks.DataType
+      TermTasks.Direct
+      TermTasks.Helpers
+      TermTasks.Messages
+      TermTasks.Parser
+      TermTasks.Perturbed
+      TermTasks.Records
+      ValidTerm
+      Paths_term_tasks
+  hs-source-dirs:
+      test
+      src
+  default-extensions:
+      DuplicateRecordFields
+      OverloadedLabels
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , base
+    , extra
+    , hspec
+    , output-monad
+    , parsec
+    , split
+    , term-tasks
+  default-language: Haskell2010
