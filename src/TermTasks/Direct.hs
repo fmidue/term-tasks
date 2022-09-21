@@ -19,9 +19,9 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputMonad m => SigInstance -> LangM m
 description SigInstance{..} = do
   text1
-  indent $ latex $ unlines $ map (mathifySignature . show) symbols
+  indent $ sequence_ $ map (latex . mathifySignature . show) symbols
   text2
-  indent $ latex $ unlines $ map itemifyTerm (zip [1 :: Int ..] terms)
+  indent $ sequence_ $ map (latex . itemifyTerm) $ zip [1 :: Int ..] terms
   text3
   text4
 
