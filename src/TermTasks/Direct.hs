@@ -139,12 +139,12 @@ partialGrade SigInstance{..} sol
             if diff > 0
               then
                 indent $ translate $ do
-                  english $ "Your solution contains " ++ show diff ++ " additional " ++ eng
-                  german $ "Ihre Lösung enthält " ++ show diff ++ ger ++ " zu viel."
+                  english $ "Your solution contains " ++ displayDiff ++ " additional " ++ eng
+                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
               else
                 indent $ translate $ do
-                  english $ "Your solution is missing " ++ show (abs diff) ++ eng
-                  german $ "Ihre Lösung enthält " ++ show diff ++ ger ++ " zu wenig."
+                  english $ "Your solution is missing " ++ displayDiff ++ eng
+                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
 
     | otherwise = pure()
   where
@@ -152,6 +152,7 @@ partialGrade SigInstance{..} sol
     invalidIndex = any (`notElem` [1..length terms]) nubSol
     wrongAmount = length nubSol /= length correct
     diff =  length nubSol - length correct
+    displayDiff = show (abs diff)
     (eng,ger) = if abs diff == 1 then (" index."," Index") else (" indices."," Indices")
 
 

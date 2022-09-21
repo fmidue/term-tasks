@@ -8,4 +8,4 @@ mathifySignature :: String -> String
 mathifySignature s = replace "->" "\\to" (replace "x" "\\times" s)
 
 itemifyTerm :: (Int, Term) -> String
-itemifyTerm (i,t) = show i ++ ". " ++ show t
+itemifyTerm (i,t) = show i ++ ".\\," ++ show t
