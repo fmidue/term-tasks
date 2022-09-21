@@ -19,9 +19,9 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputMonad m => SigInstance -> LangM m
 description SigInstance{..} = do
   text1
-  indent $ sequence_ $ map (latex . mathifySignature . show) symbols
+  indent $ mapM_ (latex . mathifySignature . show) symbols
   text2
-  indent $ sequence_ $ map (latex . itemifyTerm) $ zip [1 :: Int ..] terms
+  indent $ mapM_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
   text3
   text4
 
@@ -178,4 +178,4 @@ completeGrade SigInstance{..} sol
   where
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
-    badTerms = map ((terms !!) . (subtract 1)) $ nubSol \\ correct
+    badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
