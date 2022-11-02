@@ -1,11 +1,27 @@
 {-# LANGUAGE TupleSections, RecordWildCards, FlexibleContexts #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module TermTasks.Direct where
 
+import qualified Data.Map                         as M (fromAscList)
 
 import Data.List (nub, sort, (\\))
+import Control.Applicative (Alternative)
 import Control.Monad (when)
-import Control.Monad.Output (LangM, OutputMonad(indent, itemizeM, latex, refuse, text), english, german, translate)
+import Control.Monad.Output (
+  LangM,
+  OutputMonad (indent, itemizeM, latex, refuse),
+  Rated,
+  continueOrAbort,
+  english,
+  german,
+  multipleChoice,
+  recoverFrom,
+  translate,
+  translations,
+  )
+import Data.Bifunctor (second)
+import Data.Tuple.Extra (dupe)
 import Test.QuickCheck (Gen, shuffle)
 
 import TermTasks.Helpers
@@ -30,10 +46,13 @@ description SigInstance{..} = do
 genInst :: MonadFail Gen => Certain -> Gen SigInstance
 genInst c@Certain{..} = do
   (False, correctTerms, incorrectTerms) <- CertainSignature.task c
-  (correctness, theTerms) <- fmap unzip $ shuffle $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
+  (correctness, terms) <- fmap unzip $ shuffle
+    $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
   let Signature symbols = signatures
       correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
-  return $ SigInstance symbols theTerms correct $ extraFeedback baseConf
+      moreFeedback = extraFeedback baseConf
+      showSolution = printSolution baseConf
+  return $ SigInstance { symbols, terms, correct, moreFeedback, showSolution }
 
 
 verifyInst :: OutputMonad m => SigInstance -> LangM m
@@ -128,8 +147,19 @@ partialGrade SigInstance{..} sol
         refuse $ indent $ translate $ do
           english "At least one index in the list does not exist."
           german "Mindestens einer der Indices existiert nicht."
+    | otherwise = pure ()
+  where
+    nubSol = nub sol
+    invalidIndex = any (`notElem` [1 .. length terms]) nubSol
 
-    | wrongAmount =
+completeGrade
+  :: (Alternative m, OutputMonad m)
+  => SigInstance
+  -> [Int]
+  -> Rated m
+completeGrade SigInstance {..} sol = do
+  recoverFrom $ do
+    assert wrongAmount $ do
         refuse $ do
           indent $ translate $ do
             english "The amount of indices is wrong."
@@ -146,22 +176,7 @@ partialGrade SigInstance{..} sol
                   english $ "Your solution is missing " ++ displayDiff ++ eng
                   german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
 
-    | otherwise = pure()
-  where
-    nubSol = nub sol
-    invalidIndex = any (`notElem` [1..length terms]) nubSol
-    wrongAmount = length nubSol /= length correct
-    diff =  length nubSol - length correct
-    displayDiff = show (abs diff)
-    (eng,ger) = if abs diff == 1 then (" index."," Index") else (" indices."," Indices")
-
-
-
-
-
-completeGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
-completeGrade SigInstance{..} sol
-    | wrongSolution =
+    assert wrongSolution $ do
         refuse $ do
           indent $ translate $ do
             english "Your solution is incorrect."
@@ -170,13 +185,24 @@ completeGrade SigInstance{..} sol
             translate $ do
               english "These incorrect terms are part of your solution: "
               german "Diese Terme aus Ihrer Lösung sind falsch: "
-            itemizeM $ map (text . show) badTerms
-
-
-
-
-    | otherwise = pure()
+            itemizeM $ map (latex . show) badTerms
+  let what = translations $ do
+        english "terms"
+        german "Terme"
+      solution = if showSolution then Just (show correct) else Nothing
+      matching = M.fromAscList $ map
+        (second (`elem` correct) . dupe)
+        [0 .. length terms]
+  multipleChoice what solution matching sol
   where
+    assert = continueOrAbort showSolution
+    wrongAmount = diff /= 0
+    diff =  length nubSol - length correct
+    displayDiff = show (abs diff)
+    (eng, ger) =
+      if abs diff == 1
+      then (" index."," Index")
+      else (" indices."," Indices")
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
     badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct

@@ -2,6 +2,7 @@ name: term-tasks
 extra-source-files: []
 dependencies:
   - base
+  - containers
   - split
   - QuickCheck
   - extra

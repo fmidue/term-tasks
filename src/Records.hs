@@ -14,6 +14,7 @@ data Base = Base
             , wrongTerms :: [(Int,Error)]
             , properTerms :: Int
             , extraFeedback :: Bool
+            , printSolution :: Bool
             } deriving (Typeable, Generic)
 
 dBase :: Base
@@ -22,6 +23,7 @@ dBase = Base
         , wrongTerms = [(1,SWAP),(1,TYPE),(1,ONEMORE),(1,ONELESS)]
         , properTerms = 5
         , extraFeedback = False
+        , printSolution = False
         }
 
 
@@ -79,6 +81,7 @@ data SigInstance = SigInstance {
                     , terms :: [Term]
                     , correct :: [Int]
                     , moreFeedback :: Bool
+                    , showSolution :: Bool
                     } deriving (Typeable, Generic)
 
 dSigInst :: SigInstance
@@ -87,4 +90,5 @@ dSigInst = SigInstance {
             , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "h" []]
             , correct = [1]
             , moreFeedback = False
+            , showSolution = False
             }
