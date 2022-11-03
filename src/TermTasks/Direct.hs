@@ -158,14 +158,11 @@ completeGrade
   -> [Int]
   -> Rated m
 completeGrade SigInstance {..} sol = do
-  recoverFrom $ do
-    assert wrongAmount $ do
-        refuse $ do
-          indent $ translate $ do
-            english "The amount of indices is wrong."
-            german "Die Anzahl der Indices ist falsch."
-
-          when moreFeedback $
+  recoverFrom $ assert (not wrongAmount) $
+    translate $ do
+      english "The amount of indices is correct?"
+      german "Die Anzahl der Indices ist richtig?"
+  when (wrongAmount && moreFeedback) $
             if diff > 0
               then
                 indent $ translate $ do
@@ -175,13 +172,12 @@ completeGrade SigInstance {..} sol = do
                 indent $ translate $ do
                   english $ "Your solution is missing " ++ displayDiff ++ eng
                   german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
-
-    assert wrongSolution $ do
-        refuse $ do
-          indent $ translate $ do
-            english "Your solution is incorrect."
-            german "Ihre Lösung ist falsch."
-          when moreFeedback $ indent $ do
+  when (showSolution || not wrongAmount) $ do
+    recoverFrom $ assert (not wrongSolution) $
+      translate $ do
+        english "Your solution is correct?"
+        german "Ihre Lösung ist richtig?"
+    when (wrongSolution && moreFeedback) $ indent $ do
             translate $ do
               english "These incorrect terms are part of your solution: "
               german "Diese Terme aus Ihrer Lösung sind falsch: "
@@ -192,7 +188,7 @@ completeGrade SigInstance {..} sol = do
       solution = if showSolution then Just (show correct) else Nothing
       matching = M.fromAscList $ map
         (second (`elem` correct) . dupe)
-        [0 .. length terms]
+        [1 .. length terms]
   multipleChoice what solution matching sol
   where
     assert = continueOrAbort showSolution
