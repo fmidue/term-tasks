@@ -10,7 +10,7 @@ import Control.Applicative (Alternative)
 import Control.Monad (when)
 import Control.Monad.Output (
   LangM,
-  OutputMonad (indent, itemizeM, latex, refuse),
+  OutputMonad (indent, itemizeM, latex, refuse, text),
   Rated,
   continueOrAbort,
   english,
@@ -26,7 +26,7 @@ import Test.QuickCheck (Gen, shuffle)
 
 import TermTasks.Helpers
 import TermTasks.Messages
-import DataType (Signature(..), Symbol(..), Type(..))
+import DataType (Signature(..), Symbol(..), Type(..), termSize)
 import Records (Base(..), Certain(..), SigInstance(..))
 import qualified Tasks.CertainSignature as CertainSignature
 
@@ -61,8 +61,11 @@ verifyInst SigInstance{..}
         refuse $ indent $ translate $ do
           english "At least one of the solution indices does not exist."
           german "Mindestens eine der Lösungsindices existiert nicht."
-
-
+    | not $ null nonTrivialTerms = refuse $ do
+        translate $ do
+          english "The following terms are not of at least two symbols:"
+          german "Die folgenden Terme bestehen nicht wenigstens aus zwei Symbolen:"
+        itemizeM $ map (text . show) nonTrivialTerms
     | emptyInput =
         refuse $ indent $ translate $ do
           english "At least one of the given lists is empty."
@@ -78,6 +81,7 @@ verifyInst SigInstance{..}
     notInRange = any (`notElem` [1 .. length terms + 1]) correct
     emptyInput = null symbols || null terms
     doubleSolution = nub correct /= correct
+    nonTrivialTerms = filter ((< 2) . termSize) terms
 
 
 
@@ -112,7 +116,9 @@ verifyBase Base{..}
         refuse $ indent $ translate $ do
           english "At least one quantity is given as a negative number."
           german "Mindestens eine Anzahl wurde als negative Zahl angegeben."
-
+    | fst termSizeRange < 2 = refuse $ translate $ do
+        english "The minimum of 'termSizeRange' has to be at least two."
+        german "Das Mimimum der 'termSizeRange' muss mindestens zwei betragen."
 
     | invalidInterval =
         refuse $ indent $ translate $ do
