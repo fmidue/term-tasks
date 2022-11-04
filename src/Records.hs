@@ -87,7 +87,7 @@ data SigInstance = SigInstance {
 dSigInst :: SigInstance
 dSigInst = SigInstance {
               symbols = [Symbol "f" [Type "a", Type "b"] (Type "c"), Symbol "g" [] (Type "a"), Symbol "h" [Type "a"] (Type "b")]
-            , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "h" []]
+            , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "f" [Term "h" []]]
             , correct = [1]
             , moreFeedback = False
             , showSolution = False

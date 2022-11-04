@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# language DeriveGeneric #-}
@@ -28,6 +29,16 @@ instance Show Term where
       transTerm :: Term -> String
       transTerm (Term x []) = x
       transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
+
+foldrTerm :: (String -> b -> b) -> b -> Term -> b
+foldrTerm f x Term { symbol, arguments } =
+  f symbol $ foldr (flip $ foldrTerm f) x arguments
+
+{-|
+The total amount of occurrences of symbols within the given 'Term'.
+-}
+termSize :: Term -> Int
+termSize = foldrTerm (const (+ 1)) 0
 
 instance Show Signature where
   show = show . definitions
