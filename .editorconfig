@@ -6,7 +6,10 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
-max_line_length = 120
+max_line_length = 130
+
+[test/Spec.hs]
+max_line_length = 150
 
 [**.{yml,yaml,md}]
 max_line_length = unset

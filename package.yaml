@@ -1,6 +1,6 @@
 ---
 name: term-tasks
-extra-source-files: []
+extra-source-files: [ ]
 dependencies:
   - base
   - containers
