@@ -199,13 +199,7 @@ check' :: (Signature,([Term],[[Term]])) -> Bool
 check' (sig,(_,ts)) = all (\x -> True `notElem` (map (isValid sig) x)) ts
 
 size :: Term -> Int
-size fs = 1 + size' (#arguments fs)
-
-size' :: [Term] -> Int
-size' [] = 0
-size' (f:fs)
-  | null (#arguments f) = 1 + size' fs
-  | otherwise = 1 + size' (#arguments f) + size' fs
+size = termSize
 
 between :: Int -> Int -> Int -> Bool
 between n a b = n >= a && n <= b
