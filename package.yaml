@@ -15,8 +15,8 @@ default-extensions:
 library:
   source-dirs: src
   exposed-modules:
-    - ValidTerm
-    - InvalidTerm
+    - TermTasks.ValidTerm
+    - TermTasks.InvalidTerm
     - TermTasks.Direct
     - TermTasks.Perturbed
     - TermTasks.Records

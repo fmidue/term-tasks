@@ -10,8 +10,8 @@ build-type:     Simple
 
 library
   exposed-modules:
-      ValidTerm
-      InvalidTerm
+      TermTasks.ValidTerm
+      TermTasks.InvalidTerm
       TermTasks.Direct
       TermTasks.Perturbed
       TermTasks.Records
@@ -22,12 +22,14 @@ library
       ArbitrarySig
       Auxiliary
       DataType
+      InvalidTerm
       Parser
       Records
       Tasks.CertainSignature
       Tasks.RandomSignature
       TermTasks.Helpers
       TermTasks.Messages
+      ValidTerm
       Paths_term_tasks
   hs-source-dirs:
       src
@@ -65,10 +67,12 @@ test-suite term-tasks-test
       TermTasks.DataType
       TermTasks.Direct
       TermTasks.Helpers
+      TermTasks.InvalidTerm
       TermTasks.Messages
       TermTasks.Parser
       TermTasks.Perturbed
       TermTasks.Records
+      TermTasks.ValidTerm
       ValidTerm
       Paths_term_tasks
   hs-source-dirs:
