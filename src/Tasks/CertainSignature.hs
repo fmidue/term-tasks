@@ -10,8 +10,8 @@ import ValidTerm (validTerms)
 import Records
 
 task :: Certain -> Gen (Bool, [Term], [[Term]])
-task Certain{signatures, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
-    let correctTerms = validTerms signatures Nothing a b
+task Certain{signatures, root, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
+    let correctTerms = validTerms signatures Nothing a b root
     correctTerms' <- different correctTerms (min properTerms (length correctTerms))
-    incorrectTerms <- invalidTerms signatures wrongTerms a b `suchThat` (\x->sum (map fst wrongTerms) == sum (map length x))
+    incorrectTerms <- invalidTerms signatures a b root wrongTerms `suchThat` (\x -> map fst wrongTerms == map length x)
     return (properTerms > length correctTerms, correctTerms', incorrectTerms)

@@ -20,7 +20,7 @@ data Base = Base
 dBase :: Base
 dBase = Base
         { termSizeRange = (6,10)
-        , wrongTerms = [(1,SWAP),(1,TYPE),(1,ONEMORE),(1,ONELESS)]
+        , wrongTerms = [ (1,Swap), (1,TypeChange), (1,OneMore), (1,OneLess) ]
         , properTerms = 5
         , extraFeedback = False
         , printSolution = False
@@ -31,12 +31,14 @@ dBase = Base
 
 data Certain = Certain {
                  signatures :: Signature
+               , root :: Maybe [Type]
                , baseConf :: Base
                } deriving (Typeable, Generic)
 
 dCertain :: Certain
 dCertain = Certain
            { signatures = toSignature [("d",[],"R"),("e",[],"S"),("f",[],"T"),("g",["R","R"],"S"),("h",["R","S"],"T"),("i",["R","S","T"],"U")]
+           , root = Nothing
            , baseConf = dBase
            }
 
@@ -46,6 +48,7 @@ data Perturbed = Perturbed {
                  symbols :: [String]
                , types :: [String]
                , sigs :: [([Int],Int)]
+               , root :: Maybe [Int]
                , baseConf :: Base
                } deriving (Typeable, Generic)
 
@@ -54,6 +57,7 @@ dPerturbed = Perturbed
            { symbols = ["d","e","f","g","h","i"]
            , types = ["R","S","T","U"]
            , sigs = [ ([],1), ([],2), ([],3), ([1,1],2), ([1,2],3), ([1,2,3],4) ]
+           , root = Nothing
            , baseConf = dBase
            }
 

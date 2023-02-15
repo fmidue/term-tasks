@@ -98,6 +98,18 @@ verifyCertain Certain{..}
           english "At least one of the given symbols is an empty String."
           german "Mindestens eines der Symbole wurde als leerer String angegeben."
 
+
+    | emptyRootList =
+        refuse $ indent $ translate $ do
+          english "The type list given as possible roots must not be empty."
+          german "Die als mögliche Wurzeln angegebene Typ-Liste darf nicht leer sein."
+
+
+    | incorrectRootType =
+        refuse $ indent $ translate $ do
+          english "At least one type mentioned as possible root is not returned by any operation."
+          german "Mindestens ein Typ, der als mögliche Wurzel genannt wird, wird von keiner Operation zurückgegeben."
+
     | otherwise = verifyBase baseConf
   where
     usedDefs = definitions signatures
@@ -107,6 +119,8 @@ verifyCertain Certain{..}
 
     doubleDef = nub usedSymbols /= usedSymbols
     emptyStrings = any null usedSymbols || any null usedTypes || any null usedResults
+    emptyRootList = maybe False null root
+    incorrectRootType = maybe False (any (\t -> name t `notElem` usedResults)) root
 
 
 

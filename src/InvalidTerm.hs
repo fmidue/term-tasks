@@ -124,33 +124,32 @@ wrongSymbol' sig@(Signature fs) = do
 combination :: Int -> [Type] -> [([Type],Type)]
 combination n ts = [(x,t) | i <- reverse [0..n], t <- ts, x <- replicateM i ts ]
 
-newSignature :: Signature -> Error -> Gen (Maybe(Signature,String))
-newSignature sig SWAP = swapArgOrder sig
-newSignature sig ONEMORE = fmap Just (oneMoreArg sig)
-newSignature sig ONELESS = oneLessArg sig
-newSignature sig TYPE = oneDiffType sig
-newSignature sig SYMBOL = fmap Just (wrongSymbol sig)
-newSignature sig SYMBOLTYPE = wrongSymbol' sig
+newSignature :: Signature -> Error -> Gen (Maybe (Signature, String))
+newSignature sig Swap = swapArgOrder sig
+newSignature sig OneMore = fmap Just (oneMoreArg sig)
+newSignature sig OneLess = oneLessArg sig
+newSignature sig TypeChange = oneDiffType sig
+newSignature sig NameTypo = fmap Just (wrongSymbol sig)
+newSignature sig UnknownSymbol = wrongSymbol' sig
 
 originalSymbol :: String -> Term -> Term
 originalSymbol s' (Term s ts)
   | s == s' = Term (init s) (map (originalSymbol s') ts)
   | otherwise = Term s (map (originalSymbol s') ts)
 
-invalidTerms :: Signature -> [(Int,Error)] -> Int -> Int -> Gen [[Term]]
-invalidTerms _ [] _ _ = return []
-invalidTerms sig ((n,e):ls) a b = do
-  terms <- invalidTerms' sig e a b
-  terms' <- different terms (min n (length terms))
-  nextTerm <- invalidTerms sig ls a b
-  return (terms':nextTerm)
+invalidTerms :: Signature -> Int -> Int -> Maybe [Type] -> [(Int,Error)] -> Gen [[Term]]
+invalidTerms sig a b root =
+  traverse (\(n,e) ->
+               invalidTerms' sig a b root e >>=
+               \terms -> different terms (min n (length terms))
+           )
 
-invalidTerms' :: Signature -> Error -> Int-> Int -> Gen [Term]
-invalidTerms' sig e a b = do
+invalidTerms' :: Signature -> Int -> Int -> Maybe [Type] -> Error -> Gen [Term]
+invalidTerms' sig a b root e = do
     new <- newSignature sig e
     case new of
       Nothing -> return []
       Just (newSig,s) -> do
-        let terms = validTerms newSig (Just s) a b
+        let terms = validTerms newSig (Just s) a b root
             terms' = map (originalSymbol s) terms
         return terms'
