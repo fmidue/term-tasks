@@ -1,10 +1,11 @@
 module TermTasks.DataType
        (
-         Error
+         Error(..)
        , Signature
        , Symbol
        , Term
-       , Type
+       , Type(..)
+       , toSignature
        ) where
 
 

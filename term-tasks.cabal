@@ -10,6 +10,8 @@ build-type:     Simple
 
 library
   exposed-modules:
+      ValidTerm
+      InvalidTerm
       TermTasks.Direct
       TermTasks.Perturbed
       TermTasks.Records
@@ -20,14 +22,12 @@ library
       ArbitrarySig
       Auxiliary
       DataType
-      InvalidTerm
       Parser
       Records
       Tasks.CertainSignature
       Tasks.RandomSignature
       TermTasks.Helpers
       TermTasks.Messages
-      ValidTerm
       Paths_term_tasks
   hs-source-dirs:
       src
