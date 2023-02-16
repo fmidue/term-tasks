@@ -27,5 +27,5 @@ text3 = paragraph $ translate $ do
 
 text4 :: OutputMonad m => LangM m
 text4 = paragraph $ translate $ do
-    german "Zum Beispiel [1, 2] wuerde bedeuten, dass nur die Terme 1. und 2. von den angegebenen korrekt sind."
+    german "Zum Beispiel [1, 2] würde bedeuten, dass nur die Terme 1. und 2. von den angegebenen korrekt sind."
     english "For example, [1, 2] would indicate that only terms 1. and 2. of the given ones are correct."
