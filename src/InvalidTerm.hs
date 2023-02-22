@@ -2,6 +2,7 @@
 
 module InvalidTerm (
   invalidTerms,
+  invalidTerms'
 )where
 
 import Test.QuickCheck (Gen, elements, suchThat, chooseInt)
@@ -132,15 +133,15 @@ invalidTerms :: Signature -> Int -> Int -> Maybe [Type] -> [(Int,Error)] -> Gen 
 invalidTerms sig a b root =
   traverse (\(n,e) ->
                invalidTerms' sig a b root e >>=
-               \terms -> different terms (min n (length terms))
+               \(terms, _) -> different terms (min n (length terms))
            )
 
-invalidTerms' :: Signature -> Int -> Int -> Maybe [Type] -> Error -> Gen [Term]
+invalidTerms' :: Signature -> Int -> Int -> Maybe [Type] -> Error -> Gen ([Term], String)
 invalidTerms' sig a b root e = do
     new <- newSignature sig e
     case new of
-      Nothing -> return []
+      Nothing -> return ([], "")
       Just (newSig,s) -> do
         let terms = validTerms newSig (Just s) a b root
             terms' = map (originalSymbol s) terms
-        return terms'
+        return (terms', init s)
