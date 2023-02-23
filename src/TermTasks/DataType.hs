@@ -3,7 +3,7 @@ module TermTasks.DataType
          Error(..)
        , Signature
        , Symbol
-       , Term
+       , Term(..)
        , Type(..)
        , toSignature
        ) where
