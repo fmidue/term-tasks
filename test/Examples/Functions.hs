@@ -2,6 +2,7 @@ module Examples.Functions where
 
 import DataType
 import Data.List (find)
+import Data.Foldable (toList)
 
 allFunctions :: Signature -> [Symbol]
 allFunctions (Signature fs) = filter (not . null . #arguments) fs
