@@ -16,4 +16,4 @@ theArgumentsTypes :: Signature -> String -> Maybe [Type]
 theArgumentsTypes (Signature fs) s = fmap #arguments (find ((== s) . #symbol) fs)
 
 termSymbols :: Term a -> [a]
-termSymbols (Term x xs) = x : concatMap termSymbols xs
+termSymbols = toList

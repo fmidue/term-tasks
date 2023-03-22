@@ -125,9 +125,7 @@ newSignature sig NameTypo = fmap Just (wrongSymbol sig)
 newSignature sig UnknownSymbol = wrongSymbol' sig
 
 originalSymbol :: String -> Term String -> Term String
-originalSymbol s' (Term s ts)
-  | s == s' = Term (init s) (map (originalSymbol s') ts)
-  | otherwise = Term s (map (originalSymbol s') ts)
+originalSymbol s' = fmap (\s -> if s == s' then init s else s)
 
 invalidTerms :: Signature -> Int -> Int -> Maybe [Type] -> [(Int,Error)] -> Gen [[Term String]]
 invalidTerms sig a b root =
