@@ -12,13 +12,19 @@ import GHC.Generics
 import GHC.OverloadedLabels
 import GHC.Records
 import Data.List (nub,intercalate)
+import Test.QuickCheck (Arbitrary(..), elements)
 
 
 newtype Type = Type {name :: String}   deriving (Eq,Generic)
 data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Eq,Generic)
 newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic)
 data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
-data Error = Swap | TypeChange | OneMore | OneLess | NameTypo | UnknownSymbol   deriving (Eq,Show,Read,Bounded,Enum,Generic)
+
+data Error = Swap | TypeChange | OneMore | OneLess | NameTypo | UnknownSymbol
+  deriving (Eq, Ord, Show, Read, Bounded, Enum, Generic)
+
+instance Arbitrary Error where
+  arbitrary = elements [minBound .. maxBound]
 
 instance Show Symbol where
   show (Symbol s ts (Type t)) = s ++ " : " ++ if null ts then t else intercalate " x " (map (\(Type s') -> s') ts) ++ " -> " ++ t
