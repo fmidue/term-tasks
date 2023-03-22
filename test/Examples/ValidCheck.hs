@@ -4,13 +4,13 @@ import DataType
 import Examples.Functions (theArgumentsTypes,allConstants,theType,termSymbols)
 import Data.Maybe (fromJust)
 
-isValid :: Signature -> Term -> Bool
+isValid :: Signature -> Term String -> Bool
 isValid sig t = all (`elem` allSymbols sig) (termSymbols t) && isValidType t sig
 
-isValidType :: Term -> Signature -> Bool
+isValidType :: Term String -> Signature -> Bool
 isValidType (Term s xs) w = isValidType' (fromJust (theArgumentsTypes w s)) xs w
 
-isValidType' :: [Type] ->[Term] -> Signature -> Bool
+isValidType' :: [Type] ->[Term String] -> Signature -> Bool
 isValidType' [] [] _ = True
 isValidType' [] _  _ = False
 isValidType' _  [] _ = False

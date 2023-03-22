@@ -5,6 +5,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# language DeriveGeneric #-}
+{-# language DeriveFunctor #-}
+{-# language DeriveFoldable #-}
 
 module DataType where
 
@@ -16,7 +18,10 @@ import Test.QuickCheck (Arbitrary(..), elements)
 
 
 newtype Type = Type {name :: String}   deriving (Eq,Generic)
-data Term = Term {symbol :: String, arguments :: [Term]}   deriving (Eq,Generic)
+
+data Term a = Term {symbol :: a, arguments :: [Term a]}
+  deriving (Eq, Generic, Functor, Foldable)
+
 newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic)
 data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
 
@@ -29,22 +34,18 @@ instance Arbitrary Error where
 instance Show Symbol where
   show (Symbol s ts (Type t)) = s ++ " : " ++ if null ts then t else intercalate " x " (map (\(Type s') -> s') ts) ++ " -> " ++ t
 
-instance Show Term where
+instance Show (Term String) where
   show = transTerm
     where
-      transTerm :: Term -> String
+      transTerm :: Term String -> String
       transTerm (Term x []) = x
       transTerm (Term s xs) = s ++ "(" ++ intercalate "," (map transTerm xs) ++ ")"
-
-foldrTerm :: (String -> b -> b) -> b -> Term -> b
-foldrTerm f x Term { symbol, arguments } =
-  f symbol $ foldr (flip $ foldrTerm f) x arguments
 
 {-|
 The total amount of occurrences of symbols within the given 'Term'.
 -}
-termSize :: Term -> Int
-termSize = foldrTerm (const (+ 1)) 0
+termSize :: Term a -> Int
+termSize = length
 
 instance Show Signature where
   show = show . definitions

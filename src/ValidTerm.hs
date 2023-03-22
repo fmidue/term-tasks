@@ -10,10 +10,10 @@ import Data.List (nub)
 
 data Mode = None | No String | Once String
 
-validTerms :: Signature -> Maybe String -> Int -> Int -> Maybe [Type] -> [Term]
+validTerms :: Signature -> Maybe String -> Int -> Int -> Maybe [Type] -> [Term String]
 validTerms sig symbolOnce a b = nub . arbTerms sig (maybe None Once symbolOnce) a b
 
-arbTerms :: MonadPlus l => Signature -> Mode -> Int -> Int -> Maybe [Type] -> l Term
+arbTerms :: MonadPlus l => Signature -> Mode -> Int -> Int -> Maybe [Type] -> l (Term String)
 arbTerms sig m a b root = do
   let fs = maybe (#definitions sig) (concatMap $ allSameTypes sig) root
   (one,newMode) <- symbolWithModes m fs
@@ -23,7 +23,7 @@ arbTerms sig m a b root = do
   termList <- mapM (\(ml,t,(a',b')) -> arbTerms sig ml a' b' (Just [t])) (zip3 modeList (#arguments one) n')
   return (Term (#symbol one) termList)
 
-oneValidTerm :: Signature -> Maybe String -> Int -> Int -> Maybe [Type] -> Gen (Maybe Term)
+oneValidTerm :: Signature -> Maybe String -> Int -> Int -> Maybe [Type] -> Gen (Maybe (Term String))
 oneValidTerm sig symbolOnce a b root = do
   let terms = validTerms sig symbolOnce a b root
   case terms of

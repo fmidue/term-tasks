@@ -192,13 +192,13 @@ main = hspec $ do
   prop "allTerms generates two list: one for valid one for invalid" $
     forAll (allTerms ["a","b","c","d","e"] [Type "A",Type "B",Type "C",Type "D"] [(1,TypeChange),(1,OneLess)] 4 1 10 5) (\x -> check x && check' x)
 
-check :: (Signature,([Term],[[Term]])) -> Bool
+check :: (Signature,([Term String],[[Term String]])) -> Bool
 check (sig,(ts,_)) = all (isValid sig) ts
 
-check' :: (Signature,([Term],[[Term]])) -> Bool
+check' :: (Signature,([Term String],[[Term String]])) -> Bool
 check' (sig,(_,ts)) = all (\x -> True `notElem` (map (isValid sig) x)) ts
 
-size :: Term -> Int
+size :: Term a -> Int
 size = termSize
 
 between :: Int -> Int -> Int -> Bool
@@ -208,5 +208,5 @@ isOnce :: String -> [String] -> Bool
 isOnce s ls = length (filter (== s) ls) == 1
 
 -- maybe also for terms of a specific type
-termsOfType :: Int -> Type -> Signature -> [Term]
+termsOfType :: Int -> Type -> Signature -> [Term String]
 termsOfType n t sig = sameTypeTerms sig (term n sig) t

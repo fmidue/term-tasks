@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Parser where
 
 
@@ -23,7 +25,7 @@ withSpaces = void . trailSpaces . char
 
 
 
-instance Parse Term where
+instance Parse (Term String) where
   parser = Term <$> trailSpaces (many1 letter) <*> trailSpaces (some <|> pure [])
     where
       some = do

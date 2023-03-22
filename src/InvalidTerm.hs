@@ -124,19 +124,19 @@ newSignature sig TypeChange = oneDiffType sig
 newSignature sig NameTypo = fmap Just (wrongSymbol sig)
 newSignature sig UnknownSymbol = wrongSymbol' sig
 
-originalSymbol :: String -> Term -> Term
+originalSymbol :: String -> Term String -> Term String
 originalSymbol s' (Term s ts)
   | s == s' = Term (init s) (map (originalSymbol s') ts)
   | otherwise = Term s (map (originalSymbol s') ts)
 
-invalidTerms :: Signature -> Int -> Int -> Maybe [Type] -> [(Int,Error)] -> Gen [[Term]]
+invalidTerms :: Signature -> Int -> Int -> Maybe [Type] -> [(Int,Error)] -> Gen [[Term String]]
 invalidTerms sig a b root =
   traverse (\(n,e) ->
                invalidTerms' sig a b root e >>=
                \(terms, _) -> different terms (min n (length terms))
            )
 
-invalidTerms' :: Signature -> Int -> Int -> Maybe [Type] -> Error -> Gen ([Term], String)
+invalidTerms' :: Signature -> Int -> Int -> Maybe [Type] -> Error -> Gen ([Term String], String)
 invalidTerms' sig a b root e = do
     new <- newSignature sig e
     case new of

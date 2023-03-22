@@ -7,5 +7,5 @@ import DataType (Term)
 mathifySignature :: String -> String
 mathifySignature s = replace "->" "\\to" (replace "x" "\\times" s)
 
-itemifyTerm :: (Int, Term) -> String
+itemifyTerm :: (Int, Term String) -> String
 itemifyTerm (i,t) = show i ++ ".\\," ++ show t

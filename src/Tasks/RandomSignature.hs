@@ -8,7 +8,7 @@ import Auxiliary (different)
 import AllTerm (allTerms)
 import Records
 
-task :: Random -> Gen (Signature, [Term], [[Term]])
+task :: Random -> Gen (Signature, [Term String], [[Term String]])
 task Random{symbols, types, maxArgs, baseConf = Base{termSizeRange = (a,b), wrongTerms, properTerms}} = do
     (sig,(correctTerms,incorrectTerms)) <- allTerms symbols (map Type types) wrongTerms maxArgs a b properTerms
     correctTerms' <- different correctTerms properTerms

@@ -82,7 +82,7 @@ dRandom = Random
 
 data SigInstance = SigInstance {
                       symbols :: [Symbol]
-                    , terms :: [Term]
+                    , terms :: [Term String]
                     , correct :: [Int]
                     , moreFeedback :: Bool
                     , showSolution :: Bool
