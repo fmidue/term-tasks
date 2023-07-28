@@ -1,8 +1,10 @@
+{-# LANGUAGE FlexibleContexts #-}
 module TermTasks.Messages where
 
 import Control.Monad.Output (
+  GenericOutputMonad (..),
   LangM,
-  OutputMonad (..),
+  OutputMonad,
   english,
   german,
   translate

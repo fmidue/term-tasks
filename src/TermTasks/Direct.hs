@@ -1,3 +1,4 @@
+{-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE TupleSections, RecordWildCards, FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
@@ -9,8 +10,9 @@ import Data.List (nub, sort, (\\))
 import Control.Applicative (Alternative)
 import Control.Monad (when)
 import Control.Monad.Output (
+  GenericOutputMonad (indent, itemizeM, latex, refuse, text),
   LangM,
-  OutputMonad (indent, itemizeM, latex, refuse, text),
+  OutputMonad,
   Rated,
   continueOrAbort,
   english,
@@ -21,6 +23,7 @@ import Control.Monad.Output (
   translations,
   )
 import Data.Bifunctor (second)
+import Data.Foldable (traverse_)
 import Data.Tuple.Extra (dupe)
 import Test.QuickCheck (Gen, shuffle)
 
@@ -35,12 +38,12 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputMonad m => SigInstance -> LangM m
 description SigInstance{..} = do
   text1
-  indent $ mapM_ (latex . mathifySignature . show) symbols
+  indent $ traverse_ (latex . mathifySignature . show) symbols
   text2
-  indent $ mapM_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
+  indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
   text3
   text4
-
+  pure ()
 
 
 genInst :: MonadFail Gen => Certain -> Gen SigInstance
@@ -66,6 +69,7 @@ verifyInst SigInstance{..}
           english "The following terms are not of at least two symbols:"
           german "Die folgenden Terme bestehen nicht wenigstens aus zwei Symbolen:"
         itemizeM $ map (text . show) nonTrivialTerms
+        pure ()
     | emptyInput =
         refuse $ indent $ translate $ do
           english "At least one of the given lists is empty."
@@ -202,6 +206,8 @@ completeGrade SigInstance {..} sol = do
               english "These incorrect terms are part of your solution: "
               german "Diese Terme aus Ihrer Lösung sind falsch: "
             itemizeM $ map (latex . show) badTerms
+            pure ()
+    pure ()
   let what = translations $ do
         english "terms"
         german "Terme"
@@ -209,7 +215,8 @@ completeGrade SigInstance {..} sol = do
       matching = M.fromAscList $ map
         (second (`elem` correct) . dupe)
         [1 .. length terms]
-  multipleChoice what solution matching sol
+  x <- multipleChoice what solution matching sol
+  pure x
   where
     assert = continueOrAbort showSolution
     wrongAmount = diff /= 0
