@@ -3,7 +3,14 @@
 module TermTasks.Perturbed where
 
 
-import Control.Monad.Output (LangM, OutputMonad(indent, refuse), english, german, translate)
+import Control.Monad.Output (
+  GenericOutputMonad (indent, refuse),
+  LangM,
+  OutputMonad,
+  english,
+  german,
+  translate,
+  )
 import Data.List (elemIndex, nub, sortOn)
 import Data.List.Extra (nubOrd)
 import Data.Maybe (fromJust)
