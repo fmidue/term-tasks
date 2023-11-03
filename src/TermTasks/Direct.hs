@@ -201,7 +201,7 @@ completeGrade SigInstance {..} sol = do
       translate $ do
         english "Your solution is correct?"
         german "Ihre Lösung ist richtig?"
-    when (wrongSolution && moreFeedback) $ indent $ do
+    when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
             translate $ do
               english "These incorrect terms are part of your solution: "
               german "Diese Terme aus Ihrer Lösung sind falsch: "
