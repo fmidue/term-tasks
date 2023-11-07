@@ -10,7 +10,7 @@ import Data.List (nub, sort, (\\))
 import Control.Applicative (Alternative)
 import Control.Monad (when)
 import Control.Monad.Output (
-  GenericOutputMonad (indent, itemizeM, latex, refuse, text),
+  GenericOutputMonad (indent, itemizeM, latex, refuse, text, paragraph),
   LangM,
   OutputMonad,
   Rated,
@@ -63,7 +63,7 @@ verifyInst SigInstance{..}
     | notInRange =
         refuse $ indent $ translate $ do
           english "At least one of the solution indices does not exist."
-          german "Mindestens eine der Lösungsindices existiert nicht."
+          german "Mindestens einer der Lösungsindizes existiert nicht."
     | not $ null nonTrivialTerms = refuse $ do
         translate $ do
           english "The following terms are not of at least two symbols:"
@@ -170,7 +170,7 @@ partialGrade SigInstance{..} sol
     | invalidIndex =
         refuse $ indent $ translate $ do
           english "At least one index in the list does not exist."
-          german "Mindestens einer der Indices existiert nicht."
+          german "Mindestens einer der Indizes existiert nicht."
     | otherwise = pure ()
   where
     nubSol = nub sol
@@ -185,7 +185,7 @@ completeGrade SigInstance {..} sol = do
   recoverFrom $ assert (not wrongAmount) $
     translate $ do
       english "The amount of indices is correct?"
-      german "Die Anzahl der Indices ist richtig?"
+      german "Die Anzahl der Indizes ist richtig?"
   when (wrongAmount && moreFeedback) $
             if diff > 0
               then
@@ -215,6 +215,7 @@ completeGrade SigInstance {..} sol = do
       matching = M.fromAscList $ map
         (second (`elem` correct) . dupe)
         [1 .. length terms]
+  paragraph (text "")
   x <- multipleChoice what solution matching sol
   pure x
   where
@@ -225,7 +226,7 @@ completeGrade SigInstance {..} sol = do
     (eng, ger) =
       if abs diff == 1
       then (" index."," Index")
-      else (" indices."," Indices")
+      else (" indices."," Indizes")
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
     badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
