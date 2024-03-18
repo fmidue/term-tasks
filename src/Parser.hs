@@ -40,8 +40,8 @@ instance Parse Symbol where
   parser = do
       symb <- trailSpaces $ many1 letter
       withSpaces ':'
-      next <- sepBy1 (trailSpaces $ many1 letter) (withSpaces 'x')
-      let noArgs = Symbol symb [] (Type $ head next)
+      next@(t:_) <- sepBy1 (trailSpaces $ many1 letter) (withSpaces 'x')
+      let noArgs = Symbol symb [] (Type t)
           args = do
             void $ trailSpaces $ string "->"
             res <- trailSpaces $ many1 letter

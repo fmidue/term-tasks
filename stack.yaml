@@ -5,6 +5,6 @@ packages:
 extra-deps:
 
   - git: https://github.com/fmidue/output-monad.git
-    commit: a0758bd19e830d8c3f6e5898a07b3dbf57ad013c
+    commit: 1f3edf2cd4a13ca6cb62e24a57f6da66ef6894d0
     subdirs:
       - output-monad
