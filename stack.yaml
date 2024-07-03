@@ -4,7 +4,7 @@ packages:
   - .
 extra-deps:
 
-  - git: https://github.com/fmidue/output-monad.git
-    commit: 1f3edf2cd4a13ca6cb62e24a57f6da66ef6894d0
+  - git: https://github.com/fmidue/output-blocks.git
+    commit: f2418656472b9c32bde06ec3b916fe6d749d0290
     subdirs:
-      - output-monad
+      - output-blocks
