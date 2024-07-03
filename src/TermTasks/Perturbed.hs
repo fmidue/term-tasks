@@ -3,10 +3,10 @@
 module TermTasks.Perturbed where
 
 
-import Control.Monad.Output (
-  GenericOutputMonad (indent, refuse),
+import Control.OutputCapable.Blocks (
+  GenericOutputCapable (indent, refuse),
   LangM,
-  OutputMonad,
+  OutputCapable,
   english,
   german,
   translate,
@@ -42,7 +42,7 @@ perturbConfig Perturbed { symbols, types, sigs, root, baseConf } = do
   genInst $ Certain {signatures = Signature sigs', root = map remapTypes <$> root, baseConf}
 
 
-verifyPerturbed :: OutputMonad m => Perturbed -> LangM m
+verifyPerturbed :: OutputCapable m => Perturbed -> LangM m
 verifyPerturbed Perturbed{..}
      | emptyInput =
         refuse $ indent $ translate $ do

@@ -9,10 +9,11 @@ import qualified Data.Map                         as M (fromAscList)
 import Data.List (nub, sort, (\\))
 import Control.Applicative (Alternative)
 import Control.Monad (when)
-import Control.Monad.Output (
-  GenericOutputMonad (indent, itemizeM, latex, refuse, text, paragraph),
+import Control.OutputCapable.Blocks (
+  ArticleToUse (DefiniteArticle),
+  GenericOutputCapable (indent, itemizeM, latex, refuse, text, paragraph),
   LangM,
-  OutputMonad,
+  OutputCapable,
   Rated,
   continueOrAbort,
   english,
@@ -35,7 +36,7 @@ import qualified Tasks.CertainSignature as CertainSignature
 
 
 
-description :: OutputMonad m => SigInstance -> LangM m
+description :: OutputCapable m => SigInstance -> LangM m
 description SigInstance{..} = do
   text1
   indent $ traverse_ (latex . mathifySignature . show) symbols
@@ -58,7 +59,7 @@ genInst c@Certain{..} = do
   return $ SigInstance { symbols, terms, correct, moreFeedback, showSolution }
 
 
-verifyInst :: OutputMonad m => SigInstance -> LangM m
+verifyInst :: OutputCapable m => SigInstance -> LangM m
 verifyInst SigInstance{..}
     | notInRange =
         refuse $ indent $ translate $ do
@@ -89,7 +90,7 @@ verifyInst SigInstance{..}
 
 
 
-verifyCertain :: OutputMonad m => Certain -> LangM m
+verifyCertain :: OutputCapable m => Certain -> LangM m
 verifyCertain Certain{..}
     | doubleDef =
         refuse $ indent $ translate $ do
@@ -128,7 +129,7 @@ verifyCertain Certain{..}
 
 
 
-verifyBase :: OutputMonad m => Base -> LangM m
+verifyBase :: OutputCapable m => Base -> LangM m
 verifyBase Base{..}
     | negativeAmounts =
         refuse $ indent $ translate $ do
@@ -165,7 +166,7 @@ start = []
 
 
 
-partialGrade :: OutputMonad m => SigInstance -> [Int] -> LangM m
+partialGrade :: OutputCapable m => SigInstance -> [Int] -> LangM m
 partialGrade SigInstance{..} sol
     | invalidIndex =
         refuse $ indent $ translate $ do
@@ -177,7 +178,7 @@ partialGrade SigInstance{..} sol
     invalidIndex = any (`notElem` [1 .. length terms]) nubSol
 
 completeGrade
-  :: (Alternative m, OutputMonad m)
+  :: (Alternative m, OutputCapable m)
   => SigInstance
   -> [Int]
   -> Rated m
@@ -216,7 +217,7 @@ completeGrade SigInstance {..} sol = do
         (second (`elem` correct) . dupe)
         [1 .. length terms]
   paragraph (text "")
-  x <- multipleChoice what solution matching sol
+  x <- multipleChoice DefiniteArticle what solution matching sol
   pure x
   where
     assert = continueOrAbort showSolution
