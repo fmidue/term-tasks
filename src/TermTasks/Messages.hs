@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ApplicativeDo #-}
 module TermTasks.Messages where
 
 import Control.OutputCapable.Blocks (
@@ -23,11 +24,11 @@ text2 = paragraph $ translate $ do
     english "Decide for the following terms whether or not they are correct according to the declarations given above:"
 
 text3 :: OutputCapable m => LangM m
-text3 = paragraph $ translate $ do
+text3 = do
+  paragraph $ translate $ do
     german "Bitte geben Sie Ihre Antwort in Form einer Liste von Zahlen an, die alle korrekten Terme enthält."
     english "Please state your answer by giving a list of numbers, indicating all correct terms."
-
-text4 :: OutputCapable m => LangM m
-text4 = paragraph $ translate $ do
+  paragraph $ translate $ do
     german "Zum Beispiel [1, 2] würde bedeuten, dass nur die Terme 1. und 2. von den angegebenen korrekt sind."
     english "For example, [1, 2] would indicate that only terms 1. and 2. of the given ones are correct."
+  pure ()
