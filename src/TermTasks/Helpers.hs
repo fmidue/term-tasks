@@ -16,4 +16,4 @@ mathifySignature s = open
     withMathit snip = close ++ snip ++ open
 
 itemifyTerm :: (Int, Term String) -> String
-itemifyTerm (i,t) = show i ++ ".\\," ++ show t
+itemifyTerm (i,t) = show i ++ ".\\," ++ "\\mathit{" ++ show t ++ "}"
