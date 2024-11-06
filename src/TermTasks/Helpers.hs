@@ -5,7 +5,15 @@ import DataType (Term)
 
 
 mathifySignature :: String -> String
-mathifySignature s = replace "->" "\\to" (replace "x" "\\times" s)
+mathifySignature s = open
+  ++ replace " : " (withMathit " : ")
+      (replace " -> " (withMathit " \\to ") $
+        replace " x " (withMathit " \\times ") s)
+  ++ close
+  where
+    open = "\\mathit{"
+    close = "}"
+    withMathit snip = close ++ snip ++ open
 
 itemifyTerm :: (Int, Term String) -> String
 itemifyTerm (i,t) = show i ++ ".\\," ++ show t
