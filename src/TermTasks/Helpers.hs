@@ -1,4 +1,8 @@
-module TermTasks.Helpers where
+module TermTasks.Helpers (
+  mathifySignature,
+  itemifyTerm,
+  inMathit,
+  ) where
 
 import Data.List.Extra (replace)
 import DataType (Term)
@@ -6,14 +10,21 @@ import DataType (Term)
 
 mathifySignature :: String -> String
 mathifySignature s = open
-  ++ replace " : " (withMathit " : ")
-      (replace " -> " (withMathit " \\to ") $
-        replace " x " (withMathit " \\times ") s)
+  ++ replace " : " (around " : ")
+      (replace " -> " (around " \\to ") $
+        replace " x " (around " \\times ") s)
   ++ close
   where
-    open = "\\mathit{"
-    close = "}"
-    withMathit snip = close ++ snip ++ open
+    around snip = close ++ snip ++ open
 
 itemifyTerm :: (Int, Term String) -> String
-itemifyTerm (i,t) = show i ++ ".\\," ++ "\\mathit{" ++ show t ++ "}"
+itemifyTerm (i,t) = show i ++ ".\\," ++ inMathit t
+
+inMathit :: Show a => a -> String
+inMathit a = open ++ show a ++ close
+
+open :: String
+open = "\\mathit{"
+
+close :: String
+close = "}"
