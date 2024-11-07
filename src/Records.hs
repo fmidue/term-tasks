@@ -1,7 +1,9 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Records where
 
+import Data.Data (Data)
 import Data.Typeable
 import GHC.Generics
 
@@ -86,7 +88,7 @@ data SigInstance = SigInstance {
                     , correct :: [Int]
                     , moreFeedback :: Bool
                     , showSolution :: Bool
-                    } deriving (Typeable, Generic)
+                    } deriving (Typeable, Generic, Data)
 
 dSigInst :: SigInstance
 dSigInst = SigInstance {
