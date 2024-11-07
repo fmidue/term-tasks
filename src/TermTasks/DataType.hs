@@ -1,8 +1,8 @@
 module TermTasks.DataType
        (
          Error(..)
-       , Signature
-       , Symbol
+       , Signature(..)
+       , Symbol(..)
        , Term(..)
        , Type(..)
        , toSignature

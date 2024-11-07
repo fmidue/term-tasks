@@ -3,6 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# language DeriveDataTypeable #-}
 {-# language DeriveGeneric #-}
 {-# language DeriveFunctor #-}
 {-# language DeriveFoldable #-}
@@ -12,20 +13,21 @@ module DataType where
 import GHC.Generics
 import GHC.OverloadedLabels
 import GHC.Records
+import Data.Data (Data)
 import Data.List (nub,intercalate)
 import Test.QuickCheck (Arbitrary(..), elements)
 
 
-newtype Type = Type {name :: String}   deriving (Eq,Generic)
+newtype Type = Type {name :: String}   deriving (Eq,Data,Generic)
 
 data Term a = Term {symbol :: a, arguments :: [Term a]}
-  deriving (Eq, Generic, Functor, Foldable)
+  deriving (Eq, Data, Generic, Functor, Foldable)
 
 newtype Signature = Signature { definitions :: [Symbol]}  deriving (Generic)
-data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving Generic
+data Symbol = Symbol {symbol :: String, arguments :: [Type], result :: Type} deriving (Data, Generic)
 
 data Error = Swap | TypeChange | OneMore | OneLess | NameTypo | UnknownSymbol
-  deriving (Eq, Ord, Show, Read, Bounded, Enum, Generic)
+  deriving (Eq, Ord, Show, Read, Bounded, Enum, Data, Generic)
 
 instance Arbitrary Error where
   arbitrary = elements [minBound .. maxBound]

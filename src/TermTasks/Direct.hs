@@ -205,7 +205,7 @@ completeGrade SigInstance {..} sol = do
             translate $ do
               english "These incorrect terms are part of your solution: "
               german "Diese Terme aus Ihrer Lösung sind falsch: "
-            itemizeM $ map (latex . show) badTerms
+            itemizeM $ map (latex . inMathit) badTerms
             pure ()
     pure ()
   let what = translations $ do
