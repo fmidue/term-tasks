@@ -18,7 +18,7 @@ mathifySignature s = wrapDollar $ open
     around snip = close ++ snip ++ open
 
 itemifyTerm :: (Int, Term String) -> String
-itemifyTerm (i,t) = show i ++ ".\\," ++ inMathit t
+itemifyTerm (i,t) = show i ++ ". " ++ inMathit t
 
 inMathit :: Show a => a -> String
 inMathit a = wrapDollar $ open ++ show a ++ close
