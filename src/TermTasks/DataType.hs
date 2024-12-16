@@ -5,9 +5,11 @@ module TermTasks.DataType
        , Symbol(..)
        , Term(..)
        , Type(..)
+       , inMathit
        , toSignature
        ) where
 
 
 
 import DataType
+import TermTasks.Helpers (inMathit)
