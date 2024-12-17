@@ -11,7 +11,7 @@ import Control.Applicative (Alternative)
 import Control.Monad (when)
 import Control.OutputCapable.Blocks (
   ArticleToUse (DefiniteArticle),
-  GenericOutputCapable (indent, itemizeM, refuse, text, paragraph),
+  GenericOutputCapable (indent, itemizeM, latex, refuse, text, paragraph),
   LangM,
   OutputCapable,
   Rated,
@@ -39,9 +39,9 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputCapable m => Bool -> SigInstance -> LangM m
 description withInputHelp SigInstance{..} = do
   text1
-  indent $ traverse_ (text . mathifySignature . show) symbols
+  indent $ traverse_ (latex . mathifySignature . show) symbols
   text2
-  indent $ traverse_ (text . itemifyTerm) $ zip [1 :: Int ..] terms
+  indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
   when withInputHelp text3
   pure ()
 
@@ -205,7 +205,7 @@ completeGrade SigInstance {..} sol = do
             translate $ do
               english "These incorrect terms are part of your solution: "
               german "Diese Terme aus Ihrer Lösung sind falsch: "
-            itemizeM $ map (text . inMathit) badTerms
+            itemizeM $ map (latex . inMathit) badTerms
             pure ()
     pure ()
   let what = translations $ do
