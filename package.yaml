@@ -9,6 +9,7 @@ dependencies:
   - extra
   - parsec
   - output-blocks >= 0.2
+  - mtl
 default-extensions:
   - DuplicateRecordFields
   - OverloadedLabels

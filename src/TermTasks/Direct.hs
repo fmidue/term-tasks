@@ -43,6 +43,7 @@ description withInputHelp SigInstance{..} = do
   text2
   indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
   when withInputHelp text3
+  extra addText
   pure ()
 
 
@@ -55,7 +56,8 @@ genInst c@Certain{..} = do
       correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
       moreFeedback = extraFeedback baseConf
       showSolution = printSolution baseConf
-  return $ SigInstance { symbols, terms, correct, moreFeedback, showSolution }
+      addText = extraText baseConf
+  return $ SigInstance { symbols, terms, correct, moreFeedback, showSolution, addText }
 
 
 verifyInst :: OutputCapable m => SigInstance -> LangM m
