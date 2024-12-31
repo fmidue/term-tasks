@@ -1,14 +1,18 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Records where
 
 import Data.Data (Data)
+import Data.Map (Map)
 import Data.Typeable
 import GHC.Generics
+import Control.OutputCapable.Blocks (Language(..))
 
 import DataType (Error(..), Signature, Symbol(..), Term(..), Type(..), toSignature)
 
+deriving instance Data Language
 
 
 data Base = Base
@@ -17,6 +21,7 @@ data Base = Base
             , properTerms :: Int
             , extraFeedback :: Bool
             , printSolution :: Bool
+            , extraText :: Maybe (Map Language String)
             } deriving (Typeable, Generic)
 
 dBase :: Base
@@ -26,6 +31,7 @@ dBase = Base
         , properTerms = 5
         , extraFeedback = False
         , printSolution = False
+        , extraText = Nothing
         }
 
 
@@ -88,6 +94,7 @@ data SigInstance = SigInstance {
                     , correct :: [Int]
                     , moreFeedback :: Bool
                     , showSolution :: Bool
+                    , addText :: Maybe (Map Language String)
                     } deriving (Typeable, Generic, Data)
 
 dSigInst :: SigInstance
@@ -97,4 +104,5 @@ dSigInst = SigInstance {
             , correct = [1]
             , moreFeedback = False
             , showSolution = False
+            , addText = Nothing
             }
