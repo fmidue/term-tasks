@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE StandaloneDeriving #-}
 
 module Records where
 
@@ -11,8 +10,6 @@ import GHC.Generics
 import Control.OutputCapable.Blocks (Language(..))
 
 import DataType (Error(..), Signature, Symbol(..), Term(..), Type(..), toSignature)
-
-deriving instance Data Language
 
 
 data Base = Base
