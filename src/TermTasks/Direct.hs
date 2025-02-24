@@ -47,9 +47,10 @@ description withInputHelp SigInstance{..} = do
   pure ()
 
 
-genInst :: MonadFail Gen => Certain -> Gen SigInstance
+genInst :: Certain -> Gen SigInstance
 genInst c@Certain{..} = do
-  (False, correctTerms, incorrectTerms) <- CertainSignature.task c
+  (properTermsParameterGreaterThanLengthOfCorrectTerms, correctTerms, incorrectTerms) <- CertainSignature.task c
+  when properTermsParameterGreaterThanLengthOfCorrectTerms $ error "Task generator failed to satisfy configured options!"
   (correctness, terms) <- fmap unzip $ shuffle
     $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
   let Signature symbols = signatures

@@ -22,7 +22,7 @@ import Records (Certain(..), Perturbed(..), SigInstance)
 
 
 
-perturbConfig :: MonadFail Gen => Perturbed -> Gen SigInstance
+perturbConfig :: Perturbed -> Gen SigInstance
 perturbConfig Perturbed { symbols, types, sigs, root, baseConf } = do
   theSymbols <- shuffle [1 .. length symbols]
   let remapSymbols s = fromJust (lookup s (zip theSymbols symbols))
