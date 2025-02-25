@@ -26,3 +26,4 @@ scanl
 snd
 uncurry
 workflow
+workflows
