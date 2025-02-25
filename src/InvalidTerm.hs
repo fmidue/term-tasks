@@ -57,29 +57,21 @@ oneMoreArg sig@(Signature fs) = do
     return (Signature (newFs : fs), newSym)
 
 oneLessArg :: Signature -> Gen (Maybe (Signature, String))
-oneLessArg (Signature fs) = do
-    let available = filter (not . null . #arguments) fs
-    if null available
-    then return Nothing
-    else do
-        Symbol{symbol, arguments, result} <- elements available
-        position <- chooseInt (0, length arguments - 1)
-        let newArg = [ t | (i, t) <- zip [0..] arguments, i /= position ]
-            newSym = newSymbol symbol
-            newFs = Symbol newSym newArg result
-        return (Just (Signature (newFs : fs), newSym))
+oneLessArg (Signature fs) = withNonConstants fs $ \available -> do
+    Symbol{symbol, arguments, result} <- elements available
+    position <- chooseInt (0, length arguments - 1)
+    let newArg = [ t | (i, t) <- zip [0..] arguments, i /= position ]
+        newSym = newSymbol symbol
+        newFs = Symbol newSym newArg result
+    return (Just (Signature (newFs : fs), newSym))
 
 oneDiffType :: Signature -> Gen (Maybe (Signature, String))
-oneDiffType sig@(Signature fs) = do
-    let available = filter (not . null . #arguments) fs
-    if null available
-    then return Nothing
-    else do
-        Symbol{symbol, arguments, result} <- elements available
-        position <- chooseInt (0, length arguments - 1)
-        let types = allTypes sig
-            newList = delete (arguments !! position) types
-        if null newList
+oneDiffType sig@(Signature fs) = withNonConstants fs $ \available -> do
+    Symbol{symbol, arguments, result} <- elements available
+    position <- chooseInt (0, length arguments - 1)
+    let types = allTypes sig
+        newList = delete (arguments !! position) types
+    if null newList
         then return Nothing
         else do
             t' <- elements newList
@@ -87,6 +79,13 @@ oneDiffType sig@(Signature fs) = do
                 newSym = newSymbol symbol
                 newFs = Symbol newSym newArg result
             return (Just (Signature (newFs : fs), newSym))
+
+withNonConstants :: [Symbol] -> ([Symbol] -> Gen (Maybe (Signature, String))) -> Gen (Maybe (Signature, String))
+withNonConstants fs gen = do
+  let available = filter (not . null . #arguments) fs
+  if null available
+    then return Nothing
+    else gen available
 
 wrongSymbol :: Signature -> Gen (Signature, String)
 wrongSymbol (Signature fs) = do

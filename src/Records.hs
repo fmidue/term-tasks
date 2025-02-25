@@ -42,7 +42,14 @@ data Certain = Certain {
 
 dCertain :: Certain
 dCertain = Certain
-           { signatures = toSignature [("d",[],"R"),("e",[],"S"),("f",[],"T"),("g",["R","R"],"S"),("h",["R","S"],"T"),("i",["R","S","T"],"U")]
+           { signatures = toSignature [
+               ("d",[],"R")
+             , ("e",[],"S")
+             , ("f",[],"T")
+             , ("g",["R","R"],"S")
+             , ("h",["R","S"],"T")
+             , ("i",["R","S","T"],"U")
+             ]
            , root = Nothing
            , baseConf = dBase
            }
@@ -52,7 +59,7 @@ dCertain = Certain
 data Perturbed = Perturbed {
                  symbols :: [String]
                , types :: [String]
-               , sigs :: [([Int],Int)]
+               , signatures :: [([Int],Int)]
                , root :: Maybe [Int]
                , baseConf :: Base
                } deriving (Typeable, Generic)
@@ -61,7 +68,7 @@ dPerturbed :: Perturbed
 dPerturbed = Perturbed
            { symbols = ["d","e","f","g","h","i"]
            , types = ["R","S","T","U"]
-           , sigs = [ ([],1), ([],2), ([],3), ([1,1],2), ([1,2],3), ([1,2,3],4) ]
+           , signatures = [ ([],1), ([],2), ([],3), ([1,1],2), ([1,2],3), ([1,2,3],4) ]
            , root = Nothing
            , baseConf = dBase
            }

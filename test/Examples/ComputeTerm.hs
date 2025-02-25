@@ -23,5 +23,5 @@ subTerms :: Int -> Signature -> [Term String] -> [Term String]
 subTerms n sig w = if null (getAllT \\ w) || length getAllT >= n
                       then getAllT
                       else subTerms n sig (w ++ (getAllT \\ w))
-                         where func = allFunctions sig
-                               getAllT = theTerms sig func w
+                         where functions = allFunctions sig
+                               getAllT = theTerms sig functions w

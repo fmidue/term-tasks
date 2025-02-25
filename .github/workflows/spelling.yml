@@ -29,6 +29,8 @@ on:
   issue_comment:
     types: [created]
 
+permissions: read-all
+
 jobs:
   spelling:
     name: Check Spelling
@@ -47,7 +49,7 @@ jobs:
     steps:
       - name: check-spelling
         id: spelling
-        uses: check-spelling/check-spelling@v0.0.20
+        uses: check-spelling/check-spelling@prerelease
         with:
           suppress_push_for_open_pull_request: 1
           checkout: true
@@ -60,6 +62,14 @@ jobs:
             cspell:software-terms/softwareTerms.txt
             cspell:companies/companies.txt
             cspell:haskell/haskell.txt
+            cspell:de_DE/src/German_de_DE.dic
+            cspell:de_DE/src/hunspell/index.dic
+          ignore-pattern: '[^\p{Ll}\p{Lm}\p{Lt}\p{Lu}]'
+          upper-pattern: '[\p{Lu}\p{Lt}\p{Lm}]'
+          lower-pattern: '[\p{Ll}\p{Lm}]'
+          not-lower-pattern: '[^\p{Ll}\p{Lm}]'
+          not-upper-or-lower-pattern: '[^\p{Lu}\p{Lt}\p{Lm}]'
+          punctuation-pattern: "'"
 
   comment:
     name: Report
@@ -71,7 +81,7 @@ jobs:
     if: (success() || failure()) && needs.spelling.outputs.followup
     steps:
       - name: comment
-        uses: check-spelling/check-spelling@v0.0.20
+        uses: check-spelling/check-spelling@prerelease
         with:
           checkout: true
           spell_check_this: check-spelling/spell-check-this@prerelease
@@ -85,16 +95,16 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     if: ${{
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request &&
-        contains(github.event.comment.body, '@check-spelling-bot apply')
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@check-spelling-bot apply')
       }}
     concurrency:
       group: spelling-update-${{ github.event.issue.number }}
       cancel-in-progress: false
     steps:
       - name: apply spelling updates
-        uses: check-spelling/check-spelling@v0.0.20
+        uses: check-spelling/check-spelling@prerelease
         with:
           experimental_apply_changes_via_bot: 1
           checkout: true

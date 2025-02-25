@@ -139,7 +139,7 @@ verifyBase Base{..}
           german "Mindestens eine Anzahl wurde als negative Zahl angegeben."
     | fst termSizeRange < 2 = refuse $ translate $ do
         english "The minimum of 'termSizeRange' has to be at least two."
-        german "Das Mimimum der 'termSizeRange' muss mindestens zwei betragen."
+        german "Das Minimum der 'termSizeRange' muss mindestens zwei betragen."
 
     | invalidInterval =
         refuse $ indent $ translate $ do
@@ -149,8 +149,12 @@ verifyBase Base{..}
 
     | duplicateError =
         refuse $ indent $ translate $ do
-          english "At least one error has been entered multiple times with different quantities. (may induce duplicate terms in task)"
-          german "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. (kann in doppelten Termen in der Aufgabe resultieren)"
+          english $
+            "At least one error has been entered multiple times with different quantities. " ++
+            "(may induce duplicate terms in task)"
+          german $
+            "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. " ++
+            "(kann in doppelten Termen in der Aufgabe resultieren)"
 
 
     | otherwise = pure()
