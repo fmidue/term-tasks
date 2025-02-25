@@ -1,4 +1,4 @@
-{-# LANGUAGE NamedFieldPuns, TupleSections, FlexibleContexts, RecordWildCards #-}
+{-# LANGUAGE NamedFieldPuns, FlexibleContexts, RecordWildCards #-}
 
 module TermTasks.Perturbed where
 
