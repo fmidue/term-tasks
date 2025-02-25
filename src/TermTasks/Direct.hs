@@ -139,7 +139,7 @@ verifyBase Base{..}
           german "Mindestens eine Anzahl wurde als negative Zahl angegeben."
     | fst termSizeRange < 2 = refuse $ translate $ do
         english "The minimum of 'termSizeRange' has to be at least two."
-        german "Das Mimimum der 'termSizeRange' muss mindestens zwei betragen."
+        german "Das Minimum der 'termSizeRange' muss mindestens zwei betragen."
 
     | invalidInterval =
         refuse $ indent $ translate $ do

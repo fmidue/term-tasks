@@ -23,12 +23,12 @@ import Records (Certain(..), Perturbed(..), SigInstance)
 
 
 perturbConfig :: Perturbed -> Gen SigInstance
-perturbConfig Perturbed { symbols, types, sigs, root, baseConf } = do
+perturbConfig Perturbed { symbols, types, signatures, root, baseConf } = do
   theSymbols <- shuffle [1 .. length symbols]
   let remapSymbols s = fromJust (lookup s (zip theSymbols symbols))
   theTypes <- shuffle [1 .. length types]
   let remapTypes t = Type $ fromJust (lookup t (zip theTypes types))
-  sigs' <- map snd . sortOn fst <$>
+  signatures' <- map snd . sortOn fst <$>
     mapM (\(symbol, (arguments, result)) ->
             shuffle arguments
             >>= \arguments' ->
@@ -39,8 +39,8 @@ perturbConfig Perturbed { symbols, types, sigs, root, baseConf } = do
                         , result = remapTypes result }
                  )
          )
-    (zip [1..] sigs)
-  genInst $ Certain {signatures = Signature sigs', root = map remapTypes <$> root, baseConf}
+    (zip [1..] signatures)
+  genInst $ Certain {signatures = Signature signatures', root = map remapTypes <$> root, baseConf}
 
 
 verifyPerturbed :: OutputCapable m => Perturbed -> LangM m
@@ -76,8 +76,8 @@ verifyPerturbed Perturbed{..}
 
     | otherwise = verifyBase baseConf
   where
-    usedTypes = nubOrd $ concatMap fst sigs
-    usedResults = nubOrd $ map snd sigs
+    usedTypes = nubOrd $ concatMap fst signatures
+    usedResults = nubOrd $ map snd signatures
 
     emptyInput = null symbols || null types
     doubledSymbols = nub symbols /= symbols
