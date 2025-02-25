@@ -33,10 +33,11 @@ perturbConfig Perturbed { symbols, types, sigs, root, baseConf } = do
             shuffle arguments
             >>= \arguments' ->
               let symbol' = remapSymbols symbol
-              in return $ (elemIndex symbol' symbols ,) $
+              in return (elemIndex symbol' symbols ,
                  Symbol { symbol = symbol'
                         , arguments = map remapTypes arguments'
                         , result = remapTypes result }
+                 )
          )
     (zip [1..] sigs)
   genInst $ Certain {signatures = Signature sigs', root = map remapTypes <$> root, baseConf}
