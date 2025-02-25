@@ -56,13 +56,6 @@ oneMoreArg sig@(Signature fs) = do
         newFs = Symbol newSym newArg result
     return (Signature (newFs : fs), newSym)
 
-withNonConstants :: [Symbol] -> ([Symbol] -> Gen (Maybe (Signature, String))) -> Gen (Maybe (Signature, String))
-withNonConstants fs gen = do
-  let available = filter (not . null . #arguments) fs
-  if null available
-    then return Nothing
-    else gen available
-
 oneLessArg :: Signature -> Gen (Maybe (Signature, String))
 oneLessArg (Signature fs) = withNonConstants fs $ \available -> do
     Symbol{symbol, arguments, result} <- elements available
@@ -86,6 +79,13 @@ oneDiffType sig@(Signature fs) = withNonConstants fs $ \available -> do
                 newSym = newSymbol symbol
                 newFs = Symbol newSym newArg result
             return (Just (Signature (newFs : fs), newSym))
+
+withNonConstants :: [Symbol] -> ([Symbol] -> Gen (Maybe (Signature, String))) -> Gen (Maybe (Signature, String))
+withNonConstants fs gen = do
+  let available = filter (not . null . #arguments) fs
+  if null available
+    then return Nothing
+    else gen available
 
 wrongSymbol :: Signature -> Gen (Signature, String)
 wrongSymbol (Signature fs) = do
