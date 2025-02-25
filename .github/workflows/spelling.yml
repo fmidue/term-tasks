@@ -25,7 +25,7 @@ name: Check Spelling
 
 on:
   push:
-    branches: [main, workflows]
+    branches: [main]
   issue_comment:
     types: [created]
 

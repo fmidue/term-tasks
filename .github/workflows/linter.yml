@@ -3,7 +3,7 @@ name: Super-Linter
 
 on:
   push:
-    branches: [main, workflows]
+    branches: [main]
 
 permissions: read-all
 
