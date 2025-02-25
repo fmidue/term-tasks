@@ -1,6 +1,6 @@
 ---
 name: term-tasks
-extra-source-files: []
+extra-source-files: [ ]
 dependencies:
   - base
   - containers
@@ -39,4 +39,3 @@ tests:
     dependencies:
       - term-tasks
       - hspec
-

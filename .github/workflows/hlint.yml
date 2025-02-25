@@ -26,4 +26,3 @@ jobs:
         with:
           path: '["src/", "test/"]'
           fail-on: suggestion
-
