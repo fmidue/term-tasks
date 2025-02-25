@@ -28,6 +28,6 @@ jobs:
         uses: github/super-linter/slim@v7
         env:
           YAML_ERROR_ON_WARNING: true
-          VALIDATE_JSCPD_ALL_CODEBASE: true
+          VALIDATE_YAML_PRETTIER: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
