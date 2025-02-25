@@ -5,6 +5,8 @@ on:
   push:
     branches: [main, workflows]
 
+permissions: read-all
+
 jobs:
   build:
     name: Lint Code Base
