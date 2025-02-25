@@ -42,7 +42,14 @@ data Certain = Certain {
 
 dCertain :: Certain
 dCertain = Certain
-           { signatures = toSignature [("d",[],"R"),("e",[],"S"),("f",[],"T"),("g",["R","R"],"S"),("h",["R","S"],"T"),("i",["R","S","T"],"U")]
+           { signatures = toSignature [
+               ("d",[],"R")
+             , ("e",[],"S")
+             , ("f",[],"T")
+             , ("g",["R","R"],"S")
+             , ("h",["R","S"],"T")
+             , ("i",["R","S","T"],"U")
+             ]
            , root = Nothing
            , baseConf = dBase
            }

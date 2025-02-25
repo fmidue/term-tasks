@@ -56,8 +56,9 @@ instance Parse Signature where
 
 
 instance Parse a => Parse [a] where
-  parser = (trailSpaces listParse <?> "List")
-           <|> fail "Could not parse a list of values: The elements of a list are enclosed by square brackets '[ ]' and separated by commas."
+  parser = (trailSpaces listParse <?> "List") <|> fail (
+      "Could not parse a list of values: " ++
+      "The elements of a list are enclosed by square brackets '[ ]' and separated by commas.")
     where
       listParse = do
         withSpaces '[' <|> fail "could not parse an opening '['"

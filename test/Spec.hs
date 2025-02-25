@@ -178,19 +178,22 @@ main = hspec $ do
     forAll (invalidTerms signature6 1 10 Nothing [(3,NameTypo), (3,Swap)] >>= elements) (\x -> True `notElem` map (isValid signature6) x)
 
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["x","y","z","f","g","h"] [Type "A",Type "B",Type "C",Type "D"] [(1,TypeChange),(1,OneLess)] 4 1 10 5) (\x -> check x && check' x)
+    generatesBoth (allTerms ["x","y","z","f","g","h"] [Type "A",Type "B",Type "C",Type "D"] [(1,TypeChange),(1,OneLess)] 4 1 10 5)
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["x","y","z","f","g","h"] [Type "A",Type "B",Type "C",Type "D"] [(3,NameTypo),(3,Swap)] 5 1 10 10) (\x -> check x && check' x)
+    generatesBoth (allTerms ["x","y","z","f","g","h"] [Type "A",Type "B",Type "C",Type "D"] [(3,NameTypo),(3,Swap)] 5 1 10 10)
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["x","y","z","f","g","h"] [Type "A",Type "B",Type "C",Type "D"] [(1,NameTypo),(3,UnknownSymbol)] 4 1 10 5) (\x -> check x && check' x)
+    generatesBoth (allTerms ["x","y","z","f","g","h"] [Type "A",Type "B",Type "C",Type "D"] [(1,NameTypo),(3,UnknownSymbol)] 4 1 10 5)
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["a","b","c","d","e","f"] [Type "A",Type "B",Type "C"] [(1,TypeChange),(1,OneLess)] 4 1 10 5) (\x -> check x && check' x)
+    generatesBoth (allTerms ["a","b","c","d","e","f"] [Type "A",Type "B",Type "C"] [(1,TypeChange),(1,OneLess)] 4 1 10 5)
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["a","b","c","d","e","f"] [Type "A",Type "B",Type "C",Type "D"] [(3,NameTypo),(3,Swap)] 6 1 10 10) (\x -> check x && check' x)
+    generatesBoth (allTerms ["a","b","c","d","e","f"] [Type "A",Type "B",Type "C",Type "D"] [(3,NameTypo),(3,Swap)] 6 1 10 10)
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["a","b","c","d","e","f"] [Type "A",Type "B",Type "C",Type "D"] [(1,NameTypo),(3,UnknownSymbol)] 4 1 10 5) (\x -> check x && check' x)
+    generatesBoth (allTerms ["a","b","c","d","e","f"] [Type "A",Type "B",Type "C",Type "D"] [(1,NameTypo),(3,UnknownSymbol)] 4 1 10 5)
   prop "allTerms generates two list: one for valid one for invalid" $
-    forAll (allTerms ["a","b","c","d","e"] [Type "A",Type "B",Type "C",Type "D"] [(1,TypeChange),(1,OneLess)] 4 1 10 5) (\x -> check x && check' x)
+    generatesBoth (allTerms ["a","b","c","d","e"] [Type "A",Type "B",Type "C",Type "D"] [(1,TypeChange),(1,OneLess)] 4 1 10 5)
+
+generatesBoth :: Gen (Signature, ([Term String], [[Term String]])) -> Property
+generatesBoth condition = forAll condition $ \x -> check x && check' x
 
 check :: (Signature,([Term String],[[Term String]])) -> Bool
 check (sig,(ts,_)) = all (isValid sig) ts
