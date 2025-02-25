@@ -3,8 +3,8 @@ resolver: lts-19.30
 packages:
   - .
 extra-deps:
-
   - git: https://github.com/fmidue/output-blocks.git
     commit: f789c20b641bc4a7d07219121a6153ecb2900b0a
     subdirs:
       - output-blocks
+

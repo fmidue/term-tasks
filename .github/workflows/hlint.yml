@@ -3,7 +3,7 @@ name: Haskell Linter
 
 on:
   push:
-    branches: ['**']
+    branches: ["**"]
   pull_request:
     branches:
       - main
@@ -16,13 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 'Set up HLint'
+      - name: "Set up HLint"
         uses: haskell-actions/hlint-setup@v2
         with:
-          version: '3.5'
+          version: "3.5"
 
-      - name: 'Run HLint'
+      - name: "Run HLint"
         uses: haskell-actions/hlint-run@v2
         with:
           path: '["src/", "test/"]'
           fail-on: suggestion
+
