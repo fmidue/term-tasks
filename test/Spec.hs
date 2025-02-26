@@ -202,7 +202,7 @@ check :: (Signature,([Term String],[[Term String]])) -> Bool
 check (sig,(ts,_)) = all (isValid sig) ts
 
 check' :: (Signature,([Term String],[[Term String]])) -> Bool
-check' (sig,(_,ts)) = (not . any (any $ isValid sig)) ts
+check' (sig,(_,ts)) = all (noneValid sig) ts
 
 size :: Term a -> Int
 size = termSize
