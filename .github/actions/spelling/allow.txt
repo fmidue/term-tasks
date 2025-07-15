@@ -3,6 +3,7 @@ Bifunctor
 DSL
 Enum
 GHC
+ghc
 Graphviz
 HUnit
 Hspec
@@ -27,3 +28,4 @@ snd
 uncurry
 workflow
 workflows
+Yesod
