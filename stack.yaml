@@ -4,6 +4,6 @@ packages:
   - .
 extra-deps:
   - git: https://github.com/fmidue/output-blocks.git
-    commit: f789c20b641bc4a7d07219121a6153ecb2900b0a
+    commit: e97c5f06a17c5b99f0bed2a733bfbf974304adf3
     subdirs:
       - output-blocks
