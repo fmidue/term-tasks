@@ -5,7 +5,8 @@ on:
   push:
     branches: ["**"]
 
-permissions: read-all
+permissions:
+  contents: write
 
 jobs:
   build_and_test:
@@ -49,3 +50,16 @@ jobs:
           set +ex
         env:
           BUILD: ${{ matrix.plan.build }}
+
+      - name: Escape commit message
+        id: escape
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          echo "commit_msg=$(echo "$COMMIT_MSG" | jq -Rs '.|rtrimstr("\n")')" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger Test-Flex
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: CI-Completed
+          client-payload: '{"sha": "${{ github.sha }}", "message": ${{ steps.escape.outputs.commit_msg }}}'
