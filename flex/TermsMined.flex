@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Global where
 
@@ -73,17 +72,17 @@ validateSettings = traverse_ (verifyCertain . makeConfig) sigList
 
 module TaskData where
 
+import COntrol.Monad.Random             (MonadRandom)
 import Data.String.Interpolate          (i)
-import Data.Text                        (Text)
-import FlexTask.FormUtil                (getFormData, universalLabel)
+import FlexTask.FormUtil                (universalLabel)
 import FlexTask.Generic.Form
-import FlexTask.Types                   (HtmlDict)
+import FlexTask.GenUtil                 (fromGen)
+import FlexTask.YesodConfig             (Rendered, Widget)
 import TermTasks.DataType               (inMathit)
 import TermTasks.Direct                 (genInst)
 import TermTasks.Records (
   SigInstance(..),
   )
-import Test.QuickCheck.Gen              (Gen)
 import Yesod                            (RenderMessage(..), fieldSettingsLabel)
 
 import Global                           (TaskData)
@@ -98,8 +97,8 @@ instance RenderMessage app HeaderLabel where
   renderMessage _ _        HeaderLabel  = "Korrekte Terme"
 
 
-getTask :: Gen (TaskData, String, IO ([Text],HtmlDict))
-getTask = do
+getTask :: MonadRandom m => m (TaskData, String, Rendered Widget)
+getTask = fromGen $ do
     config <- task04
     inst <- genInst config
     pure (inst, checkers, getFormData $ form inst)

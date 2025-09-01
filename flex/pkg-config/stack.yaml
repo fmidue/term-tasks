@@ -4,12 +4,12 @@ packages:
   - .
 extra-deps:
   - git: https://github.com/fmidue/flex-tasks.git
-    commit: d503fb7c658920a498fe520a2e8d82873aa5ef2e
+    commit: 4ae738feee22ad11e4836b64eced903249ecfe48
     subdirs:
       - flex-tasks
       - flex-tasks-processing
   - git: https://github.com/fmidue/autotool-capabilities.git
-    commit: abf9b15ad431e517ae0700ad9dfb6f6941e10538
+    commit: 8067088f23759d787c049677a26868df26c1676f
     subdirs:
       - autotool-capabilities
       - autotool-capabilities-io-instances
