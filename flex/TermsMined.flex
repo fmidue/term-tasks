@@ -5,11 +5,6 @@ module Global where
 import TermTasks.Records (
   SigInstance(..),
   )
-import TermTasks.DataType (
-  Symbol(..),
-  Term(..),
-  Type(..),
-  )
 
 
 type Submission = [Int]
@@ -72,7 +67,7 @@ validateSettings = traverse_ (verifyCertain . makeConfig) sigList
 
 module TaskData where
 
-import COntrol.Monad.Random             (MonadRandom)
+import Control.Monad.Random             (MonadRandom)
 import Data.String.Interpolate          (i)
 import FlexTask.FormUtil                (universalLabel)
 import FlexTask.Generic.Form
