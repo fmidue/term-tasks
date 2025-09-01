@@ -96,7 +96,7 @@ getTask :: MonadRandom m => m (TaskData, String, Rendered Widget)
 getTask = fromGen $ do
     config <- task04
     inst <- genInst config
-    pure (inst, checkers, getFormData $ form inst)
+    pure (inst, checkers, form inst)
   where
     latexLabel = zipWith
       (\n -> universalLabel . (show n ++) . (". \\(" ++) . (++ "\\)") . inMathit)
