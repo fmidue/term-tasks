@@ -42,3 +42,4 @@ ignore$
 \.zip$
 ^\.github/actions/spelling/
 ^\.github/linters/
+^\Q.github/pull_request_template.md\E$
