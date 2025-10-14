@@ -1,11 +1,17 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+#if !MIN_VERSION_base(4,18,0)
+{-# LANGUAGE DerivingStrategies #-}
+#endif
 
 module Records where
 
 import Data.Data (Data)
 import Data.Map (Map)
-import Data.Typeable
+#if !MIN_VERSION_base(4,18,0)
+import Data.Typeable (Typeable)
+#endif
 import GHC.Generics
 import Control.OutputCapable.Blocks (Language(..))
 
@@ -19,7 +25,11 @@ data Base = Base
             , extraFeedback :: Bool
             , printSolution :: Bool
             , extraText :: Maybe (Map Language String)
-            } deriving (Typeable, Generic)
+            }
+  deriving Generic
+#if !MIN_VERSION_base(4,18,0)
+  deriving Typeable
+#endif
 
 dBase :: Base
 dBase = Base
@@ -38,7 +48,11 @@ data Certain = Certain {
                  signatures :: Signature
                , root :: Maybe [Type]
                , baseConf :: Base
-               } deriving (Typeable, Generic)
+               }
+  deriving Generic
+#if !MIN_VERSION_base(4,18,0)
+  deriving Typeable
+#endif
 
 dCertain :: Certain
 dCertain = Certain
@@ -62,7 +76,11 @@ data Perturbed = Perturbed {
                , signatures :: [([Int],Int)]
                , root :: Maybe [Int]
                , baseConf :: Base
-               } deriving (Typeable, Generic)
+               }
+  deriving Generic
+#if !MIN_VERSION_base(4,18,0)
+  deriving Typeable
+#endif
 
 dPerturbed :: Perturbed
 dPerturbed = Perturbed
@@ -99,7 +117,11 @@ data SigInstance = SigInstance {
                     , moreFeedback :: Bool
                     , showSolution :: Bool
                     , addText :: Maybe (Map Language String)
-                    } deriving (Typeable, Generic, Data)
+                    }
+  deriving (Data, Generic)
+#if !MIN_VERSION_base(4,18,0)
+  deriving Typeable
+#endif
 
 dSigInst :: SigInstance
 dSigInst = SigInstance {
