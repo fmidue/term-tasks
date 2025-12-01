@@ -20,15 +20,15 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputCapable m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Terme, ob sie korrekt im Sinne der oben gegebenen Deklarationen sind:"
-    english "Decide for the following terms whether or not they are correct according to the declarations given above:"
+    german "Entscheiden Sie für die folgenden Terme, ob es sich um korrekte Terme im Sinne der oben gegebenen Deklarationen handelt:"
+    english "Decide for the following terms whether or not they are correct terms according to the declarations given above:"
 
 text3 :: OutputCapable m => LangM m
 text3 = do
   paragraph $ translate $ do
-    german "Bitte geben Sie Ihre Antwort in Form einer Liste von Zahlen an, die alle korrekten Terme enthält."
-    english "Please state your answer by giving a list of numbers, indicating all correct terms."
+    german "Geben Sie Ihre Antwort in Form einer Liste von Zahlen an, die genau alle korrekten Terme enthält."
+    english "State your answer by giving a list of numbers, indicating exactly all correct terms."
   paragraph $ translate $ do
-    german "Zum Beispiel [1, 2] würde bedeuten, dass nur die Terme 1. und 2. von den angegebenen korrekt sind."
-    english "For example, [1, 2] would indicate that only terms 1. and 2. of the given ones are correct."
+    german "Zum Beispiel würde [1, 2] bedeuten, dass nur die Terme 1. und 2. der gegebenen korrekt sind."
+    english "For example, [1, 2] would mean that only terms 1. and 2. of the given ones are correct."
   pure ()
