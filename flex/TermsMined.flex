@@ -119,7 +119,7 @@ module Check where
 
 import Control.Applicative              (Alternative)
 import Control.OutputCapable.Blocks
-import TermTasks.Direct                 (completeGrade, partialGrade)
+import TermTasks.Direct                 (completeGrade)
 
 import Global                           (Submission, TaskData)
 
@@ -128,10 +128,10 @@ import Global                           (Submission, TaskData)
 checkSyntax
   :: OutputCapable m
   => a
-  -> TaskData
-  -> Submission
+  -> b
+  -> c
   -> LangM m
-checkSyntax _ = partialGrade
+checkSyntax _ _ _ = pure ()
 
 
 checkSemantics
