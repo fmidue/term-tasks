@@ -26,8 +26,8 @@ dBase = Base
         { termSizeRange = (6,10)
         , wrongTerms = [ (1,Swap), (1,TypeChange), (1,OneMore), (1,OneLess) ]
         , properTerms = 5
-        , extraFeedback = False
-        , printSolution = False
+        , extraFeedback = True
+        , printSolution = True
         , extraText = Nothing
         }
 
@@ -109,7 +109,7 @@ dSigInst = SigInstance {
               symbols = [Symbol "f" [Type "a", Type "b"] (Type "c"), Symbol "g" [] (Type "a"), Symbol "h" [Type "a"] (Type "b")]
             , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "f" [Term "h" []]]
             , correct = [1]
-            , moreFeedback = False
-            , showSolution = False
+            , moreFeedback = True
+            , showSolution = True
             , addText = Nothing
             }
