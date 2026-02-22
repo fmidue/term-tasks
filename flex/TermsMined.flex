@@ -92,8 +92,8 @@ data HeaderLabel = HeaderLabel
 
 
 instance RenderMessage app HeaderLabel where
-  renderMessage _ ("en":_) HeaderLabel  = "Correct terms (choose all):"
-  renderMessage _ _        HeaderLabel  = "Korrekte Terme (alle auswählen):"
+  renderMessage _ ("en":_) HeaderLabel  = "Correct terms: (indicate all)"
+  renderMessage _ _        HeaderLabel  = "Korrekte Terme: (alle angeben)"
 
 
 getTask :: MonadRandom m => m (TaskData, String, Rendered Widget)
