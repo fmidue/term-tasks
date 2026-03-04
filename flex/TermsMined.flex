@@ -129,9 +129,8 @@ checkSyntax
   :: OutputCapable m
   => a
   -> b
-  -> c
   -> LangM m
-checkSyntax _ _ _ = pure ()
+checkSyntax _ _ = pure ()
 
 
 checkSemantics
