@@ -13,6 +13,7 @@ library
       TermTasks.ValidTerm
       TermTasks.InvalidTerm
       TermTasks.Direct
+      TermTasks.Form
       TermTasks.Perturbed
       TermTasks.Records
       TermTasks.DataType
@@ -42,10 +43,12 @@ library
     , base
     , containers
     , extra
+    , flex-tasks
     , mtl
     , output-blocks >=0.2
     , parsec
     , split
+    , yesod
   default-language: Haskell2010
 
 test-suite term-tasks-test
@@ -67,6 +70,7 @@ test-suite term-tasks-test
       Tasks.RandomSignature
       TermTasks.DataType
       TermTasks.Direct
+      TermTasks.Form
       TermTasks.Helpers
       TermTasks.InvalidTerm
       TermTasks.Messages
@@ -88,10 +92,12 @@ test-suite term-tasks-test
     , base
     , containers
     , extra
+    , flex-tasks
     , hspec
     , mtl
     , output-blocks >=0.2
     , parsec
     , split
     , term-tasks
+    , yesod
   default-language: Haskell2010

@@ -7,9 +7,11 @@ dependencies:
   - split
   - QuickCheck
   - extra
+  - flex-tasks
   - parsec
   - output-blocks >= 0.2
   - mtl
+  - yesod
 default-extensions:
   - DuplicateRecordFields
   - OverloadedLabels
@@ -19,6 +21,7 @@ library:
     - TermTasks.ValidTerm
     - TermTasks.InvalidTerm
     - TermTasks.Direct
+    - TermTasks.Form
     - TermTasks.Perturbed
     - TermTasks.Records
     - TermTasks.DataType
