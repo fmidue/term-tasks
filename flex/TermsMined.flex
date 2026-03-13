@@ -79,21 +79,14 @@ import FlexTask.GenUtil                 (fromGen)
 import FlexTask.YesodConfig             (Rendered, Widget)
 import TermTasks.DataType               (inMathit)
 import TermTasks.Direct                 (genInst)
+import TermTasks.Form                   (TermsLabel)
 import TermTasks.Records (
   SigInstance(..),
   )
-import Yesod                            (RenderMessage(..), fieldSettingsLabel)
+import Yesod                            (fieldSettingsLabel)
 
 import Global                           (TaskData)
 import TaskSettings                     (task04)
-
-
-data HeaderLabel = HeaderLabel
-
-
-instance RenderMessage app HeaderLabel where
-  renderMessage _ ("en":_) HeaderLabel  = "Correct terms: (indicate all)"
-  renderMessage _ _        HeaderLabel  = "Korrekte Terme: (alle angeben)"
 
 
 getTask :: MonadRandom m => m (TaskData, String, Rendered Widget)
@@ -108,7 +101,7 @@ getTask = fromGen $ do
       . terms
     form inst = formify
       (Nothing :: Maybe MultipleChoiceSelection)
-      [[buttons Vertical (fieldSettingsLabel HeaderLabel) $ latexLabel inst]]
+      [[buttons Vertical (fieldSettingsLabel TermsLabel) $ latexLabel inst]]
 
 
 checkers :: String
