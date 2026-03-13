@@ -73,17 +73,10 @@ module TaskData where
 
 import Control.Monad.Random             (MonadRandom)
 import Data.String.Interpolate          (i)
-import FlexTask.FormUtil                (universalLabel)
-import FlexTask.Generic.Form
 import FlexTask.GenUtil                 (fromGen)
 import FlexTask.YesodConfig             (Rendered, Widget)
-import TermTasks.DataType               (inMathit)
 import TermTasks.Direct                 (genInst)
-import TermTasks.Form                   (TermsLabel)
-import TermTasks.Records (
-  SigInstance(..),
-  )
-import Yesod                            (fieldSettingsLabel)
+import TermTasks.Form                   (inputForm)
 
 import Global                           (TaskData)
 import TaskSettings                     (task04)
@@ -93,15 +86,7 @@ getTask :: MonadRandom m => m (TaskData, String, Rendered Widget)
 getTask = fromGen $ do
     config <- task04
     inst <- genInst config
-    pure (inst, checkers, form inst)
-  where
-    latexLabel = zipWith
-      (\n -> universalLabel . (show n ++) . (". \\(" ++) . (++ "\\)") . inMathit)
-      [1 :: Int ..]
-      . terms
-    form inst = formify
-      (Nothing :: Maybe MultipleChoiceSelection)
-      [[buttons Vertical (fieldSettingsLabel TermsLabel) $ latexLabel inst]]
+    pure (inst, checkers, inputForm inst)
 
 
 checkers :: String
