@@ -4,9 +4,8 @@
 module Records where
 
 import Data.Data (Data)
-import Data.Map (Map)
 import GHC.Generics
-import Control.OutputCapable.Blocks (Language(..))
+import Control.OutputCapable.Blocks (ExtraText(NoExtraText))
 
 import DataType (Error(..), Signature, Symbol(..), Term(..), Type(..), toSignature)
 
@@ -17,7 +16,7 @@ data Base = Base
             , properTerms :: Int
             , extraFeedback :: Bool
             , printSolution :: Bool
-            , extraText :: Maybe (Map Language String)
+            , extraText :: ExtraText
             }
   deriving Generic
 
@@ -28,7 +27,7 @@ dBase = Base
         , properTerms = 5
         , extraFeedback = True
         , printSolution = True
-        , extraText = Nothing
+        , extraText = NoExtraText
         }
 
 
@@ -100,7 +99,7 @@ data SigInstance = SigInstance {
                     , correct :: [Int]
                     , moreFeedback :: Bool
                     , showSolution :: Bool
-                    , addText :: Maybe (Map Language String)
+                    , addText :: ExtraText
                     }
   deriving (Data, Generic)
 
@@ -111,5 +110,5 @@ dSigInst = SigInstance {
             , correct = [1]
             , moreFeedback = True
             , showSolution = True
-            , addText = Nothing
+            , addText = NoExtraText
             }

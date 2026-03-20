@@ -17,6 +17,7 @@ import Control.OutputCapable.Blocks (
   Rated,
   continueOrAbort,
   english,
+  extra,
   german,
   multipleChoice,
   recoverFrom,
