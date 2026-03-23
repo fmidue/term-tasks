@@ -56,7 +56,7 @@ makeConfig sig = Certain {
     properTerms = 5,
     extraFeedback = True,
     printSolution = True,
-    extraText = Nothing
+    extraText = NoExtraText
   }
 }
 
