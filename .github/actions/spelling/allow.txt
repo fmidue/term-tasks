@@ -1,5 +1,6 @@
 Autotool
 Bifunctor
+checkboxes
 DSL
 Enum
 GHC
