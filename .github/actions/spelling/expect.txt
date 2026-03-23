@@ -1,9 +1,7 @@
-args
 avh
 aws
 ekg
 Euterpea
-Expr
 haskellscrabble
 itemify
 LPFP
@@ -11,7 +9,5 @@ mathify
 mathit
 packedstring
 pfs
-prettyprint
 protobuf
-undef
 unliftio
