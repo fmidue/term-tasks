@@ -4,7 +4,6 @@ aws
 ekg
 Euterpea
 Expr
-formify
 haskellscrabble
 itemify
 LPFP

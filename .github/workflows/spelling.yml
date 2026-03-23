@@ -59,7 +59,7 @@ jobs:
           extra_dictionaries:
             cspell:latex/dict/latex.txt
             cspell:filetypes/filetypes.txt
-            cspell:software-terms/src/softwareTerms.txt
+            cspell:software-terms/src/software-terms.txt
             cspell:companies/src/companies.txt
             cspell:haskell/src/haskell.txt
             cspell:de_DE/src/German_de_DE.dic
