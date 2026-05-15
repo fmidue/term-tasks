@@ -89,12 +89,25 @@ getTask = fromGen $ do
 checkers :: String
 checkers = [i|
 
+{-\# Language ApplicativeDo \#-}
+{-\# Language RecordWildCards \#-}
+
 module Check where
 
 
+import qualified Data.Map               as M (fromAscList)
+
 import Control.Applicative              (Alternative)
+import Control.Monad                    (when)
 import Control.OutputCapable.Blocks
-import TermTasks.Direct                 (completeGrade)
+import Data.Bifunctor                   (second)
+import Data.List                        (nub, sort, (\\\\))
+import Data.Tuple.Extra                 (dupe)
+import TermTasks.Records (
+  Base(..),
+  Certain(..),
+  SigInstance(..)
+  )
 
 import Global                           (Submission, TaskData)
 
@@ -114,7 +127,58 @@ checkSemantics
   -> TaskData
   -> Submission
   -> Rated m
-checkSemantics _ = completeGrade
+checkSemantics _ SigInstance{..} sol = do
+  recoverFrom $ assert (not wrongAmount) $
+    translate $ do
+      english "The amount of indices is correct?"
+      german "Die Anzahl der Indizes ist richtig?"
+  when (wrongAmount && moreFeedback) $
+            if diff > 0
+              then
+                indent $ translate $ do
+                  english $ "Your solution contains " ++ displayDiff ++ " additional " ++ eng
+                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
+              else
+                indent $ translate $ do
+                  english $ "Your solution is missing " ++ displayDiff ++ eng
+                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+  when (showSolution || not wrongAmount) $ do
+    recoverFrom $ assert (not wrongSolution) $
+      translate $ do
+        english "Your solution is correct?"
+        german "Ihre Lösung ist richtig?"
+    when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
+            translate $ do
+              english "These incorrect terms are part of your solution: "
+              german "Diese Terme aus Ihrer Lösung sind falsch: "
+            itemizeM $ map (latex . inMathit) badTerms
+            pure ()
+    pure ()
+  let what = translations $ do
+        english "terms"
+        german "Terme"
+      solution =
+        if showSolution
+        then Just (DefiniteArticle, show correct)
+        else Nothing
+      matching = M.fromAscList $ map
+        (second (`elem` correct) . dupe)
+        [1 .. length terms]
+  paragraph (text "")
+  x <- multipleChoice what solution matching sol
+  pure x
+  where
+    assert = continueOrAbort showSolution
+    wrongAmount = diff /= 0
+    diff =  length nubSol - length correct
+    displayDiff = show (abs diff)
+    (eng, ger) =
+      if abs diff == 1
+      then (" index."," Index")
+      else (" indices."," Indizes")
+    nubSol = nub sol
+    wrongSolution = sort nubSol /= sort correct
+    badTerms = map ((terms !!) . subtract 1) $ nubSol \\\\ correct
 
 |]
 
