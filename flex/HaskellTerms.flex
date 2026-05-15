@@ -110,7 +110,7 @@ import TermTasks.Records (
   )
 
 import Global                           (Submission, TaskData)
-
+import Helpers                          (inMathit)
 
 
 checkSyntax
@@ -311,9 +311,9 @@ haskellStyleTerm :: Term String -> String
 haskellStyleTerm (Term x []) = x
 haskellStyleTerm (Term s [a,b])
   | isInfix s = intercalate "\\ "
-    [ decideBrackets (infixTermNeedsBrackets s) a
+    [ decideBrackets infixTermNeedsBrackets a
     , drop 1 $ dropEnd 1 s
-    , decideBrackets (infixTermNeedsBrackets s) b
+    , decideBrackets infixTermNeedsBrackets b
     ]
 haskellStyleTerm (Term s xs) = s ++ "\\ " ++
   intercalate "\\ " (map (decideBrackets termNeedsBrackets) xs)
@@ -330,10 +330,9 @@ termNeedsBrackets :: Term a -> Bool
 termNeedsBrackets (Term _ args) = notNull args
 
 
--- Assumption: All defined infix operators are associative
-infixTermNeedsBrackets :: String -> Term String -> Bool
-infixTermNeedsBrackets _ (Term _ []) = False
-infixTermNeedsBrackets lastOp (Term s args) = isInfix s && lastOp /= s
+infixTermNeedsBrackets :: Term String -> Bool
+infixTermNeedsBrackets (Term _ []) = False
+infixTermNeedsBrackets (Term s args) = isInfix s
 
 
 isInfix :: String -> Bool
