@@ -104,8 +104,6 @@ import Data.Bifunctor                   (second)
 import Data.List                        (nub, sort, (\\\\))
 import Data.Tuple.Extra                 (dupe)
 import TermTasks.Records (
-  Base(..),
-  Certain(..),
   SigInstance(..)
   )
 
@@ -191,7 +189,6 @@ module Description (description) where
 
 import Control.OutputCapable.Blocks
 import Data.Foldable                    (traverse_)
-import Data.List                        (intercalate)
 import TermTasks.Records                (SigInstance(..))
 
 import Messages                         (text1, text2)
@@ -332,7 +329,7 @@ termNeedsBrackets (Term _ args) = notNull args
 
 infixTermNeedsBrackets :: Term String -> Bool
 infixTermNeedsBrackets (Term _ []) = False
-infixTermNeedsBrackets (Term s args) = isInfix s
+infixTermNeedsBrackets (Term s _) = isInfix s
 
 
 isInfix :: String -> Bool
@@ -341,7 +338,7 @@ isInfix s = take 1 s == "(" && takeEnd 1 s == ")"
 
 haskellStyleSignature :: Symbol -> String
 haskellStyleSignature (Symbol s args result) = s ++ " :: " ++
-  foldr (\next -> ((next ++ " -> ") ++)) (name result) (map name args)
+  foldr ((\next -> ((next ++ " -> ") ++)) . name) (name result) args
 
 
 ===================================================
