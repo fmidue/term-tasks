@@ -7,7 +7,6 @@ itemify
 LPFP
 mathify
 mathit
-MathJax
 packedstring
 pfs
 protobuf
