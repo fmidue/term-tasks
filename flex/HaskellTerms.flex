@@ -56,9 +56,9 @@ makeConfig sig = Certain {
     extraFeedback = True,
     printSolution = True,
     extraText = Static (M.fromList [
-      (English, "Note that the details here differ slightly from those in the example in the slides,"
+      (English, "Note that the details here differ slightly from those in the Modellierung slides,"
                 ++ " as does the notation regarding parentheses and the specification of multiple arguments."),
-      (German, "Beachten Sie, dass die Details hier etwas anders sind als im Beispiel in den Folien,"
+      (German, "Beachten Sie, dass die Details hier etwas anders sind als in den Modellierung-Folien,"
                ++ " ebenso die abweichende Notation hinsichtlich Klammerung und Angabe mehrerer Argumente.")]
     )
   }
@@ -178,8 +178,8 @@ checkSemantics _ SigInstance{..} sol = do
     displayDiff = show (abs diff)
     (eng, ger) =
       if abs diff == 1
-      then (" choice."," Auswahl")
-      else (" choices."," Auswahlen")
+      then (" choice."," Option")
+      else (" choices."," Optionen")
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
     badTerms = map ((terms !!) . subtract 1) $ nubSol \\\\ correct
@@ -260,7 +260,7 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputCapable m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Auswahlen, ob es sich um korrekte Ausdrücke gemäß der gegebenen Deklarationen handelt:"
+    german "Entscheiden Sie für die folgenden Optionen, ob es sich um korrekte Ausdrücke gemäß der gegebenen Deklarationen handelt:"
     english "Decide for the following choices whether or not they are correct expressions according to the given declarations:"
 
 =============================================
