@@ -137,6 +137,11 @@ checkSyntax SigInstance{..} sol =
     wrongAmount = diff /= 0
     diff =  length nubSol - length correct
     nubSol = nub sol
+    displayDiff = show (abs diff)
+    (eng, ger) =
+      if abs diff == 1
+      then (" choice."," Option")
+      else (" choices."," Optionen")
 
 
 checkSemantics
@@ -175,11 +180,6 @@ checkSemantics _ SigInstance{..} sol = do
     assert = continueOrAbort showSolution
     wrongAmount = diff /= 0
     diff =  length nubSol - length correct
-    displayDiff = show (abs diff)
-    (eng, ger) =
-      if abs diff == 1
-      then (" choice."," Option")
-      else (" choices."," Optionen")
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
     badTerms = map ((terms !!) . subtract 1) $ nubSol \\\\ correct
