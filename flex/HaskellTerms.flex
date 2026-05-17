@@ -30,7 +30,7 @@ import TermTasks.DataType (
   toSignature,
   )
 
-
+import qualified Data.Map as M
 
 task :: Certain
 task = makeConfig $ toSignature
@@ -40,7 +40,8 @@ task = makeConfig $ toSignature
   , ("rotated", ["Double", "Picture"], "Picture")
   -- escaping '&' due to MathJax encoding problem
   , ("(\\&)", ["Picture", "Picture"], "Picture")
-  , ("d", [], "Double")
+  , ("5", [], "Double")
+  , ("7", [], "Double")
   ]
 
 
@@ -54,7 +55,10 @@ makeConfig sig = Certain {
     properTerms = 5,
     extraFeedback = True,
     printSolution = True,
-    extraText = NoExtraText
+    extraText = Static (M.fromList [
+      (English, "Note that the details here differ slightly from those in the example in the slides, as does the notation regarding parentheses and the specification of multiple arguments."),
+      (German, "Beachten Sie, dass die Details hier etwas anders sind als im Beispiel in den Folien, ebenso die abweichende Notation hinsichtlich Klammerung und Angabe mehrerer Argumente.")]
+    )
   }
 }
 
@@ -113,10 +117,24 @@ import Helpers                          (inMathit)
 
 checkSyntax
   :: OutputCapable m
-  => a
-  -> b
+  => TaskData
+  -> Submission
   -> LangM m
-checkSyntax _ _ = pure ()
+checkSyntax SigInstance{..} sol =
+  when (wrongAmount && moreFeedback) $
+            if diff > 0
+              then
+                refuse $ translate $ do
+                  english $ "Your solution contains " ++ displayDiff ++ " additional " ++ eng
+                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
+              else
+                refuse $ translate $ do
+                  english $ "Your solution is missing " ++ displayDiff ++ eng
+                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+  where
+    wrongAmount = diff /= 0
+    diff =  length nubSol - length correct
+    nubSol = nub sol
 
 
 checkSemantics
@@ -126,20 +144,6 @@ checkSemantics
   -> Submission
   -> Rated m
 checkSemantics _ SigInstance{..} sol = do
-  recoverFrom $ assert (not wrongAmount) $
-    translate $ do
-      english "The amount of indices is correct?"
-      german "Die Anzahl der Indizes ist richtig?"
-  when (wrongAmount && moreFeedback) $
-            if diff > 0
-              then
-                indent $ translate $ do
-                  english $ "Your solution contains " ++ displayDiff ++ " additional " ++ eng
-                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
-              else
-                indent $ translate $ do
-                  english $ "Your solution is missing " ++ displayDiff ++ eng
-                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
   when (showSolution || not wrongAmount) $ do
     recoverFrom $ assert (not wrongSolution) $
       translate $ do
@@ -147,14 +151,14 @@ checkSemantics _ SigInstance{..} sol = do
         german "Ihre Lösung ist richtig?"
     when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
             translate $ do
-              english "These incorrect terms are part of your solution: "
-              german "Diese Terme aus Ihrer Lösung sind falsch: "
+              english "These incorrect expressions are part of your solution: "
+              german "Diese Ausdrücke aus Ihrer Lösung sind falsch: "
             itemizeM $ map (latex . inMathit) badTerms
             pure ()
     pure ()
   let what = translations $ do
-        english "terms"
-        german "Terme"
+        english "expressions"
+        german "Ausdrücke"
       solution =
         if showSolution
         then Just (DefiniteArticle, show correct)
@@ -172,8 +176,8 @@ checkSemantics _ SigInstance{..} sol = do
     displayDiff = show (abs diff)
     (eng, ger) =
       if abs diff == 1
-      then (" index."," Index")
-      else (" indices."," Indizes")
+      then (" choice."," Auswahl")
+      else (" choices."," Auswahlen")
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
     badTerms = map ((terms !!) . subtract 1) $ nubSol \\\\ correct
@@ -254,8 +258,8 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputCapable m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Terme, ob es sich um korrekte Terme im Sinne der oben gegebenen Deklarationen handelt:"
-    english "Decide for the following terms whether or not they are correct terms according to the declarations given above:"
+    german "Entscheiden Sie für die folgenden Auswahlen, ob es sich um korrekte Ausdrücke im Sinne der oben gegebenen Deklarationen handelt:"
+    english "Decide for the following choices whether or not they are correct expressions according to the declarations given above:"
 
 =============================================
 
@@ -337,7 +341,7 @@ isInfix s = take 1 s == "(" && takeEnd 1 s == ")"
 
 
 haskellStyleSignature :: Symbol -> String
-haskellStyleSignature (Symbol s args result) = s ++ " :: " ++
+haskellStyleSignature (Symbol s args result) = (if isInfix s then drop 1 (dropEnd 1 s) else s) ++ " :: " ++
   foldr ((\next -> ((next ++ " -> ") ++)) . name) (name result) args
 
 
@@ -349,7 +353,7 @@ haskellStyleSignature (Symbol s args result) = s ++ " :: " ++
 
 module Form (
   termsForm,
-  )where
+  ) where
 
 
 import FlexTask.FormHelpers             (labeledCheckboxes)
@@ -369,8 +373,8 @@ data TermsLabel = TermsLabel
 
 
 instance RenderMessage FlexForm TermsLabel where
-  renderMessage _   ("en":_) _ = "Correct terms: (indicate all)"
-  renderMessage _   _        _ = "Korrekte Terme: (alle angeben)"
+  renderMessage _   ("en":_) _ = "Correct expressions: (indicate all)"
+  renderMessage _   _        _ = "Korrekte Ausdrücke: (alle angeben)"
 
 
 asMathNotation :: SigInstance -> [String]
