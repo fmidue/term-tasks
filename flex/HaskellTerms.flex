@@ -56,8 +56,10 @@ makeConfig sig = Certain {
     extraFeedback = True,
     printSolution = True,
     extraText = Static (M.fromList [
-      (English, "Note that the details here differ slightly from those in the example in the slides, as does the notation regarding parentheses and the specification of multiple arguments."),
-      (German, "Beachten Sie, dass die Details hier etwas anders sind als im Beispiel in den Folien, ebenso die abweichende Notation hinsichtlich Klammerung und Angabe mehrerer Argumente.")]
+      (English, "Note that the details here differ slightly from those in the example in the slides,"
+                ++ " as does the notation regarding parentheses and the specification of multiple arguments."),
+      (German, "Beachten Sie, dass die Details hier etwas anders sind als im Beispiel in den Folien,"
+               ++ " ebenso die abweichende Notation hinsichtlich Klammerung und Angabe mehrerer Argumente.")]
     )
   }
 }
@@ -258,8 +260,8 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputCapable m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Auswahlen, ob es sich um korrekte Ausdrücke im Sinne der oben gegebenen Deklarationen handelt:"
-    english "Decide for the following choices whether or not they are correct expressions according to the declarations given above:"
+    german "Entscheiden Sie für die folgenden Auswahlen, ob es sich um korrekte Ausdrücke gemäß der gegebenen Deklarationen handelt:"
+    english "Decide for the following choices whether or not they are correct expressions according to the given declarations:"
 
 =============================================
 
