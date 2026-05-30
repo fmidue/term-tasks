@@ -227,7 +227,7 @@ completeGrade SigInstance {..} sol = do
         (second (`elem` correct) . dupe)
         [1 .. length terms]
   paragraph (text "")
-  x <- multipleChoice what solution matching sol
+  x <- multipleChoice (Just what) solution matching sol
   pure x
   where
     assert = continueOrAbort showSolution
