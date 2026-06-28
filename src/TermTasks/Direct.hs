@@ -38,12 +38,12 @@ import qualified Tasks.CertainSignature as CertainSignature
 
 
 description :: OutputCapable m => Bool -> SigInstance -> LangM m
-description withInputHelp SigInstance{..} = do
+description textVersion SigInstance{..} = do
   text1
   indent $ traverse_ (latex . mathifySignature . show) symbols
   text2
-  indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
-  when withInputHelp text3
+  when textVersion $ indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
+  when textVersion text3
   extra addText
   pure ()
 

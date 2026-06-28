@@ -20,8 +20,8 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputCapable m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Optionen, ob es sich um korrekte Terme gemäß der oben gegebenen Deklarationen handelt:"
-    english "Decide for the following choices whether or not they are correct terms according to the declarations given above:"
+    german "Entscheiden Sie für die folgenden Optionen, ob es sich um korrekte Terme gemäß der oben gegebenen Deklarationen handelt."
+    english "Decide for the following choices whether or not they are correct terms according to the declarations given above."
 
 text3 :: OutputCapable m => LangM m
 text3 = do

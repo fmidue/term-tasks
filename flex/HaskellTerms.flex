@@ -201,7 +201,7 @@ import Messages                         (text1, text2)
 import Global                           (TaskData)
 import Helpers (
   haskellStyleSignature,
-  itemifyTerm,
+  -- itemifyTerm,
   mathifySignature,
   )
 
@@ -211,7 +211,7 @@ description _ SigInstance{..} = do
   text1
   indent $ traverse_ (latex . mathifySignature . haskellStyleSignature) symbols
   text2
-  indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
+  -- indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
   extra addText
   pure ()
 
@@ -260,14 +260,14 @@ text1 = paragraph $ translate $ do
 
 text2 :: OutputCapable m => LangM m
 text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Optionen, ob es sich um korrekte Ausdrücke gemäß der oben gegebenen Deklarationen handelt:"
-    english "Decide for the following choices whether or not they are correct expressions according to the declarations given above:"
+    german "Entscheiden Sie für die folgenden Optionen, ob es sich um korrekte Ausdrücke gemäß der oben gegebenen Deklarationen handelt."
+    english "Decide for the following choices whether or not they are correct expressions according to the declarations given above."
 
 =============================================
 
 module Helpers (
   mathifySignature,
-  itemifyTerm,
+  -- itemifyTerm,
   inMathit,
   haskellStyleSignature,
   ) where
@@ -294,8 +294,8 @@ mathifySignature s = open
     around snip = close ++ snip ++ open
 
 
-itemifyTerm :: (Int, Term String) -> String
-itemifyTerm (i,t) = show i ++ ".\\," ++ inMathit t
+-- itemifyTerm :: (Int, Term String) -> String
+-- itemifyTerm (i,t) = show i ++ ".\\," ++ inMathit t
 
 
 inMathit :: Term String -> String
