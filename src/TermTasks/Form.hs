@@ -8,13 +8,15 @@ module TermTasks.Form (
   )where
 
 
-import FlexTask.FormHelpers             (labeledCheckboxes)
-import FlexTask.Generic.Form (
+import FlexTask.Form (
   Alignment(Vertical),
+  FlexForm,
   MultipleChoiceSelection,
+  Rendered,
+  Widget,
   formify,
+  labeledCheckboxes,
   )
-import FlexTask.YesodConfig             (FlexForm, Widget, Rendered)
 import Yesod (
   RenderMessage(..),
   fieldSettingsLabel,
