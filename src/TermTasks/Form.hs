@@ -1,6 +1,7 @@
 {-# language FlexibleInstances #-}
 {-# language MultiParamTypeClasses #-}
 {-# language OverloadedStrings #-}
+{-# language TypeApplications #-}
 
 module TermTasks.Form (
   termsForm,
@@ -8,7 +9,11 @@ module TermTasks.Form (
 
 
 import FlexTask.FormHelpers             (labeledCheckboxes)
-import FlexTask.Generic.Form            (Alignment(Vertical))
+import FlexTask.Generic.Form (
+  Alignment(Vertical),
+  MultipleChoiceSelection,
+  formify,
+  )
 import FlexTask.YesodConfig             (FlexForm, Widget, Rendered)
 import Yesod (
   RenderMessage(..),
@@ -33,7 +38,7 @@ asMathNotation = map (("\\("++) . (++"\\)") . inMathit) . terms
 
 
 termsForm :: SigInstance -> Rendered Widget
-termsForm = labeledCheckboxes
+termsForm = formify @MultipleChoiceSelection Nothing . labeledCheckboxes
   Vertical
   (fieldSettingsLabel TermsLabel)
   . asMathNotation
