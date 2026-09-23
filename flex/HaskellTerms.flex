@@ -1,5 +1,5 @@
 taskName: HaskellTerms
-
+validation: Validate
 =============================================
 
 module Global where
@@ -78,7 +78,7 @@ module TaskData where
 import Control.Monad.Random             (MonadRandom)
 import Data.String.Interpolate          (i)
 import FlexTask.GenUtil                 (fromGen)
-import FlexTask.YesodConfig             (Rendered, Widget)
+import FlexTask.Form                    (Rendered, Widget)
 import TermTasks.Direct                 (genInst)
 import Form                             (termsForm)
 
@@ -221,8 +221,7 @@ module Parse (parseSubmission) where
 
 
 import Data.Functor            ((<&>))
-import FlexTask.Generic.Form   (getAnswers)
-import FlexTask.Generic.Parse  (formParser, parseInfallibly)
+import FlexTask.Parser  (formParser, getAnswers, parseInfallibly)
 
 import Global                  (Submission)
 
@@ -352,15 +351,21 @@ haskellStyleSignature (Symbol s args result) = (if isInfix s then drop 1 (dropEn
 {-# language FlexibleInstances #-}
 {-# language MultiParamTypeClasses #-}
 {-# language OverloadedStrings #-}
+{-# language TypeApplications #-}
 
 module Form (
   termsForm,
   ) where
 
 
-import FlexTask.FormHelpers             (labeledCheckboxes)
-import FlexTask.Generic.Form            (Alignment(Vertical))
-import FlexTask.YesodConfig             (FlexForm, Widget, Rendered)
+import FlexTask.Form (
+  Alignment(Vertical),
+  FlexForm,
+  MultipleChoiceSelection,
+  Rendered,
+  Widget,
+  formify,
+  labeledCheckboxes,)
 import Yesod (
   RenderMessage(..),
   fieldSettingsLabel,
@@ -384,7 +389,8 @@ asMathNotation = map (("\\("++) . (++"\\)") . inMathit) . terms
 
 
 termsForm :: SigInstance -> Rendered Widget
-termsForm = labeledCheckboxes
-  Vertical
-  (fieldSettingsLabel TermsLabel)
+termsForm = formify @MultipleChoiceSelection Nothing
+  . labeledCheckboxes
+    Vertical
+    (fieldSettingsLabel TermsLabel)
   . asMathNotation
