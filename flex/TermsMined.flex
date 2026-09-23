@@ -1,6 +1,6 @@
 
 taskName: TermsMined
-
+validation: Validate
 =============================================
 
 module Global where
@@ -74,7 +74,7 @@ module TaskData where
 import Control.Monad.Random             (MonadRandom)
 import Data.String.Interpolate          (i)
 import FlexTask.GenUtil                 (fromGen)
-import FlexTask.YesodConfig             (Rendered, Widget)
+import FlexTask.Form                    (Rendered, Widget)
 import TermTasks.Direct                 (genInst)
 import TermTasks.Form                   (termsForm)
 
@@ -141,8 +141,7 @@ module Parse (parseSubmission) where
 
 
 import Data.Functor            ((<&>))
-import FlexTask.Generic.Form   (getAnswers)
-import FlexTask.Generic.Parse  (formParser, parseInfallibly)
+import FlexTask.Parser         (formParser, getAnswers, parseInfallibly)
 
 import Global                  (Submission)
 
