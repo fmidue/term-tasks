@@ -2,6 +2,7 @@ avh
 aws
 ekg
 Euterpea
+formify
 haskellscrabble
 itemify
 LPFP
