@@ -127,12 +127,12 @@ checkSyntax SigInstance{..} sol =
             if diff > 0
               then
                 refuse $ translate $ do
-                  english $ "Your solution contains " ++ displayDiff ++ " additional " ++ eng
-                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
+                  english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
+                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
               else
                 refuse $ translate $ do
-                  english $ "Your solution is missing " ++ displayDiff ++ eng
-                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+                  english $ "The submitted solution is missing " ++ displayDiff ++ eng
+                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
   where
     wrongAmount = diff /= 0
     diff =  length nubSol - length correct
@@ -154,12 +154,12 @@ checkSemantics _ SigInstance{..} sol = do
   when (showSolution || not wrongAmount) $ do
     recoverFrom $ assert (not wrongSolution) $
       translate $ do
-        english "Your solution is correct?"
-        german "Ihre Lösung ist richtig?"
+        english "Submitted solution solution is correct?"
+        german "Eingereichte Lösung ist richtig?"
     when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
             translate $ do
-              english "These incorrect expressions are part of your solution: "
-              german "Diese Ausdrücke aus Ihrer Lösung sind falsch: "
+              english "These incorrect expressions are part of the submitted solution: "
+              german "Diese Ausdrücke aus der eingereichten Lösung sind falsch: "
             itemizeM $ map (latex . inMathit) badTerms
             pure ()
     pure ()

@@ -198,21 +198,21 @@ completeGrade SigInstance {..} sol = do
             if diff > 0
               then
                 indent $ translate $ do
-                  english $ "Your solution contains " ++ displayDiff ++ " additional " ++ eng
-                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
+                  english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
+                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
               else
                 indent $ translate $ do
-                  english $ "Your solution is missing " ++ displayDiff ++ eng
-                  german $ "Ihre Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+                  english $ "The submitted solution is missing " ++ displayDiff ++ eng
+                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
   when (showSolution || not wrongAmount) $ do
     recoverFrom $ assert (not wrongSolution) $
       translate $ do
-        english "Your solution is correct?"
-        german "Ihre Lösung ist richtig?"
+        english "Submitted solution is correct?"
+        german "Eingereichte Lösung ist richtig?"
     when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
             translate $ do
-              english "These incorrect terms are part of your solution: "
-              german "Diese Terme aus Ihrer Lösung sind falsch: "
+              english "These incorrect terms are part of the submitted solution: "
+              german "Diese Terme aus der eingereichten Lösung sind falsch: "
             itemizeM $ map (latex . inMathit) badTerms
             pure ()
     pure ()
