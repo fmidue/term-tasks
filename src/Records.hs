@@ -10,10 +10,17 @@ import Control.OutputCapable.Blocks (ExtraText(NoExtraText))
 import DataType (Error(..), Signature, Symbol(..), Term(..), Type(..), toSignature)
 
 
+data DisplayStyle
+  = MathStyle
+  | HaskellStyle
+  deriving (Data, Generic)
+
+
 data Base = Base
             { termSizeRange :: (Int,Int)
             , wrongTerms :: [(Int,Error)]
             , properTerms :: Int
+            , style :: DisplayStyle
             , extraFeedback :: Bool
             , printSolution :: Bool
             , extraText :: ExtraText
@@ -25,6 +32,7 @@ dBase = Base
         { termSizeRange = (6,10)
         , wrongTerms = [ (1,Swap), (1,TypeChange), (1,OneMore), (1,OneLess) ]
         , properTerms = 5
+        , style = MathStyle
         , extraFeedback = True
         , printSolution = True
         , extraText = NoExtraText
@@ -97,6 +105,7 @@ data SigInstance = SigInstance {
                       symbols :: [Symbol]
                     , terms :: [Term String]
                     , correct :: [Int]
+                    , displayStyle :: DisplayStyle
                     , moreFeedback :: Bool
                     , showSolution :: Bool
                     , addText :: ExtraText
@@ -108,6 +117,7 @@ dSigInst = SigInstance {
               symbols = [Symbol "f" [Type "a", Type "b"] (Type "c"), Symbol "g" [] (Type "a"), Symbol "h" [Type "a"] (Type "b")]
             , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "f" [Term "h" []]]
             , correct = [1]
+            , displayStyle = MathStyle
             , moreFeedback = True
             , showSolution = True
             , addText = NoExtraText

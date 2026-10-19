@@ -32,7 +32,7 @@ import Test.QuickCheck (Gen, shuffle)
 import TermTasks.Helpers
 import TermTasks.Messages
 import DataType (Signature(..), Symbol(..), Type(..), termSize)
-import Records (Base(..), Certain(..), SigInstance(..))
+import Records (Base(..), Certain(..), DisplayStyle(..), SigInstance(..))
 import qualified Tasks.CertainSignature as CertainSignature
 
 
@@ -40,12 +40,16 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputCapable m => Bool -> SigInstance -> LangM m
 description textVersion SigInstance{..} = do
   text1
-  indent $ traverse_ (latex . mathifySignature . show) symbols
+  indent $ traverse_ (latex . mathifySignature . displaySignature) symbols
   text2
-  when textVersion $ indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
+  when textVersion $ indent $ traverse_ (latex . itemifyTerm . second displayTerm) $ zip [1 :: Int ..] terms
   when textVersion text3
   extra addText
   pure ()
+  where
+    (displaySignature, displayTerm) = case displayStyle of
+      MathStyle    -> (show, show)
+      HaskellStyle -> (haskellStyleSignature, haskellStyleTerm)
 
 
 genInst :: Certain -> Gen SigInstance
@@ -56,10 +60,11 @@ genInst c@Certain{..} = do
     $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
   let Signature symbols = signatures
       correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
+      displayStyle = style baseConf
       moreFeedback = extraFeedback baseConf
       showSolution = printSolution baseConf
       addText = extraText baseConf
-  return $ SigInstance { symbols, terms, correct, moreFeedback, showSolution, addText }
+  return $ SigInstance { symbols, terms, correct, displayStyle, moreFeedback, showSolution, addText }
 
 
 verifyInst :: OutputCapable m => SigInstance -> LangM m
@@ -213,7 +218,7 @@ completeGrade SigInstance {..} sol = do
             translate $ do
               english "These incorrect terms are part of the submitted solution: "
               german "Diese Terme aus der eingereichten Lösung sind falsch: "
-            itemizeM $ map (latex . inMathit) badTerms
+            itemizeM $ map (latex . inMathit . displayHow) badTerms
             pure ()
     pure ()
   let what = translations $ do
@@ -241,3 +246,6 @@ completeGrade SigInstance {..} sol = do
     nubSol = nub sol
     wrongSolution = sort nubSol /= sort correct
     badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
+    displayHow = case displayStyle of
+      MathStyle    -> show
+      HaskellStyle -> haskellStyleTerm
