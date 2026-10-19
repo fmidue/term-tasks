@@ -154,7 +154,7 @@ checkSemantics _ SigInstance{..} sol = do
   when (showSolution || not wrongAmount) $ do
     recoverFrom $ assert (not wrongSolution) $
       translate $ do
-        english "Submitted solution solution is correct?"
+        english "Submitted solution is correct?"
         german "Eingereichte Lösung ist richtig?"
     when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
             translate $ do
