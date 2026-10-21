@@ -88,6 +88,11 @@ verifyInst SigInstance{..}
           english "At least one choice is given multiple times."
           german "Mindestens eine Optionen wurde mehrfach angegeben."
 
+    | earlyAnswersFeedback && not moreFeedback =
+        refuse $ indent $ translate $ do
+          english "'earlyAnswersFeedback' does not have any effect without 'moreFeedback' enabled."
+          german "'earlyAnswersFeedback' hat ohne 'moreFeedback' keinen Effekt."
+
     | otherwise = pure()
   where
     notInRange = any (`notElem` [1 .. length terms + 1]) correct
@@ -161,6 +166,10 @@ verifyBase Base{..}
             "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. " ++
             "(kann in doppelten Termen in der Aufgabe resultieren)"
 
+    | earlyNumberOfAnswersFeedback && not extraFeedback =
+        refuse $ indent $ translate $ do
+          english "'earlyNumberOfAnswersFeedback' does not have any effect without 'extraFeedback' enabled."
+          german "'earlyNumberOfAnswersFeedback' hat ohne 'extraFeedback' keinen Effekt."
 
     | otherwise = pure()
   where
