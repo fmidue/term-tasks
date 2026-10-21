@@ -22,8 +22,8 @@ import Yesod (
   fieldSettingsLabel,
   )
 
-import TermTasks.Records                (SigInstance(terms))
-import TermTasks.Helpers                (inMathit)
+import TermTasks.Records                (DisplayStyle(..), SigInstance(..))
+import TermTasks.Helpers                (haskellStyleTerm, inMathit)
 
 
 
@@ -35,12 +35,16 @@ instance RenderMessage FlexForm TermsLabel where
   renderMessage _   _        _ = "Korrekte Terme: (alle angeben)"
 
 
-asMathNotation :: SigInstance -> [String]
-asMathNotation = map (("\\("++) . (++"\\)") . inMathit) . terms
+toNotation :: SigInstance -> [String]
+toNotation inst = map (("\\("++) . (++"\\)") . inMathit . howToDisplay) $ terms inst
+  where
+    howToDisplay = case displayStyle inst of
+      MathStyle -> show
+      HaskellStyle -> haskellStyleTerm
 
 
 termsForm :: SigInstance -> Rendered Widget
 termsForm = formify @MultipleChoiceSelection Nothing . labeledCheckboxes
   Vertical
   (fieldSettingsLabel TermsLabel)
-  . asMathNotation
+  . toNotation
