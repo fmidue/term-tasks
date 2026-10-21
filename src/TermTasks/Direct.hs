@@ -7,7 +7,6 @@ module TermTasks.Direct where
 import qualified Data.Map                         as M (fromAscList)
 
 import Data.List (nub, sort, (\\))
-import Control.Applicative (Alternative)
 import Control.Monad (when)
 import Control.OutputCapable.Blocks (
   ArticleToUse (DefiniteArticle),
@@ -15,14 +14,13 @@ import Control.OutputCapable.Blocks (
   LangM,
   OutputCapable,
   Rated,
-  continueOrAbort,
   english,
   extra,
   german,
   multipleChoice,
-  recoverFrom,
   translate,
   translations,
+  yesNo,
   )
 import Data.Bifunctor (second)
 import Data.Foldable (traverse_)
@@ -190,12 +188,12 @@ partialGrade SigInstance{..} sol
     invalidIndex = any (`notElem` [1 .. length terms]) nubSol
 
 completeGrade
-  :: (Alternative m, OutputCapable m)
+  :: OutputCapable m
   => SigInstance
   -> [Int]
   -> Rated m
 completeGrade SigInstance {..} sol = do
-  recoverFrom $ assert (not wrongAmount) $
+  yesNo (not wrongAmount) $
     translate $ do
       english "The amount of indices is correct?"
       german "Die Anzahl der Indizes ist richtig?"
@@ -210,7 +208,7 @@ completeGrade SigInstance {..} sol = do
                   english $ "The submitted solution is missing " ++ displayDiff ++ eng
                   german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
   when (showSolution || not wrongAmount) $ do
-    recoverFrom $ assert (not wrongSolution) $
+    yesNo (not wrongSolution) $
       translate $ do
         english "Submitted solution is correct?"
         german "Eingereichte Lösung ist richtig?"
