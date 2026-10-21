@@ -7,7 +7,7 @@ module TermTasks.Direct where
 import qualified Data.Map                         as M (fromAscList)
 
 import Data.List (nub, sort, (\\))
-import Control.Monad (when)
+import Control.Monad (unless, when)
 import Control.OutputCapable.Blocks (
   ArticleToUse (DefiniteArticle),
   GenericOutputCapable (indent, itemizeM, latex, refuse, text, paragraph),
@@ -59,10 +59,11 @@ genInst c@Certain{..} = do
   let Signature symbols = signatures
       correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
       displayStyle = style baseConf
+      earlyAnswersFeedback = earlyNumberOfAnswersFeedback baseConf
       moreFeedback = extraFeedback baseConf
       showSolution = printSolution baseConf
       addText = extraText baseConf
-  return $ SigInstance { symbols, terms, correct, displayStyle, moreFeedback, showSolution, addText }
+  return $ SigInstance { symbols, terms, correct, displayStyle, earlyAnswersFeedback, moreFeedback, showSolution, addText }
 
 
 verifyInst :: OutputCapable m => SigInstance -> LangM m
@@ -182,7 +183,8 @@ partialGrade SigInstance{..} sol
         refuse $ indent $ translate $ do
           english "At least one index in the list does not exist."
           german "Mindestens einer der Indizes existiert nicht."
-    | otherwise = pure ()
+    | otherwise = when earlyAnswersFeedback $
+        numberOfAnswersCheck True moreFeedback correct nubSol
   where
     nubSol = nub sol
     invalidIndex = any (`notElem` [1 .. length terms]) nubSol
@@ -193,20 +195,13 @@ completeGrade
   -> [Int]
   -> Rated m
 completeGrade SigInstance {..} sol = do
-  yesNo (not wrongAmount) $
-    translate $ do
-      english "The amount of indices is correct?"
-      german "Die Anzahl der Indizes ist richtig?"
-  when (wrongAmount && moreFeedback) $
-            if diff > 0
-              then
-                indent $ translate $ do
-                  english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
-                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
-              else
-                indent $ translate $ do
-                  english $ "The submitted solution is missing " ++ displayDiff ++ eng
-                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+  unless earlyAnswersFeedback $ do
+    yesNo (not wrongAmount) $
+      translate $ do
+        english "The amount of indices is correct?"
+        german "Die Anzahl der Indizes ist richtig?"
+    numberOfAnswersCheck False moreFeedback correct nubSol
+    pure ()
   when (showSolution || not wrongAmount) $ do
     yesNo (not wrongSolution) $
       translate $ do
@@ -233,7 +228,29 @@ completeGrade SigInstance {..} sol = do
   x <- multipleChoice (Just what) solution matching sol
   pure x
   where
-    assert = continueOrAbort showSolution
+    wrongAmount = diff /= 0
+    diff =  length nubSol - length correct
+    nubSol = nub sol
+    wrongSolution = sort nubSol /= sort correct
+    badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
+    displayHow = case displayStyle of
+      MathStyle    -> show
+      HaskellStyle -> haskellStyleTerm
+
+
+numberOfAnswersCheck :: OutputCapable m => Bool -> Bool -> [Int] -> [Int] -> LangM m
+numberOfAnswersCheck shouldRefuse moreFeedback correct nubSol =
+  when (wrongAmount && moreFeedback) $ (if shouldRefuse then refuse else id) $
+    if diff > 0
+      then
+        indent $ translate $ do
+          english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
+          german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
+      else
+        indent $ translate $ do
+          english $ "The submitted solution is missing " ++ displayDiff ++ eng
+          german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+  where
     wrongAmount = diff /= 0
     diff =  length nubSol - length correct
     displayDiff = show (abs diff)
@@ -241,9 +258,3 @@ completeGrade SigInstance {..} sol = do
       if abs diff == 1
       then (" index."," Index")
       else (" indices."," Indizes")
-    nubSol = nub sol
-    wrongSolution = sort nubSol /= sort correct
-    badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
-    displayHow = case displayStyle of
-      MathStyle    -> show
-      HaskellStyle -> haskellStyleTerm

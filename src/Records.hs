@@ -21,6 +21,7 @@ data Base = Base
             , wrongTerms :: [(Int,Error)]
             , properTerms :: Int
             , style :: DisplayStyle
+            , earlyNumberOfAnswersFeedback :: Bool
             , extraFeedback :: Bool
             , printSolution :: Bool
             , extraText :: ExtraText
@@ -33,6 +34,7 @@ dBase = Base
         , wrongTerms = [ (1,Swap), (1,TypeChange), (1,OneMore), (1,OneLess) ]
         , properTerms = 5
         , style = MathStyle
+        , earlyNumberOfAnswersFeedback = False
         , extraFeedback = True
         , printSolution = True
         , extraText = NoExtraText
@@ -106,6 +108,7 @@ data SigInstance = SigInstance {
                     , terms :: [Term String]
                     , correct :: [Int]
                     , displayStyle :: DisplayStyle
+                    , earlyAnswersFeedback :: Bool
                     , moreFeedback :: Bool
                     , showSolution :: Bool
                     , addText :: ExtraText
@@ -118,6 +121,7 @@ dSigInst = SigInstance {
             , terms = [Term "f" [Term "g" [], Term "h" [Term "g" []]], Term "g" [Term "h" []], Term "f" [Term "h" []]]
             , correct = [1]
             , displayStyle = MathStyle
+            , earlyAnswersFeedback = False
             , moreFeedback = True
             , showSolution = True
             , addText = NoExtraText
