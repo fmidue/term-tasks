@@ -85,8 +85,8 @@ verifyInst SigInstance{..}
 
     | doubleSolution =
         refuse $ indent $ translate $ do
-          english "At least one correct index is given multiple times."
-          german "Mindestens ein Lösungsindex wurde mehrfach angegeben."
+          english "At least one choice is given multiple times."
+          german "Mindestens eine Optionen wurde mehrfach angegeben."
 
     | otherwise = pure()
   where
@@ -181,8 +181,8 @@ partialGrade :: OutputCapable m => SigInstance -> [Int] -> LangM m
 partialGrade SigInstance{..} sol
     | invalidIndex =
         refuse $ indent $ translate $ do
-          english "At least one index in the list does not exist."
-          german "Mindestens einer der Indizes existiert nicht."
+          english "At least one choice in the list does not exist."
+          german "Mindestens eine der Optionen existiert nicht."
     | otherwise = when earlyAnswersFeedback $
         numberOfAnswersCheck True moreFeedback correct nubSol
   where
@@ -198,8 +198,8 @@ completeGrade SigInstance {..} sol = do
   unless earlyAnswersFeedback $ do
     yesNo (not wrongAmount) $
       translate $ do
-        english "The amount of indices is correct?"
-        german "Die Anzahl der Indizes ist richtig?"
+        english "The amount of choices is correct?"
+        german "Die Anzahl der Optionen ist richtig?"
     numberOfAnswersCheck False moreFeedback correct nubSol
     pure ()
   when (showSolution || not wrongAmount) $ do
@@ -256,5 +256,5 @@ numberOfAnswersCheck shouldRefuse moreFeedback correct nubSol =
     displayDiff = show (abs diff)
     (eng, ger) =
       if abs diff == 1
-      then (" index."," Index")
-      else (" indices."," Indizes")
+      then (" choice."," Option")
+      else (" choices."," Optionen")
