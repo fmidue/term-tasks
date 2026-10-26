@@ -25,6 +25,7 @@ import TermTasks.Direct                 (verifyCertain)
 import TermTasks.Records (
   Certain(..),
   Base(..),
+  DisplayStyle(..),
   )
 import TermTasks.DataType (
   Error(..),
@@ -54,6 +55,8 @@ makeConfig sig = Certain {
     termSizeRange = ( 6, 10 ),
     wrongTerms = [(1, Swap), (1, TypeChange), (1, OneMore), (1, OneLess)],
     properTerms = 5,
+    style = MathStyle,
+    earlyNumberOfAnswersFeedback = False,
     extraFeedback = True,
     printSolution = True,
     extraText = NoExtraText

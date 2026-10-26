@@ -23,6 +23,7 @@ import TermTasks.Direct                 (verifyCertain)
 import TermTasks.Records (
   Certain(..),
   Base(..),
+  DisplayStyle(..),
   )
 import TermTasks.DataType (
   Error(..),
@@ -53,6 +54,8 @@ makeConfig sig = Certain {
     termSizeRange = ( 6, 10 ),
     wrongTerms = [(1, Swap), (1, TypeChange), (1, OneMore), (1, OneLess)],
     properTerms = 5,
+    style = HaskellStyle,
+    earlyNumberOfAnswersFeedback = True,
     extraFeedback = True,
     printSolution = True,
     extraText = Static (M.fromList [
@@ -80,7 +83,7 @@ import Data.String.Interpolate          (i)
 import FlexTask.GenUtil                 (fromGen)
 import FlexTask.Form                    (Rendered, Widget)
 import TermTasks.Direct                 (genInst)
-import Form                             (termsForm)
+import TermTasks.Form                   (termsForm)
 
 import Global                           (TaskData)
 import TaskSettings                     (task)
@@ -101,20 +104,10 @@ checkers = [i|
 module Check where
 
 
-import qualified Data.Map               as M (fromAscList)
-
-import Control.Applicative              (Alternative)
-import Control.Monad                    (when)
 import Control.OutputCapable.Blocks
-import Data.Bifunctor                   (second)
-import Data.List                        (nub, sort, (\\\\))
-import Data.Tuple.Extra                 (dupe)
-import TermTasks.Records (
-  SigInstance(..)
-  )
+import TermTasks.Direct                 (completeGrade, partialGrade)
 
 import Global                           (Submission, TaskData)
-import Helpers                          (inMathit)
 
 
 checkSyntax
@@ -122,67 +115,16 @@ checkSyntax
   => TaskData
   -> Submission
   -> LangM m
-checkSyntax SigInstance{..} sol =
-  when (wrongAmount && moreFeedback) $
-            if diff > 0
-              then
-                refuse $ translate $ do
-                  english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
-                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
-              else
-                refuse $ translate $ do
-                  english $ "The submitted solution is missing " ++ displayDiff ++ eng
-                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
-  where
-    wrongAmount = diff /= 0
-    diff =  length nubSol - length correct
-    nubSol = nub sol
-    displayDiff = show (abs diff)
-    (eng, ger) =
-      if abs diff == 1
-      then (" choice."," Option")
-      else (" choices."," Optionen")
+checkSyntax = partialGrade
 
 
 checkSemantics
-  :: (Alternative m, OutputCapable m)
+  :: OutputCapable m
   => a
   -> TaskData
   -> Submission
   -> Rated m
-checkSemantics _ SigInstance{..} sol = do
-  when (showSolution || not wrongAmount) $ do
-    recoverFrom $ assert (not wrongSolution) $
-      translate $ do
-        english "Submitted solution is correct?"
-        german "Eingereichte Lösung ist richtig?"
-    when (wrongSolution && moreFeedback && not (null badTerms)) $ indent $ do
-            translate $ do
-              english "These incorrect expressions are part of the submitted solution: "
-              german "Diese Ausdrücke aus der eingereichten Lösung sind falsch: "
-            itemizeM $ map (latex . inMathit) badTerms
-            pure ()
-    pure ()
-  let what = translations $ do
-        english "expressions"
-        german "Ausdrücke"
-      solution =
-        if showSolution
-        then Just (DefiniteArticle, show correct)
-        else Nothing
-      matching = M.fromAscList $ map
-        (second (`elem` correct) . dupe)
-        [1 .. length terms]
-  paragraph (text "")
-  x <- multipleChoice (Just what) solution matching sol
-  pure x
-  where
-    assert = continueOrAbort showSolution
-    wrongAmount = diff /= 0
-    diff =  length nubSol - length correct
-    nubSol = nub sol
-    wrongSolution = sort nubSol /= sort correct
-    badTerms = map ((terms !!) . subtract 1) $ nubSol \\\\ correct
+checkSemantics _ = completeGrade
 
 |]
 
@@ -193,27 +135,16 @@ checkSemantics _ SigInstance{..} sol = do
 
 module Description (description) where
 
-import Control.OutputCapable.Blocks
-import Data.Foldable                    (traverse_)
-import TermTasks.Records                (SigInstance(..))
 
-import Messages                         (text1, text2)
+import qualified TermTasks.Direct       as D
+
+import Control.OutputCapable.Blocks     (LangM, OutputCapable)
+
 import Global                           (TaskData)
-import Helpers (
-  haskellStyleSignature,
-  -- itemifyTerm,
-  mathifySignature,
-  )
 
 
 description :: OutputCapable m => a -> TaskData -> LangM m
-description _ SigInstance{..} = do
-  text1
-  indent $ traverse_ (latex . mathifySignature . haskellStyleSignature) symbols
-  text2
-  -- indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
-  extra addText
-  pure ()
+description _ = D.description False
 
 =============================================
 
@@ -233,164 +164,3 @@ parseSubmission ::
   -> m Submission
 parseSubmission input = parseInfallibly formParser input <&> getAnswers
 
-=============================================
-
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ApplicativeDo #-}
-
-module Messages where
-
-import Control.OutputCapable.Blocks (
-  GenericOutputCapable (..),
-  LangM,
-  OutputCapable,
-  english,
-  german,
-  translate
-  )
-
-
-
-text1 :: OutputCapable m => LangM m
-text1 = paragraph $ translate $ do
-    german "Betrachten Sie die folgenden Deklarationen von Konstanten und Operationen:"
-    english "Consider the following declarations of constants and operations:"
-
-
-text2 :: OutputCapable m => LangM m
-text2 = paragraph $ translate $ do
-    german "Entscheiden Sie für die folgenden Optionen, ob es sich um korrekte Ausdrücke gemäß der oben gegebenen Deklarationen handelt."
-    english "Decide for the following choices whether or not they are correct expressions according to the declarations given above."
-
-=============================================
-
-module Helpers (
-  mathifySignature,
-  -- itemifyTerm,
-  inMathit,
-  haskellStyleSignature,
-  ) where
-
-
-import Data.List.Extra (
-  dropEnd,
-  intercalate,
-  notNull,
-  replace,
-  takeEnd
-  )
-import TermTasks.DataType               (Term(..), Symbol(..), name)
-
-
-
-mathifySignature :: String -> String
-mathifySignature s = open
-  ++ replace " : " (around " : ")
-      (replace " -> " (around " \\to ") $
-        replace " x " (around " \\times ") s)
-  ++ close
-  where
-    around snip = close ++ snip ++ open
-
-
--- itemifyTerm :: (Int, Term String) -> String
--- itemifyTerm (i,t) = show i ++ ".\\," ++ inMathit t
-
-
-inMathit :: Term String -> String
-inMathit t = open ++ haskellStyleTerm t ++ close
-
-
-open :: String
-open = "\\mathit{"
-
-
-close :: String
-close = "}"
-
-
-haskellStyleTerm :: Term String -> String
-haskellStyleTerm (Term x []) = x
-haskellStyleTerm (Term s [a,b])
-  | isInfix s = intercalate "\\ "
-    [ decideBrackets infixTermNeedsBrackets a
-    , drop 1 $ dropEnd 1 s
-    , decideBrackets infixTermNeedsBrackets b
-    ]
-haskellStyleTerm (Term s xs) = s ++ "\\ " ++
-  intercalate "\\ " (map (decideBrackets termNeedsBrackets) xs)
-
-
-decideBrackets :: (Term String -> Bool) -> Term String -> String
-decideBrackets decider t
-  | decider t = "(" ++ display ++ ")"
-  | otherwise = display
-  where display = haskellStyleTerm t
-
-
-termNeedsBrackets :: Term a -> Bool
-termNeedsBrackets (Term _ args) = notNull args
-
-
-infixTermNeedsBrackets :: Term String -> Bool
-infixTermNeedsBrackets (Term _ []) = False
-infixTermNeedsBrackets (Term s _) = isInfix s
-
-
-isInfix :: String -> Bool
-isInfix s = take 1 s == "(" && takeEnd 1 s == ")"
-
-
-haskellStyleSignature :: Symbol -> String
-haskellStyleSignature (Symbol s args result) = (if isInfix s then drop 1 (dropEnd 1 s) else s) ++ " :: " ++
-  foldr ((\next -> ((next ++ " -> ") ++)) . name) (name result) args
-
-
-===================================================
-
-{-# language FlexibleInstances #-}
-{-# language MultiParamTypeClasses #-}
-{-# language OverloadedStrings #-}
-{-# language TypeApplications #-}
-
-module Form (
-  termsForm,
-  ) where
-
-
-import FlexTask.Form (
-  Alignment(Vertical),
-  FlexForm,
-  MultipleChoiceSelection,
-  Rendered,
-  Widget,
-  formify,
-  labeledCheckboxes,)
-import Yesod (
-  RenderMessage(..),
-  fieldSettingsLabel,
-  )
-
-import TermTasks.Records                (SigInstance(terms))
-import Helpers                          (inMathit)
-
-
-
-data TermsLabel = TermsLabel
-
-
-instance RenderMessage FlexForm TermsLabel where
-  renderMessage _   ("en":_) _ = "Correct expressions: (indicate all)"
-  renderMessage _   _        _ = "Korrekte Ausdrücke: (alle angeben)"
-
-
-asMathNotation :: SigInstance -> [String]
-asMathNotation = map (("\\("++) . (++"\\)") . inMathit) . terms
-
-
-termsForm :: SigInstance -> Rendered Widget
-termsForm = formify @MultipleChoiceSelection Nothing
-  . labeledCheckboxes
-    Vertical
-    (fieldSettingsLabel TermsLabel)
-  . asMathNotation

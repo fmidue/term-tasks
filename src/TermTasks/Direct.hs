@@ -7,22 +7,20 @@ module TermTasks.Direct where
 import qualified Data.Map                         as M (fromAscList)
 
 import Data.List (nub, sort, (\\))
-import Control.Applicative (Alternative)
-import Control.Monad (when)
+import Control.Monad (unless, when)
 import Control.OutputCapable.Blocks (
   ArticleToUse (DefiniteArticle),
   GenericOutputCapable (indent, itemizeM, latex, refuse, text, paragraph),
   LangM,
   OutputCapable,
   Rated,
-  continueOrAbort,
   english,
   extra,
   german,
   multipleChoice,
-  recoverFrom,
   translate,
   translations,
+  yesNo,
   )
 import Data.Bifunctor (second)
 import Data.Foldable (traverse_)
@@ -32,7 +30,7 @@ import Test.QuickCheck (Gen, shuffle)
 import TermTasks.Helpers
 import TermTasks.Messages
 import DataType (Signature(..), Symbol(..), Type(..), termSize)
-import Records (Base(..), Certain(..), SigInstance(..))
+import Records (Base(..), Certain(..), DisplayStyle(..), SigInstance(..))
 import qualified Tasks.CertainSignature as CertainSignature
 
 
@@ -40,12 +38,16 @@ import qualified Tasks.CertainSignature as CertainSignature
 description :: OutputCapable m => Bool -> SigInstance -> LangM m
 description textVersion SigInstance{..} = do
   text1
-  indent $ traverse_ (latex . mathifySignature . show) symbols
+  indent $ traverse_ (latex . mathifySignature . displaySignature) symbols
   text2
-  when textVersion $ indent $ traverse_ (latex . itemifyTerm) $ zip [1 :: Int ..] terms
+  when textVersion $ indent $ traverse_ (latex . itemifyTerm . second displayTerm) $ zip [1 :: Int ..] terms
   when textVersion text3
   extra addText
   pure ()
+  where
+    (displaySignature, displayTerm) = case displayStyle of
+      MathStyle    -> (show, show)
+      HaskellStyle -> (haskellStyleSignature, haskellStyleTerm)
 
 
 genInst :: Certain -> Gen SigInstance
@@ -56,10 +58,12 @@ genInst c@Certain{..} = do
     $ map (True,) correctTerms ++ map (False,) (concat incorrectTerms)
   let Signature symbols = signatures
       correct = [ i | (i,True) <- zip [1 :: Int ..] correctness]
+      displayStyle = style baseConf
+      earlyAnswersFeedback = earlyNumberOfAnswersFeedback baseConf
       moreFeedback = extraFeedback baseConf
       showSolution = printSolution baseConf
       addText = extraText baseConf
-  return $ SigInstance { symbols, terms, correct, moreFeedback, showSolution, addText }
+  return $ SigInstance { symbols, terms, correct, displayStyle, earlyAnswersFeedback, moreFeedback, showSolution, addText }
 
 
 verifyInst :: OutputCapable m => SigInstance -> LangM m
@@ -81,8 +85,13 @@ verifyInst SigInstance{..}
 
     | doubleSolution =
         refuse $ indent $ translate $ do
-          english "At least one correct index is given multiple times."
-          german "Mindestens ein Lösungsindex wurde mehrfach angegeben."
+          english "At least one choice is given multiple times."
+          german "Mindestens eine Optionen wurde mehrfach angegeben."
+
+    | earlyAnswersFeedback && not moreFeedback =
+        refuse $ indent $ translate $ do
+          english "'earlyAnswersFeedback' does not have any effect without 'moreFeedback' enabled."
+          german "'earlyAnswersFeedback' hat ohne 'moreFeedback' keinen Effekt."
 
     | otherwise = pure()
   where
@@ -157,6 +166,10 @@ verifyBase Base{..}
             "Mindestens einer der Fehlertypen wurde mehrfach mit verschiedener Anzahl angegeben. " ++
             "(kann in doppelten Termen in der Aufgabe resultieren)"
 
+    | earlyNumberOfAnswersFeedback && not extraFeedback =
+        refuse $ indent $ translate $ do
+          english "'earlyNumberOfAnswersFeedback' does not have any effect without 'extraFeedback' enabled."
+          german "'earlyNumberOfAnswersFeedback' hat ohne 'extraFeedback' keinen Effekt."
 
     | otherwise = pure()
   where
@@ -177,35 +190,29 @@ partialGrade :: OutputCapable m => SigInstance -> [Int] -> LangM m
 partialGrade SigInstance{..} sol
     | invalidIndex =
         refuse $ indent $ translate $ do
-          english "At least one index in the list does not exist."
-          german "Mindestens einer der Indizes existiert nicht."
-    | otherwise = pure ()
+          english "At least one choice in the list does not exist."
+          german "Mindestens eine der Optionen existiert nicht."
+    | otherwise = when earlyAnswersFeedback $
+        numberOfAnswersCheck True moreFeedback correct nubSol
   where
     nubSol = nub sol
     invalidIndex = any (`notElem` [1 .. length terms]) nubSol
 
 completeGrade
-  :: (Alternative m, OutputCapable m)
+  :: OutputCapable m
   => SigInstance
   -> [Int]
   -> Rated m
 completeGrade SigInstance {..} sol = do
-  recoverFrom $ assert (not wrongAmount) $
-    translate $ do
-      english "The amount of indices is correct?"
-      german "Die Anzahl der Indizes ist richtig?"
-  when (wrongAmount && moreFeedback) $
-            if diff > 0
-              then
-                indent $ translate $ do
-                  english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
-                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
-              else
-                indent $ translate $ do
-                  english $ "The submitted solution is missing " ++ displayDiff ++ eng
-                  german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+  unless earlyAnswersFeedback $ do
+    yesNo (not wrongAmount) $
+      translate $ do
+        english "The amount of choices is correct?"
+        german "Die Anzahl der Optionen ist richtig?"
+    numberOfAnswersCheck False moreFeedback correct nubSol
+    pure ()
   when (showSolution || not wrongAmount) $ do
-    recoverFrom $ assert (not wrongSolution) $
+    yesNo (not wrongSolution) $
       translate $ do
         english "Submitted solution is correct?"
         german "Eingereichte Lösung ist richtig?"
@@ -213,7 +220,7 @@ completeGrade SigInstance {..} sol = do
             translate $ do
               english "These incorrect terms are part of the submitted solution: "
               german "Diese Terme aus der eingereichten Lösung sind falsch: "
-            itemizeM $ map (latex . inMathit) badTerms
+            itemizeM $ map (latex . inMathit . displayHow) badTerms
             pure ()
     pure ()
   let what = translations $ do
@@ -230,14 +237,33 @@ completeGrade SigInstance {..} sol = do
   x <- multipleChoice (Just what) solution matching sol
   pure x
   where
-    assert = continueOrAbort showSolution
+    wrongAmount = diff /= 0
+    diff =  length nubSol - length correct
+    nubSol = nub sol
+    wrongSolution = sort nubSol /= sort correct
+    badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
+    displayHow = case displayStyle of
+      MathStyle    -> show
+      HaskellStyle -> haskellStyleTerm
+
+
+numberOfAnswersCheck :: OutputCapable m => Bool -> Bool -> [Int] -> [Int] -> LangM m
+numberOfAnswersCheck shouldRefuse moreFeedback correct nubSol =
+  when (wrongAmount && moreFeedback) $ (if shouldRefuse then refuse else id) $
+    if diff > 0
+      then
+        indent $ translate $ do
+          english $ "The submitted solution contains " ++ displayDiff ++ " additional " ++ eng
+          german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu viel."
+      else
+        indent $ translate $ do
+          english $ "The submitted solution is missing " ++ displayDiff ++ eng
+          german $ "Die eingereichte Lösung enthält " ++ displayDiff ++ ger ++ " zu wenig."
+  where
     wrongAmount = diff /= 0
     diff =  length nubSol - length correct
     displayDiff = show (abs diff)
     (eng, ger) =
       if abs diff == 1
-      then (" index."," Index")
-      else (" indices."," Indizes")
-    nubSol = nub sol
-    wrongSolution = sort nubSol /= sort correct
-    badTerms = map ((terms !!) . subtract 1) $ nubSol \\ correct
+      then (" choice."," Option")
+      else (" choices."," Optionen")
